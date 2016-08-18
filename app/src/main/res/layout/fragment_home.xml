@@ -1,0 +1,87 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="layout.HomeFragment">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.40"
+            android:layout_marginTop="55dp"
+            android:background="#ffffff">
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                android:name="com.google.android.gms.maps.MapFragment"
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.60"
+            android:background="#ffffff">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/request_search_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/radius_spinner_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:text="Requests within"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="5dp"/>
+
+                <Spinner
+                    android:id="@+id/radius_spinner"
+                    android:layout_toRightOf="@+id/radius_spinner_label"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_height="wrap_content"
+                    android:prompt="@string/radius_spinner_title"/>
+
+                <!--<android.support.v7.widget.SearchView
+                    android:id="@+id/request_search"
+                    android:layout_below="@+id/radius_spinner_label"
+                    android:icon="@drawable/ic_search_white_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:showAsAction="always"/> -->
+
+            </RelativeLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:layout_below="@+id/request_search_layout"
+                    android:id="@+id/request_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+            </RelativeLayout>
+
+
+
+        </ScrollView>
+
+    </LinearLayout>
+
+
+</FrameLayout>

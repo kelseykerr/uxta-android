@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottomBarHomeItem"
+        android:icon="@drawable/ic_home_white_24dp"
+        android:title="Home" />
+    <!--<item
+        android:id="@+id/bottomBarItemTwo"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="Search" /> -->
+    <item
+        android:id="@+id/bottomBarRequestItem"
+        android:icon="@drawable/ic_add_white_24dp"
+        android:title="New Request" />
+
+    <!--<item
+        android:id="@+id/bottomBarItemFour"
+        android:icon="@drawable/ic_my_location_white_24dp"
+        android:title="Location" />-->
+
+
+    <item
+        android:id="@+id/bottomBarAccountItem"
+        android:icon="@drawable/ic_person_outline_white_24dp"
+        android:title="Account" />
+
+
+
+</menu>
