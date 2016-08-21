@@ -120,7 +120,7 @@ public class LandingActivity extends AppCompatActivity
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/user");
+                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/users/me");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);

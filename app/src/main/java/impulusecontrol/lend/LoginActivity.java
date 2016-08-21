@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                                     JSONObject object,
                                     GraphResponse response) {
                                 try {
+                                    Log.e("token: ", loginResult.getAccessToken().getToken());
                                     user = new User();
                                     user.setFacebookId(object.getString("id").toString());
                                     String email = object.has("email") ?
@@ -74,7 +75,6 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(LoginActivity.this, LandingActivity.class);
                                 startActivity(intent);
                                 finish();
-
                             }
 
                         });
