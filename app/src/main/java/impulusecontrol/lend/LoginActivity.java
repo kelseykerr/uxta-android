@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
         if(user != null && user.getAccessToken() != null){
-            Log.e("current token: ", user.getAccessToken());
+            Log.e("Current token: ", user.getAccessToken());
 
             Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
 
