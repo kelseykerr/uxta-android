@@ -1,11 +1,9 @@
 package impulusecontrol.lend;
 
-import java.io.Serializable;
-
 /**
  * Created by kerrk on 7/16/16.
  */
-public class User implements Serializable {
+public class User extends BaseEntity {
 
     private String userId;
 
@@ -18,6 +16,24 @@ public class User implements Serializable {
     private String name;
 
     private String accessToken;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String phone;
+
+    private String address;
+
+    private String addressLine2;
+
+    private String city;
+
+    private String state;
+
+    private String zip;
+
+    private String _id;
 
     public User() {
 
@@ -69,5 +85,77 @@ public class User implements Serializable {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAddressLine2() {
+        return addressLine2;
+    }
+
+    public void setAddressLine2(String addressLine2) {
+        this.addressLine2 = addressLine2;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }

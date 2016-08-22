@@ -1,21 +1,17 @@
 package impulusecontrol.lend;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 
 /**
  * Created by kerrk on 8/7/16.
  */
-public class Request {
-
-    private String id;
+public class Request extends BaseEntity {
 
     private User user;
 
     private String itemName;
-
-    private Double longitude;
-
-    private Double latitude;
 
     private Date postDate;
 
@@ -27,13 +23,8 @@ public class Request {
 
     private String description;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    @JsonProperty("location")
+    private Location location = new Location();
 
     public User getUser() {
         return user;
@@ -52,19 +43,19 @@ public class Request {
     }
 
     public Double getLongitude() {
-        return longitude;
+        return location.longitude;
     }
 
     public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+        this.location.longitude = longitude;
     }
 
     public Double getLatitude() {
-        return latitude;
+        return location.latitude;
     }
 
     public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+        this.location.latitude = latitude;
     }
 
     public Date getPostDate() {
@@ -105,5 +96,32 @@ public class Request {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public static class Location {
+
+        public Location() {
+
+        }
+
+        private Double longitude;
+
+        private Double latitude;
+
+        public Double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(Double longitude) {
+            this.longitude = longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(Double latitude) {
+            this.latitude = latitude;
+        }
     }
 }

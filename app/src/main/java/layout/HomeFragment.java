@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,14 +35,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
-import impulusecontrol.lend.Category;
+import impulusecontrol.lend.AppUtils;
+import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
 import impulusecontrol.lend.Request;
 import impulusecontrol.lend.RequestAdapter;
+import impulusecontrol.lend.User;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,6 +75,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     FragmentTransaction ft;
     MapFragment mapFragment;
     private Context context;
+    private User user;
+    private List<Request> requests = new ArrayList<>();
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -95,6 +105,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
         mapFragment.getMapAsync(this);
+        user= PrefUtils.getCurrentUser(context);
+
 
         // Spinner element
         Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
@@ -103,16 +115,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         spinner.setOnItemSelectedListener(this);
 
         // Spinner Drop down elements
-        List<String> radiusList = new ArrayList<String>();
-        radiusList.add(".1 miles");
-        radiusList.add(".25 miles");
-        radiusList.add(".5 miles");
-        radiusList.add("1 mile");
-        radiusList.add("5 miles");
-        radiusList.add("10 miles");
+        List<Double> radiusList = new ArrayList<Double>();
+        radiusList.add(.1);
+        radiusList.add(.25);
+        radiusList.add(.5);
+        radiusList.add(1.0);
+        radiusList.add(5.0);
+        radiusList.add(10.0);
 
         // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, radiusList);
+        ArrayAdapter<Double> dataAdapter = new ArrayAdapter<Double>(context, android.R.layout.simple_spinner_item, radiusList);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -127,8 +139,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         recList.setLayoutManager(llm);
 
         //TODO: fetch requests from server
-        List<Request> requests = new ArrayList<>();
-        Category cat = new Category();
+        /*Category cat = new Category();
         cat.setId("1");
         cat.setName("dummy category");
         Request r1 = new Request();
@@ -154,22 +165,52 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         r3.setDescription("a dummy request");
         requests.add(r1);
         requests.add(r2);
-        requests.add(r3);
-
+        requests.add(r3);*/
         RequestAdapter ca = new RequestAdapter(requests);
         recList.setAdapter(ca);
 
         return v;
     }
 
+    private void getRequests(final Double radius) {
+        new AsyncTask<Void,Void,Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (latLng == null) {
+                    return null;
+                }
+                try {
+                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/requests?radius="
+                            + radius + "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
+                        String output = AppUtils.getResponseContent(conn);
+                        try {
+                            requests = AppUtils.jsonStringToRequestList(output);
+                        } catch (IOException e) {
+                            Log.e("Error", "Recieved an error while trying to fetch " +
+                                    "requests from server, please try again later!");
+                        }
+                    Log.i("request ", "size: " + requests.size());
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not get requests: " + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
-
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+        // On selecting a radius from the spinner
+        Double radius = (Double) parent.getItemAtPosition(position);
+        // Get requests within that radius
+        getRequests(radius);
     }
+
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
     }
@@ -212,6 +253,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
+            getRequests(.1);
         }
 
         mLocationRequest = new LocationRequest();
@@ -249,6 +291,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
+        Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         currLocationMarker = map.addMarker(markerOptions);
@@ -264,6 +307,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
+        getRequests(.1);
         //ft.show(mapFragment).commit();
 
     }
