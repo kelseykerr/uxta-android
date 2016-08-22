@@ -77,6 +77,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private Context context;
     private User user;
     private List<Request> requests = new ArrayList<>();
+    private RecyclerView recList;
 
 
     private OnFragmentInteractionListener mListener;
@@ -132,43 +133,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
-        RecyclerView recList = (RecyclerView) v.findViewById(R.id.request_list);
+        recList = (RecyclerView) v.findViewById(R.id.request_list);
         recList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-
-        //TODO: fetch requests from server
-        /*Category cat = new Category();
-        cat.setId("1");
-        cat.setName("dummy category");
-        Request r1 = new Request();
-        r1.setId("1");
-        r1.setItemName("Item 1");
-        r1.setCategory(cat);
-        r1.setPostDate(new Date());
-        //r1.setExpireDate(new Date() + );
-        r1.setDescription("a dummy request");
-        Request r2 = new Request();
-        r2.setId("2");
-        r2.setItemName("Item 2");
-        r2.setCategory(cat);
-        r2.setPostDate(new Date());
-        //r1.setExpireDate(new Date() + );
-        r2.setDescription("a dummy request");
-        Request r3 = new Request();
-        r3.setId("3");
-        r3.setItemName("Item 3");
-        r3.setCategory(cat);
-        r3.setPostDate(new Date());
-        //r1.setExpireDate(new Date() + );
-        r3.setDescription("a dummy request");
-        requests.add(r1);
-        requests.add(r2);
-        requests.add(r3);*/
-        RequestAdapter ca = new RequestAdapter(requests);
-        recList.setAdapter(ca);
-
         return v;
     }
 
@@ -187,14 +156,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("x-auth-token", user.getAccessToken());
-                        String output = AppUtils.getResponseContent(conn);
+                    String output = AppUtils.getResponseContent(conn);
                         try {
                             requests = AppUtils.jsonStringToRequestList(output);
                         } catch (IOException e) {
-                            Log.e("Error", "Recieved an error while trying to fetch " +
+                            Log.e("Error", "Received an error while trying to fetch " +
                                     "requests from server, please try again later!");
                         }
-                    Log.i("request ", "size: " + requests.size());
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not get requests: " + e.getMessage());
                 }
@@ -209,6 +177,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         Double radius = (Double) parent.getItemAtPosition(position);
         // Get requests within that radius
         getRequests(radius);
+        if (recList != null) {
+            RequestAdapter ca = new RequestAdapter(requests);
+            recList.setAdapter(ca);
+        }
     }
 
     public void onNothingSelected(AdapterView<?> arg0) {
@@ -254,6 +226,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
             getRequests(.1);
+            if (recList != null) {
+                RequestAdapter ca = new RequestAdapter(requests);
+                recList.setAdapter(ca);
+            }
         }
 
         mLocationRequest = new LocationRequest();
@@ -308,6 +284,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
         getRequests(.1);
+        if (recList != null) {
+            RequestAdapter ca = new RequestAdapter(requests);
+            recList.setAdapter(ca);
+        }
         //ft.show(mapFragment).commit();
 
     }

@@ -29,7 +29,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         Request r = requests.get(i);
         requestViewHolder.vItemName.setText(r.getItemName());
         requestViewHolder.vPostedDate.setText(r.getPostDate().toString());
-        requestViewHolder.vCategoryName.setText(r.getCategory().getName());
+        requestViewHolder.vCategoryName.setText(r.getCategory() != null ? r.getCategory().getName() : "");
         requestViewHolder.vDescription.setText(r.getDescription());
     }
 
