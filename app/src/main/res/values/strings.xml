@@ -7,4 +7,19 @@
     <string name="ok">ok</string>
     <string name="radius_spinner_title">radius</string>
     <string name="permission_fine_location_rationale">Location is used to display requests in your area and find matches for request you make</string>
+    <string-array name="request_type_array">
+        <item>item</item>
+        <item>service</item>
+    </string-array>
+    <string name="request_type_prompt">request type</string>
+    <string name="request_category_prompt">select a category</string>
+    <string name="nearby_api_path">http://ec2-54-242-74-234.compute-1.amazonaws.com/api</string>
+    <string name="home_fragment_tag">home</string>
+    <string name="account_fragment_tag">account</string>
+    <string name="request_fragment_tag">request</string>
+    <string-array name="request_category_array">
+        <item>select a category...</item>
+        <item>tools</item>
+    </string-array>
+
 </resources>

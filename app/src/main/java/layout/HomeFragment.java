@@ -24,6 +24,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -40,14 +42,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import impulusecontrol.lend.AppUtils;
+import impulusecontrol.lend.Constants;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
-import impulusecontrol.lend.Request;
+import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.RequestAdapter;
-import impulusecontrol.lend.User;
+import impulusecontrol.lend.model.User;
 
 
 /**
@@ -78,6 +80,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private User user;
     private List<Request> requests = new ArrayList<>();
     private RecyclerView recList;
+    private RequestAdapter requestAdapter;
+    private List<Marker> requestMarkers = new ArrayList<>();
 
 
     private OnFragmentInteractionListener mListener;
@@ -100,14 +104,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v =  inflater.inflate(R.layout.fragment_home, container, false);
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
         mapFragment = (MapFragment) this.getChildFragmentManager()
                 .findFragmentById(R.id.map);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
         mapFragment.getMapAsync(this);
-        user= PrefUtils.getCurrentUser(context);
-
+        user = PrefUtils.getCurrentUser(context);
 
         // Spinner element
         Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
@@ -142,31 +145,76 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void getRequests(final Double radius) {
-        new AsyncTask<Void,Void,Void>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 if (latLng == null) {
                     return null;
                 }
                 try {
-                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/requests?radius="
-                            + radius + "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude);
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + radius +
+                            "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
+                            "&includeMine=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("x-auth-token", user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
-                        try {
-                            requests = AppUtils.jsonStringToRequestList(output);
-                        } catch (IOException e) {
-                            Log.e("Error", "Received an error while trying to fetch " +
-                                    "requests from server, please try again later!");
-                        }
+                    try {
+                        requests = AppUtils.jsonStringToRequestList(output);
+                    } catch (IOException e) {
+                        Log.e("Error", "Received an error while trying to fetch " +
+                                "requests from server, please try again later!");
+                    }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not get requests: " + e.getMessage());
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (requestAdapter != null) {
+                    requestAdapter.swap(requests);
+                }
+                if (requestMarkers != null) {
+                    //remove old markers
+                    for (Marker m : requestMarkers) {
+                        m.remove();
+                    }
+                }
+                requestMarkers.clear();
+                if (requests.size() < 1) {
+                    if (latLng != null) {
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(latLng).zoom(15).build();
+                        map.animateCamera(CameraUpdateFactory
+                                .newCameraPosition(cameraPosition));
+                        PrefUtils.setLatLng(latLng);
+                    }
+                    return;
+                }
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(currLocationMarker.getPosition());
+
+                //TODO: up android version & use java 8 streams here
+                for (Request request : requests) {
+                    LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    markerOptions.title(request.getItemName());
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    Marker marker = map.addMarker(markerOptions);
+                    requestMarkers.add(marker);
+                    builder.include(marker.getPosition());
+                }
+
+                LatLngBounds bounds = builder.build();
+                int padding = 120; // offset from edges of the map in pixels
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                map.moveCamera(cu);
+
             }
         }.execute();
     }
@@ -177,10 +225,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         Double radius = (Double) parent.getItemAtPosition(position);
         // Get requests within that radius
         getRequests(radius);
-        if (recList != null) {
-            RequestAdapter ca = new RequestAdapter(requests);
-            recList.setAdapter(ca);
-        }
+
     }
 
     public void onNothingSelected(AdapterView<?> arg0) {
@@ -220,6 +265,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         }
         if (mLastLocation != null) {
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            PrefUtils.setLatLng(latLng);
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("Current Position");
@@ -227,8 +273,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             currLocationMarker = map.addMarker(markerOptions);
             getRequests(.1);
             if (recList != null) {
-                RequestAdapter ca = new RequestAdapter(requests);
-                recList.setAdapter(ca);
+                requestAdapter = new RequestAdapter(requests);
+                recList.setAdapter(requestAdapter);
             }
         }
 
@@ -248,12 +294,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onConnectionSuspended(int i) {
-        Toast.makeText(context,"onConnectionSuspended",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(context,"onConnectionFailed",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "onConnectionFailed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -284,10 +330,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
         getRequests(.1);
-        if (recList != null) {
-            RequestAdapter ca = new RequestAdapter(requests);
-            recList.setAdapter(ca);
-        }
+        requestAdapter.swap(requests);
         //ft.show(mapFragment).commit();
 
     }

@@ -1,4 +1,6 @@
-package impulusecontrol.lend;
+package impulusecontrol.lend.model;
+
+import impulusecontrol.lend.BaseEntity;
 
 /**
  * Created by kerrk on 7/16/16.

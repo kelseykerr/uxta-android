@@ -1,6 +1,7 @@
 package impulusecontrol.lend;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-/**
- * Created by kerrk on 8/7/16.
- */
+import impulusecontrol.lend.model.Request;
+
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private List<Request> requests;
@@ -27,9 +27,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
-        requestViewHolder.vItemName.setText(r.getItemName());
-        requestViewHolder.vPostedDate.setText(r.getPostDate().toString());
-        requestViewHolder.vCategoryName.setText(r.getCategory() != null ? r.getCategory().getName() : "");
+        String htmlString = r.getUser().getFirstName() + " requested a <b>" +
+                r.getItemName() + "</b>";
+        requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
+        String diff = AppUtils.getTimeDiffString(r.getPostDate());
+        requestViewHolder.vPostedDate.setText(diff);
+        if (r.getCategory() == null) {
+            requestViewHolder.vCategoryName.setVisibility(View.GONE);
+        } else {
+            requestViewHolder.vCategoryName.setText(r.getCategory().getName());
+        }
         requestViewHolder.vDescription.setText(r.getDescription());
     }
 
@@ -40,6 +47,12 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 inflate(R.layout.request_card, viewGroup, false);
 
         return new RequestViewHolder(itemView);
+    }
+
+    public void swap(List<Request> newRequests){
+        requests.clear();
+        requests.addAll(newRequests);
+        notifyDataSetChanged();
     }
 
 

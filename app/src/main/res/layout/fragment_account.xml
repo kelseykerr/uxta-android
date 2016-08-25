@@ -25,8 +25,8 @@
                     android:id="@+id/profileImage"
                     android:layout_width="90dp"
                     android:layout_height="120dp"
-                    android:layout_marginTop="60dp"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginTop="60dp"
                     android:background="#ffffff" />
 
 
@@ -34,9 +34,9 @@
                     android:id="@+id/user_profile_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
                     android:layout_marginTop="76dp"
                     android:layout_toRightOf="@+id/profileImage"
-                    android:layout_marginLeft="10dp"
                     android:textColor="#585757"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -46,119 +46,63 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/user_profile_name"
-                    android:layout_toRightOf="@+id/profileImage"
-                    android:layout_marginLeft="10dp"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="30dp"
                     android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/profileImage"
                     android:text="2500 Wisconsin Ave NW"
                     android:textColor="#585757"
                     android:textSize="14sp" />
+
                 <TextView
                     android:id="@+id/user_city_zip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/user_home_address_street"
-                    android:layout_toRightOf="@+id/profileImage"
-                    android:layout_marginLeft="10dp"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="30dp"
                     android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/profileImage"
                     android:text="Washington, D.C. 20007"
                     android:textColor="#585757"
                     android:textSize="14sp" />
 
-                <TextView android:text="Logout"
+                <TextView
                     android:id="@+id/logout_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/profileImage"
-                    android:padding="10dp"
-                    android:layout_marginTop="5dp"
-                    android:background="#494949"
-                    android:textColor="#fff"
-                    android:layout_marginLeft="10dp"
                     android:layout_below="@+id/user_city_zip"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/profileImage"
+                    android:background="#4EE2EC"
+                    android:padding="10dp"
+                    android:text="Logout"
+                    android:textColor="#fff" />
 
             </RelativeLayout>
-
-
-            <LinearLayout
-                android:layout_width="fill_parent"
+            <TextView
+                android:id="@+id/recent_requests_heading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/profile_layout"
-                android:layout_marginTop="5dp"
-                android:orientation="vertical">
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:padding="10dp"
+                android:text="my recent requests:"
+                android:textColor="#585757"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/open_requests"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/user_profile_name"
-                    android:layout_toRightOf="@+id/profileImage"
-                    android:layout_marginLeft="10dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="12dp"
-                    android:text="open requests:"
-                    android:textColor="#585757"
-                    android:textSize="14sp" />
+                <android.support.v7.widget.RecyclerView
+                    android:layout_below="@+id/recent_requests_heading"
+                    android:id="@+id/recent_request_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="#fff"
-                    android:textColor="#585757"
-                    android:clickable="true"
-                    android:elevation="4dp"
-                    android:padding="20dp"
-                    android:text="Request for X object" />
-
-                <TextView
-                    android:id="@+id/recent_transactions"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/user_profile_name"
-                    android:layout_toRightOf="@+id/profileImage"
-                    android:layout_marginLeft="10dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="12dp"
-                    android:text="recent requests:"
-                    android:textColor="#585757"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="#fff"
-                    android:clickable="true"
-                    android:elevation="4dp"
-                    android:padding="20dp"
-                    android:text="Gave a drill" />
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginTop="3dp"
-                    android:background="#fff"
-                    android:clickable="true"
-                    android:elevation="4dp"
-                    android:padding="20dp"
-                    android:text="borrowed a dress" />
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="#fff"
-                    android:clickable="true"
-                    android:elevation="4dp"
-                    android:padding="20dp"
-                    android:text="borrowed an umbrella" />
-            </LinearLayout>
-        </RelativeLayout>
+            </RelativeLayout>
     </ScrollView>
 
 </FrameLayout>

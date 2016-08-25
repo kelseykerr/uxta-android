@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import impulusecontrol.lend.model.User;
+
 public class LoginActivity extends AppCompatActivity {
 
     private TextView info;

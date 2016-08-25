@@ -23,19 +23,23 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import impulusecontrol.lend.model.User;
 import layout.AccountFragment;
 import layout.HomeFragment;
+import layout.NewRequestFragment;
 
 /**
  * Created by kerrk on 7/17/16.
  */
 public class LandingActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
-        HomeFragment.OnFragmentInteractionListener {
+        HomeFragment.OnFragmentInteractionListener,
+        NewRequestFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
     private BottomBar mBottomBar;
+    private Integer currentMenuItem;
     FragmentManager fragmentManager = getFragmentManager();
 
     /**
@@ -76,47 +80,103 @@ public class LandingActivity extends AppCompatActivity
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
-
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    HomeFragment fragment = HomeFragment.newInstance();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment)
-                            .commit();
+                    if(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                                .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
+                                .commit();
+                    } else {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                                .add(R.id.content_frame, HomeFragment.newInstance(), Constants.HOME_FRAGMENT_TAG)
+                                .commit();
+                    }
+                    hideOtherFragments("home", R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    AccountFragment fragment = AccountFragment.newInstance();
+                    if(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
+                                .show(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
+                                .commit();
+                    } else {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
+                                .add(R.id.content_frame, AccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                                .commit();
+                    }
+                    hideOtherFragments("account", R.animator.exit_to_right);
+                } else {
+                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
+                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
+                    if(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG) != null) {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(firstAnim, secondAnim)
+                                .show(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG))
+                                .commit();
+                    } else {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(firstAnim, secondAnim)
+                                .add(R.id.content_frame, NewRequestFragment.newInstance(), Constants.REQUEST_FRAGMENT_TAG)
+                                .commit();
+                    }
+                   hideOtherFragments(Constants.REQUEST_FRAGMENT_TAG, secondAnim);
+                }
+                currentMenuItem = menuItemId;
+            }
 
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment)
-                            .commit();
+            public void hideOtherFragments(String current, int leaveAnimation) {
+                if (!current.equals(Constants.HOME_FRAGMENT_TAG)) {
+                    if(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null){
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(0, leaveAnimation)
+                                .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
+                                .commit();
+                    }
+                }
+                if (!current.equals(Constants.REQUEST_FRAGMENT_TAG)) {
+                    if(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG) != null){
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(0, leaveAnimation)
+                                .hide(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG))
+                                .commit();
+                    }
+                }
+                if (!current.equals(Constants.ACCOUNT_FRAGMENT_TAG)) {
+                    if(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null){
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(0, leaveAnimation)
+                                .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
+                                .commit();
+                    }
                 }
             }
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                if (menuItemId == R.id.bottomBarHomeItem) {
+                /*if (menuItemId == R.id.bottomBarHomeItem) {
                     HomeFragment fragment = HomeFragment.newInstance();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment)
+                            .replace(R.id.content_frame, fragment, Constants.HOME_FRAGMENT_TAG)
                             .commit();
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                        AccountFragment fragment = AccountFragment.newInstance();
-
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.content_frame, fragment)
-                                .commit();
-                }
+                    AccountFragment fragment = AccountFragment.newInstance();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.content_frame, fragment, Constants.ACCOUNT_FRAGMENT_TAG)
+                            .commit();
+                }*/
             }
         });
 
-        user=PrefUtils.getCurrentUser(LandingActivity.this);
+        user = PrefUtils.getCurrentUser(LandingActivity.this);
         Log.e("user access token: ", user.getAccessToken());
         Log.e("user name: ", user.getName());
 
         // this isn't necessary ....just testing the server setup
-        new AsyncTask<Void,Void,Void>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
@@ -143,13 +203,6 @@ public class LandingActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.radius_spinner) {
-            //TODO: make call to server to get requests within radius
-            return super.onOptionsItemSelected(item);
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

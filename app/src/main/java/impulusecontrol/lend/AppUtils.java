@@ -4,13 +4,15 @@ import android.util.Log;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.Deserializers;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.List;
+
+import impulusecontrol.lend.model.Request;
 
 /**
  * Created by kerrk on 8/21/16.
@@ -25,12 +27,10 @@ public class AppUtils {
 
     public static List<Request> jsonStringToRequestList(String jsonString) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        Log.e("blah", jsonString);
         try {
             List<Request> pojos = mapper.readValue(jsonString, new TypeReference<List<Request>>() {});
             return pojos;
         } catch (IOException e) {
-            Log.e("blah blah", e.getMessage());
             throw new IOException(e);
         }
     }
@@ -50,5 +50,25 @@ public class AppUtils {
             sb.append(output);
         }
         return sb.toString();
+    }
+
+    public static String getTimeDiffString(Date start) {
+        long diff = new Date().getTime() - start.getTime();
+
+        long diffMinutes = diff / (60 * 1000) % 60;
+        long diffHours = diff / (60 * 60 * 1000);
+        int diffDays = (int) diff / (1000 * 60 * 60 * 24);
+
+        if (diffDays > 1) {
+            return diffDays + " days ago";
+        } else if (diffDays == 1) {
+            return diffDays + " day ago";
+        } else if (diffHours >= 1) {
+            return diffHours + " hours ago";
+        } else if (diffMinutes > 1) {
+            return diffMinutes + " minutes ago";
+        } else {
+            return "a moment ago";
+        }
     }
 }
