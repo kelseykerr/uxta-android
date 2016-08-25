@@ -11,15 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import impulusecontrol.lend.AppUtils;
@@ -27,6 +31,7 @@ import impulusecontrol.lend.Category;
 import impulusecontrol.lend.Constants;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
+import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.model.User;
 
 /**
@@ -41,6 +46,9 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     private List<String> categoryNames = new ArrayList<>();
     Spinner categorySpinner;
     Spinner rentalSpinner;
+    Button requestBtn;
+    EditText itemName;
+    EditText description;
 
     public NewRequestFragment() {
 
@@ -74,12 +82,14 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
         typeSpinner.setAdapter(typeAdapter);
         typeSpinner.setOnItemSelectedListener(this);
 
+        itemName = (EditText) view.findViewById(R.id.request_name);
+        description = (EditText) view.findViewById(R.id.request_description);
 
         categorySpinner = (Spinner) view.findViewById(R.id.request_category);
         ArrayAdapter<String> categoryAdapter;
         //TODO: this is crazy...why can't I use the list above. must fix.
         List<String> c = new ArrayList<>();
-        c.add("select a category");
+        c.add(Constants.SELECT_CATEGORY_STRING);
         c.add("tools");
         categoryAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, c);
         categorySpinner.setAdapter(categoryAdapter);
@@ -90,6 +100,14 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
         rentBuyList.add("buy");
         rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, rentBuyList);
         rentalSpinner.setAdapter(rentBuyAdapter);
+
+        requestBtn = (Button) view.findViewById(R.id.create_request_button);
+        requestBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                createRequest(v);
+            }
+        });
+
 
         return view;
     }
@@ -115,6 +133,65 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private Request createNewRequestObject() {
+        Request newRequest = new Request();
+        newRequest.setItemName(itemName.getText().toString());
+        newRequest.setDescription(description.getText().toString());
+        if (typeSpinner.getSelectedItem().toString().equals("item")) {
+            newRequest.setType(Request.Type.item);
+            newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
+        } else {
+           newRequest.setType(Request.Type.service);
+        }
+        if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
+            String cat = categorySpinner.getSelectedItem().toString();
+            for (Category c:categories) {
+                if (c.getName().equals(cat)) {
+                    newRequest.setCategory(c);
+                }
+            }
+        }
+        newRequest.setPostDate(new Date());
+        newRequest.setLatitude(PrefUtils.latLng.latitude);
+        newRequest.setLongitude(PrefUtils.latLng.longitude);
+        newRequest.setLocation(null);
+        return newRequest;
+    }
+
+    private void createRequest(View v) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
+                    conn.setRequestProperty("Content-Type","application/json");
+
+                    Request newRequest = createNewRequestObject();
+                    ObjectMapper mapper = new ObjectMapper();
+                    String requestJson = mapper.writeValueAsString(newRequest);
+                    byte[] outputInBytes = requestJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    int responseCode = conn.getResponseCode();
+                    Log.i("POST /api/requests", "Response Code : " + responseCode);
+                    if (responseCode != 201) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not create new request: " + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
     }
 
     public void getCategories() {

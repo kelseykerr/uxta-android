@@ -64,8 +64,16 @@
         android:id="@+id/request_description"
         android:layout_gravity="left"
         android:maxLength="200"
-        android:maxLines="2"
+        android:maxLines="3"
         android:textColor="@color/colorAccent"
         android:textColorHint="@color/mutedGrey" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="create request"
+        android:id="@+id/create_request_button"
+        android:textColor="#ffffff"
+        android:background="@color/colorPrimary" />
 
 </LinearLayout>

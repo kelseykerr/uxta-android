@@ -1,16 +1,17 @@
 package impulusecontrol.lend.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
 import impulusecontrol.lend.BaseEntity;
 import impulusecontrol.lend.Category;
-import impulusecontrol.lend.model.User;
 
 /**
  * Created by kerrk on 8/7/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Request extends BaseEntity {
 
     private User user;
@@ -26,6 +27,12 @@ public class Request extends BaseEntity {
     private Boolean rental;
 
     private String description;
+
+    private Type type;
+
+    private Double latitude;
+
+    private Double longitude;
 
     @JsonProperty("location")
     private Location location = new Location();
@@ -47,18 +54,20 @@ public class Request extends BaseEntity {
     }
 
     public Double getLongitude() {
-        return location.longitude;
+        return location != null ? location.longitude : longitude;
     }
 
     public void setLongitude(Double longitude) {
+        this.longitude = longitude;
         this.location.longitude = longitude;
     }
 
     public Double getLatitude() {
-        return location.latitude;
+        return location != null ? location.latitude : latitude;
     }
 
     public void setLatitude(Double latitude) {
+        this.latitude = latitude;
         this.location.latitude = latitude;
     }
 
@@ -102,6 +111,24 @@ public class Request extends BaseEntity {
         this.description = description;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+
+
     public static class Location {
 
         public Location() {
@@ -127,5 +154,9 @@ public class Request extends BaseEntity {
         public void setLatitude(Double latitude) {
             this.latitude = latitude;
         }
+    }
+
+    public static enum Type {
+        item, service
     }
 }

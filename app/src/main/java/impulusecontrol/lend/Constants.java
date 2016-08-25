@@ -12,5 +12,7 @@ public class Constants {
 
     public static final String NEARBY_API_PATH = "http://ec2-54-242-74-234.compute-1.amazonaws.com/api";
 
+    public static final String SELECT_CATEGORY_STRING = "select a category";
+
 
 }
