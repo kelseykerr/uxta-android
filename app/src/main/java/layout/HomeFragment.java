@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -82,6 +83,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private RecyclerView recList;
     private RequestAdapter requestAdapter;
     private List<Marker> requestMarkers = new ArrayList<>();
+    private TextView noResults;
 
 
     private OnFragmentInteractionListener mListener;
@@ -141,6 +143,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
+
+        noResults = (TextView) v.findViewById(R.id.no_results);
+        noResults.setVisibility(View.GONE);
         return v;
     }
 
@@ -186,6 +191,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 }
                 requestMarkers.clear();
                 if (requests.size() < 1) {
+                    noResults.setVisibility(View.VISIBLE);
                     if (latLng != null) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(latLng).zoom(15).build();
@@ -194,6 +200,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                         PrefUtils.setLatLng(latLng);
                     }
                     return;
+                } else {
+                    noResults.setVisibility(View.GONE);
                 }
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(currLocationMarker.getPosition());

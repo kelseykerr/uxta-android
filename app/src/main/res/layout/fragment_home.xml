@@ -77,6 +77,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:showAsAction="always"/> -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/radius_spinner"
+                    android:layout_marginTop="15dip"
+                    android:text="no requests were found within this radius"
+                    android:textStyle="italic"
+                    android:id="@+id/no_results"/>
 
             </RelativeLayout>
 
