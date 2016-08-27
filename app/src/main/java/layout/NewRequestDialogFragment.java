@@ -1,21 +1,30 @@
 package layout;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +49,7 @@ import impulusecontrol.lend.model.User;
 /**
  * Created by kerrk on 8/23/16.
  */
-public class NewRequestFragment extends Fragment implements AdapterView.OnItemSelectedListener  {
+public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener  {
     private User user;
     private Context context;
     Spinner typeSpinner;
@@ -52,13 +61,15 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     Button requestBtn;
     EditText itemName;
     EditText description;
+    View view;
+    private ViewGroup viewGroup;
 
-    public NewRequestFragment() {
+    public NewRequestDialogFragment() {
 
     }
 
-    public static NewRequestFragment newInstance() {
-        NewRequestFragment fragment = new NewRequestFragment();
+    public static NewRequestDialogFragment newInstance() {
+        NewRequestDialogFragment fragment = new NewRequestDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -74,6 +85,7 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        viewGroup = container;
         // Inflate the layout for this fragment
         List<String> types = new ArrayList<>();
         types.add("item");
@@ -111,8 +123,29 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
             }
         });
 
+        TextView cancelText = (TextView) view.findViewById(R.id.cancel_request);
+        cancelText.setOnTouchListener(new View.OnTouchListener() {
 
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                dismiss();
+                return false;
+            }
+        });
+
+        this.view = view;
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        dialog.getWindow().getAttributes().windowAnimations = R.style.RequestDialog;
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        }
     }
 
     @Override
@@ -199,9 +232,9 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 201) {
-                    ((LandingActivity)getActivity()).goToAccount();
+                    dismiss();
+                    ((LandingActivity)getActivity()).goToHistory();
                 }
-                //TODO: display error if responseCode != 201
             }
         }.execute();
     }

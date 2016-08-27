@@ -6,6 +6,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:elevation="4dp">
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,6 +15,17 @@
         android:drawablePadding="0dp"
         android:singleLine="true"
         android:contextClickable="true" />
+
+    <ImageButton
+        android:id="@+id/new_request_button"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right"
+        android:onClick="showDialog"
+        android:background="@null"
+        android:src="@drawable/ic_add_box_white_24dp"
+        />
 
 
 </android.support.v7.widget.Toolbar>

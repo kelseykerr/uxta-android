@@ -8,5 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="RequestDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/RequestDialogAnimation</item>
+    </style>
+
+    <style name="RequestDialogAnimation">
+        <item name="android:windowEnterAnimation">@animator/slide_up</item>
+        <item name="android:windowExitAnimation">@animator/exit_up</item>
+    </style>
+
 
 </resources>

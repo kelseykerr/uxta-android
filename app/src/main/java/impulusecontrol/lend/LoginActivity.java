@@ -30,10 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        Log.e("resuming", "");
         if(user != null && user.getAccessToken() != null){
-            Log.e("Current token: ", user.getAccessToken());
-            Log.e("***", "**come on");
             Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
             startActivity(homeIntent);
             finish();
@@ -43,19 +40,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onPostResume() {
         super.onPostResume();
-        Log.e("onpostresume", "");
     }
 
     @Override
     public void onStart() {
         super.onStart();  // Always call the superclass method first
-        Log.e("onstart", "");
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
-        Log.e("onrestart", "");
     }
 
 

@@ -1,8 +1,9 @@
 package impulusecontrol.lend;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,6 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.roughike.bottombar.BottomBar;
@@ -28,7 +33,7 @@ import impulusecontrol.lend.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
-import layout.NewRequestFragment;
+import layout.NewRequestDialogFragment;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -36,13 +41,14 @@ import layout.NewRequestFragment;
 public class LandingActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
-        NewRequestFragment.OnFragmentInteractionListener,
+        NewRequestDialogFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
+    private ImageButton newRequestButton;
     FragmentManager fragmentManager = getFragmentManager();
 
     /**
@@ -81,6 +87,13 @@ public class LandingActivity extends AppCompatActivity
         toolbar.setTitle("");
         toolbar.setSubtitle("");
 
+        newRequestButton = (ImageButton) findViewById(R.id.new_request_button);
+        newRequestButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(v);
+            }
+        });
+
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
         setmBottomBarListener();
@@ -109,6 +122,23 @@ public class LandingActivity extends AppCompatActivity
             }
 
         }.execute();
+    }
+
+    public void showDialog(View view) {
+        DialogFragment newFragment = NewRequestDialogFragment
+                .newInstance();
+
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void doPositiveClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "Positive click!");
+    }
+
+    public void doNegativeClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "Negative click!");
     }
 
     public void setmBottomBarListener() {
@@ -250,13 +280,12 @@ public class LandingActivity extends AppCompatActivity
         // END_INCLUDE(fine_location_permission_request)
     }
 
-    public void goToAccount() {
-        AccountFragment fragment = (AccountFragment)fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
+    public void goToHistory() {
+        HistoryFragment fragment = (HistoryFragment)fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
         if (fragment != null) {
             fragment.parentScroll.scrollTo(0, 0);
-
         }
-        mBottomBar.selectTabAtPosition(2, true);
+        mBottomBar.selectTabAtPosition(1, true);
     }
 
 }
