@@ -1,10 +1,10 @@
 package impulusecontrol.lend;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,10 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.TouchDelegate;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -93,6 +91,23 @@ public class LandingActivity extends AppCompatActivity
                 showDialog(v);
             }
         });
+        Rect clickableArea = new Rect();
+        newRequestButton.getHitRect(clickableArea);
+        // Extend the touch area of the ImageButton beyond its bounds
+        // on the right and bottom.
+        //TODO: this doesn't work
+        clickableArea.left += 400;
+        clickableArea.bottom += 400;
+        clickableArea.top += 400;
+        clickableArea.bottom += 400;
+        TouchDelegate touchDelegate = new TouchDelegate(clickableArea,
+                newRequestButton);
+        // Sets the TouchDelegate on the parent view, such that touches
+        // within the touch delegate bounds are routed to the child.
+        if (View.class.isInstance(newRequestButton.getParent())) {
+            ((View) newRequestButton.getParent()).setTouchDelegate(touchDelegate);
+        }
+
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
@@ -127,18 +142,7 @@ public class LandingActivity extends AppCompatActivity
     public void showDialog(View view) {
         DialogFragment newFragment = NewRequestDialogFragment
                 .newInstance();
-
         newFragment.show(getFragmentManager(), "dialog");
-    }
-
-    public void doPositiveClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "Positive click!");
-    }
-
-    public void doNegativeClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "Negative click!");
     }
 
     public void setmBottomBarListener() {

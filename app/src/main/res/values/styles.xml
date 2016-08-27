@@ -14,7 +14,11 @@
 
     <style name="RequestDialogAnimation">
         <item name="android:windowEnterAnimation">@animator/slide_up</item>
-        <item name="android:windowExitAnimation">@animator/exit_up</item>
+        <item name="android:windowExitAnimation">@animator/slide_down</item>
+    </style>
+
+    <style parent="@android:style/Widget.Spinner" name="SpinnerAsEditText">
+        <item name="android:background">@android:drawable/edit_text</item>
     </style>
 
 

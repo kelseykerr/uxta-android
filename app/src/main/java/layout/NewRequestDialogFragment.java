@@ -1,5 +1,7 @@
 package layout;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -7,6 +9,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,6 +18,7 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -62,7 +66,6 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     EditText itemName;
     EditText description;
     View view;
-    private ViewGroup viewGroup;
 
     public NewRequestDialogFragment() {
 
@@ -85,7 +88,6 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        viewGroup = container;
         // Inflate the layout for this fragment
         List<String> types = new ArrayList<>();
         types.add("item");
@@ -132,7 +134,22 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
                 return false;
             }
         });
-
+        Rect clickableArea = new Rect();
+        cancelText.getHitRect(clickableArea);
+        // Extend the touch area of
+        // the ImageButton beyond its bounds
+        // on the right and bottom.
+        clickableArea.left += 200;
+        clickableArea.bottom += 200;
+        clickableArea.top += 200;
+        clickableArea.right += 200;
+        TouchDelegate touchDelegate = new TouchDelegate(clickableArea,
+                cancelText);
+        // Sets the TouchDelegate on the parent view, such that touches
+        // within the touch delegate bounds are routed to the child.
+        if (View.class.isInstance(cancelText.getParent())) {
+            ((View) cancelText.getParent()).setTouchDelegate(touchDelegate);
+        }
         this.view = view;
         return view;
     }
@@ -141,10 +158,12 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     public void onStart() {
         super.onStart();
         Dialog dialog = getDialog();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.RequestDialog;
         if (dialog != null) {
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            //TODO: This doesn't work!!
+            dialog.getWindow().setWindowAnimations(R.style.RequestDialog);
+
         }
     }
 
