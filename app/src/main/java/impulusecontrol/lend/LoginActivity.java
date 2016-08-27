@@ -27,6 +27,38 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private User user;
 
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        Log.e("resuming", "");
+        if(user != null && user.getAccessToken() != null){
+            Log.e("Current token: ", user.getAccessToken());
+            Log.e("***", "**come on");
+            Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
+    }
+
+    @Override
+    public void onPostResume() {
+        super.onPostResume();
+        Log.e("onpostresume", "");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();  // Always call the superclass method first
+        Log.e("onstart", "");
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        Log.e("onrestart", "");
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +69,9 @@ public class LoginActivity extends AppCompatActivity {
         user = PrefUtils.getCurrentUser(LoginActivity.this);
         if(user != null && user.getAccessToken() != null){
             Log.e("Current token: ", user.getAccessToken());
-
+            Log.e("***", "**come on");
             Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
-
             startActivity(homeIntent);
-
             finish();
         }
         info = (TextView) findViewById(R.id.info);

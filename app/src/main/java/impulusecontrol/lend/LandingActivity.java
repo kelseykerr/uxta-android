@@ -2,6 +2,7 @@ package impulusecontrol.lend;
 
 import android.Manifest;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -25,6 +26,7 @@ import java.net.URL;
 
 import impulusecontrol.lend.model.User;
 import layout.AccountFragment;
+import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewRequestFragment;
 
@@ -34,7 +36,8 @@ import layout.NewRequestFragment;
 public class LandingActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
-        NewRequestFragment.OnFragmentInteractionListener {
+        NewRequestFragment.OnFragmentInteractionListener,
+        HistoryFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
@@ -80,6 +83,35 @@ public class LandingActivity extends AppCompatActivity
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
+        setmBottomBarListener();
+
+        user = PrefUtils.getCurrentUser(LandingActivity.this);
+        Log.e("user access token: ", user.getAccessToken());
+        Log.e("user name: ", user.getName());
+
+        // this isn't necessary ....just testing the server setup
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
+                    int responseCode = conn.getResponseCode();
+                    Log.e("response: ", "GET Response Code :: " + responseCode);
+                } catch (IOException e) {
+                    Log.e("ERROR!!!!! ", e.getMessage());
+                }
+                return null;
+            }
+
+        }.execute();
+    }
+
+    public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
@@ -95,7 +127,7 @@ public class LandingActivity extends AppCompatActivity
                                 .add(R.id.content_frame, HomeFragment.newInstance(), Constants.HOME_FRAGMENT_TAG)
                                 .commit();
                     }
-                    hideOtherFragments("home", R.animator.exit_to_left);
+                    hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
                     if(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
@@ -108,22 +140,22 @@ public class LandingActivity extends AppCompatActivity
                                 .add(R.id.content_frame, AccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
                                 .commit();
                     }
-                    hideOtherFragments("account", R.animator.exit_to_right);
+                    hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    if(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG) != null) {
+                    if(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
-                                .show(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG))
+                                .show(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
                                 .commit();
                     } else {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
-                                .add(R.id.content_frame, NewRequestFragment.newInstance(), Constants.REQUEST_FRAGMENT_TAG)
+                                .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                                 .commit();
                     }
-                   hideOtherFragments(Constants.REQUEST_FRAGMENT_TAG, secondAnim);
+                    hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
                 }
                 currentMenuItem = menuItemId;
             }
@@ -137,11 +169,11 @@ public class LandingActivity extends AppCompatActivity
                                 .commit();
                     }
                 }
-                if (!current.equals(Constants.REQUEST_FRAGMENT_TAG)) {
-                    if(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG) != null){
+                if (!current.equals(Constants.HISTORY_FRAGMENT_TAG)) {
+                    if(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null){
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(0, leaveAnimation)
-                                .hide(fragmentManager.findFragmentByTag(Constants.REQUEST_FRAGMENT_TAG))
+                                .hide(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
                                 .commit();
                     }
                 }
@@ -157,44 +189,8 @@ public class LandingActivity extends AppCompatActivity
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                /*if (menuItemId == R.id.bottomBarHomeItem) {
-                    HomeFragment fragment = HomeFragment.newInstance();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment, Constants.HOME_FRAGMENT_TAG)
-                            .commit();
-                } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    AccountFragment fragment = AccountFragment.newInstance();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment, Constants.ACCOUNT_FRAGMENT_TAG)
-                            .commit();
-                }*/
             }
         });
-
-        user = PrefUtils.getCurrentUser(LandingActivity.this);
-        Log.e("user access token: ", user.getAccessToken());
-        Log.e("user name: ", user.getName());
-
-        // this isn't necessary ....just testing the server setup
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/users/me");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
-                    int responseCode = conn.getResponseCode();
-                    Log.e("response: ", "GET Response Code :: " + responseCode);
-                } catch (IOException e) {
-                    Log.e("ERROR!!!!! ", e.getMessage());
-                }
-                return null;
-            }
-
-        }.execute();
     }
 
 
@@ -252,6 +248,15 @@ public class LandingActivity extends AppCompatActivity
                     REQUEST_FINE_LOCATION);
         }
         // END_INCLUDE(fine_location_permission_request)
+    }
+
+    public void goToAccount() {
+        AccountFragment fragment = (AccountFragment)fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
+        if (fragment != null) {
+            fragment.parentScroll.scrollTo(0, 0);
+
+        }
+        mBottomBar.selectTabAtPosition(2, true);
     }
 
 }

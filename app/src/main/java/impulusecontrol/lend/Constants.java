@@ -14,5 +14,7 @@ public class Constants {
 
     public static final String SELECT_CATEGORY_STRING = "select a category";
 
+    public static final String HISTORY_FRAGMENT_TAG = "history";
+
 
 }

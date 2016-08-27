@@ -3,15 +3,15 @@
     <item
         android:id="@+id/bottomBarHomeItem"
         android:icon="@drawable/ic_home_white_24dp"
-        android:title="Home" />
+        android:title="home"/>
     <!--<item
         android:id="@+id/bottomBarItemTwo"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="Search" /> -->
     <item
         android:id="@+id/bottomBarRequestItem"
-        android:icon="@drawable/ic_add_white_24dp"
-        android:title="New Request" />
+        android:icon="@drawable/ic_history_white_24dp"
+        android:title="history"/>
 
     <!--<item
         android:id="@+id/bottomBarItemFour"
@@ -22,7 +22,7 @@
     <item
         android:id="@+id/bottomBarAccountItem"
         android:icon="@drawable/ic_person_outline_white_24dp"
-        android:title="Account" />
+        android:title="account" />
 
 
 

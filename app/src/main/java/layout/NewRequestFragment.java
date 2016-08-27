@@ -1,6 +1,8 @@
 package layout;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,6 +31,7 @@ import java.util.List;
 import impulusecontrol.lend.AppUtils;
 import impulusecontrol.lend.Category;
 import impulusecontrol.lend.Constants;
+import impulusecontrol.lend.LandingActivity;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
 import impulusecontrol.lend.model.Request;
@@ -131,7 +134,6 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
@@ -161,9 +163,11 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     private void createRequest(View v) {
-        new AsyncTask<Void, Void, Void>() {
+        // AsyncTask<Params, Progress, Result>
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
                 try {
                     URL url = new URL(Constants.NEARBY_API_PATH + "/requests");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -181,7 +185,7 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
                     os.write(outputInBytes);
                     os.close();
 
-                    int responseCode = conn.getResponseCode();
+                    responseCode = conn.getResponseCode();
                     Log.i("POST /api/requests", "Response Code : " + responseCode);
                     if (responseCode != 201) {
                         throw new IOException(conn.getResponseMessage());
@@ -189,10 +193,19 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not create new request: " + e.getMessage());
                 }
-                return null;
+                return responseCode;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                if (responseCode == 201) {
+                    ((LandingActivity)getActivity()).goToAccount();
+                }
+                //TODO: display error if responseCode != 201
             }
         }.execute();
     }
+
 
     public void getCategories() {
         new AsyncTask<Void, Void, Void>() {
@@ -241,7 +254,6 @@ public class NewRequestFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
     }
 
 }

@@ -1,11 +1,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:descendantFocusability="beforeDescendants"
     android:layout_height="match_parent"
     tools:context="layout.AccountFragment">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
+        android:focusable="true"
+        android:id="@+id/account_parent_scrollview"
+        android:focusableInTouchMode="true"
+        android:descendantFocusability="beforeDescendants"
         android:layout_height="match_parent">
 
         <RelativeLayout
@@ -82,27 +89,8 @@
                     android:textColor="#fff" />
 
             </RelativeLayout>
-            <TextView
-                android:id="@+id/recent_requests_heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/profile_layout"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:padding="10dp"
-                android:text="my recent requests:"
-                android:textColor="#585757"
-                android:textSize="16sp" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:layout_below="@+id/recent_requests_heading"
-                    android:id="@+id/recent_request_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </RelativeLayout>
+        </RelativeLayout>
     </ScrollView>
 
 </FrameLayout>

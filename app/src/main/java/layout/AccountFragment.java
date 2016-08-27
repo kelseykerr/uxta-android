@@ -9,29 +9,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import impulusecontrol.lend.AppUtils;
 import impulusecontrol.lend.LoginActivity;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
-import impulusecontrol.lend.model.Request;
-import impulusecontrol.lend.RequestAdapter;
 import impulusecontrol.lend.model.User;
 
 /**
@@ -48,9 +41,7 @@ public class AccountFragment extends Fragment {
     private TextView btnLogout;
     private User user;
     private ImageView profileImage;
-    private List<Request> recentRequests = new ArrayList<>();
-    private RecyclerView recentRequestList;
-    private RequestAdapter requestAdapter;
+    public ScrollView parentScroll;
 
     private OnFragmentInteractionListener mListener;
 
@@ -74,7 +65,6 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        requestAdapter = new RequestAdapter(recentRequests);
         super.onCreate(savedInstanceState);
     }
 
@@ -124,17 +114,12 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
+
         TextView myAwesomeTextView = (TextView)view.findViewById(R.id.user_profile_name);
         myAwesomeTextView.setText(user.getName());
-
-        recentRequestList = (RecyclerView) view.findViewById(R.id.recent_request_list);
-        recentRequestList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(context);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recentRequestList.setLayoutManager(llm);
-        recentRequestList.setAdapter(requestAdapter);
-        getRequests();
-
+        llm.setOrientation(LinearLayoutManager.VERTICAL);;
         return view;
 
     }
@@ -179,36 +164,4 @@ public class AccountFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void getRequests() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL("http://ec2-54-242-74-234.compute-1.amazonaws.com/api/users/me/requests");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
-                    String output = AppUtils.getResponseContent(conn);
-                    try {
-                        recentRequests = AppUtils.jsonStringToRequestList(output);
-                    } catch (IOException e) {
-                        Log.e("Error", "Received an error while trying to fetch " +
-                                "requests from server, please try again later!");
-                    }
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get requests: " + e.getMessage());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                if (requestAdapter != null) {
-                    requestAdapter.swap(recentRequests);
-                }
-            }
-        }.execute();
-    }
 }
