@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/request_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardElevation="4dp">
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true"
+    android:paddingBottom="15dp"
+    card_view:cardElevation="0dp">
 
-    <!--<RelativeLayout
+
+   <!-- <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/request_card_background"> -->
+        android:layout_height="80dp"
+        app:dragEdge="right"
+        app:mode="normal">
 
-        <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/swipe_layout"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            app:dragEdge="right"
-            app:mode="normal">
+        <FrameLayout
+            android:id="@+id/delete_layout"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:background="#ffcc0000">
 
-            <FrameLayout
-                android:id="@+id/delete_layout"
-                android:layout_width="90dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="#ffcc0000">
+                android:background="@android:color/holo_red_dark"
+                android:gravity="center"
+                android:text="Delete"
+                android:textColor="@android:color/white" />
+        </FrameLayout> -->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/holo_red_dark"
-                    android:gravity="center"
-                    android:text="Delete"
-                    android:textColor="@android:color/white" />
-            </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
 
-            <FrameLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/white">
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/request_card_background">
+                android:background="@drawable/request_card_background">
 
                 <TextView
                     android:id="@+id/item_name"
@@ -84,53 +85,9 @@
                     android:layout_marginTop="6dp"
                     android:text="description"
                     android:textSize="14dp" />
-                </RelativeLayout>
+            </RelativeLayout>
 
-            </FrameLayout>
-        </com.chauthai.swipereveallayout.SwipeRevealLayout>
-
-        <!--<TextView
-            android:id="@+id/item_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="6dp"
-            android:gravity="center_vertical"
-            android:text="item name"
-            android:textSize="18dp" />
-
-        <TextView
-            android:id="@+id/category_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/item_name"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="6dp"
-            android:gravity="center_vertical"
-            android:text="category name"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/posted_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/category_name"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="6dp"
-            android:gravity="center_vertical"
-            android:text="posted date"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/posted_date"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="6dp"
-            android:text="description"
-            android:textSize="14dp" />
-
-    </RelativeLayout> -->
+        </FrameLayout>
+    <!--</com.chauthai.swipereveallayout.SwipeRevealLayout> -->
 
 </android.support.v7.widget.CardView>

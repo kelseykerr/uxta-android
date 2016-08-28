@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -30,9 +31,9 @@ import java.util.List;
 
 import impulusecontrol.lend.AppUtils;
 import impulusecontrol.lend.Constants;
+import impulusecontrol.lend.HistoryCardAdapter;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
-import impulusecontrol.lend.RequestAdapter;
 import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.model.User;
 
@@ -49,12 +50,14 @@ public class HistoryFragment extends Fragment {
     private User user;
     private List<Request> recentRequests = new ArrayList<>();
     private RecyclerView requestHistoryList;
-    private RequestAdapter requestAdapter;
+    private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
     private AlertDialog.Builder alertDialog;
     private Paint p = new Paint();
     private View view;
     private boolean add = false;
+    private TextView description;
+    private TextView category;
 
     private OnFragmentInteractionListener mListener;
 
@@ -78,7 +81,7 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        requestAdapter = new RequestAdapter(recentRequests);
+        historyCardAdapter = new HistoryCardAdapter(recentRequests);
         initDialog();
         super.onCreate(savedInstanceState);
     }
@@ -96,7 +99,7 @@ public class HistoryFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         requestHistoryList.setLayoutManager(llm);
-        requestHistoryList.setAdapter(requestAdapter);
+        requestHistoryList.setAdapter(historyCardAdapter);
         getRequests();
         this.view = view;
         //initSwipe();
@@ -170,8 +173,8 @@ public class HistoryFragment extends Fragment {
 
             @Override
             protected void onPostExecute(Void result) {
-                if (requestAdapter != null) {
-                    requestAdapter.swap(recentRequests);
+                if (historyCardAdapter != null) {
+                    historyCardAdapter.swap(recentRequests);
                 }
             }
         }.execute();
@@ -253,13 +256,13 @@ public class HistoryFragment extends Fragment {
                     adapter.addItem(et_country.getText().toString());*/
                     getRequests();
                     dialog.dismiss();
-                    requestAdapter.notifyDataSetChanged();
+                    historyCardAdapter.notifyDataSetChanged();
                 } else {
                     /*countries.set(edit_position,et_country.getText().toString());
                     adapter.notifyDataSetChanged();*/
                     getRequests();
                     dialog.dismiss();
-                    requestAdapter.notifyDataSetChanged();
+                    historyCardAdapter.notifyDataSetChanged();
 
                 }
 

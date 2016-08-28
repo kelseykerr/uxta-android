@@ -37,7 +37,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         Request r = requests.get(i);
         // Save/restore the open/close state.
         // You need to provide a String id which uniquely defines the data object.
-        viewBinderHelper.bind(requestViewHolder.swipeRevealLayout, r.getId());
+        //viewBinderHelper.bind(requestViewHolder.swipeRevealLayout, r.getId());
         User currUser = PrefUtils.getCurrentUser(requestViewHolder.context);
         String userName = currUser.getUserId().equals(r.getUser().getUserId()) ? "" : r.getUser().getFirstName() + " ";
 
@@ -76,7 +76,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected TextView vPostedDate;
         protected TextView vDescription;
         protected SwipeRevealLayout swipeRevealLayout;
-        private View deleteLayout;
+        //private View deleteLayout;
         protected Context context;
 
         public RequestViewHolder(Context context, View v) {
@@ -85,8 +85,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView)  v.findViewById(R.id.category_name);
             vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            swipeRevealLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
-            deleteLayout = v.findViewById(R.id.delete_layout);
+            //swipeRevealLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
+            //deleteLayout = v.findViewById(R.id.delete_layout);
             this.context = context;
 
         }
