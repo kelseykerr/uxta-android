@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();  // Always call the superclass method first
         if(user != null && user.getAccessToken() != null){
-            Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
+            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(homeIntent);
             finish();
         }
@@ -62,9 +62,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
         if(user != null && user.getAccessToken() != null){
-            Log.e("Current token: ", user.getAccessToken());
-            Log.e("***", "**come on");
-            Intent homeIntent = new Intent(LoginActivity.this, LandingActivity.class);
+            Log.i("Current token: ", user.getAccessToken() + " ****************");
+            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(homeIntent);
             finish();
         }
@@ -82,7 +81,8 @@ public class LoginActivity extends AppCompatActivity {
                                     JSONObject object,
                                     GraphResponse response) {
                                 try {
-                                    Log.e("token: ", loginResult.getAccessToken().getToken());
+                                    Log.i("token: ", loginResult.getAccessToken().getToken() +
+                                            " ****************");
                                     user = new User();
                                     user.setFacebookId(object.getString("id").toString());
                                     String email = object.has("email") ?
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                                Intent intent = new Intent(LoginActivity.this, LandingActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             }

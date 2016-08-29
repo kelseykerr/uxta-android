@@ -8,24 +8,13 @@ import java.util.List;
  * Created by kerrk on 8/24/16.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Category {
-
-    private String _id;
-
+public class Category extends BaseEntity {
     private String name;
 
     private List<String> examples;
 
     public Category() {
 
-    }
-
-    public String get_id() {
-        return _id;
-    }
-
-    public void set_id(String _id) {
-        this._id = _id;
     }
 
     public String getName() {

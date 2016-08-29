@@ -5,14 +5,11 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
-
-import com.chauthai.swipereveallayout.ViewBinderHelper;
 
 import java.util.List;
 
@@ -23,11 +20,6 @@ import impulusecontrol.lend.model.Request;
  */
 public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.HistoryCardViewHolder> {
     private List<Request> requests;
-    private Boolean isViewExpanded = false;
-
-
-    // This object helps you save/restore the open/close state of each view
-    private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
 
     public HistoryCardAdapter(List<Request> requests) {
         this.requests = requests;
@@ -41,14 +33,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     @Override
     public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
-        // Save/restore the open/close state.
-        // You need to provide a String id which uniquely defines the data object.
-        //viewBinderHelper.bind(requestViewHolder.swipeRevealLayout, r.getId());
         String htmlString = "requested a <b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
         requestViewHolder.vPostedDate.setText(diff);
+        // description and category will appear when the card is clicked/expanded
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
         if (r.getCategory() == null) {
@@ -56,7 +46,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.vCategoryName.setText(r.getCategory().getName());
         }
-
+        //this click method will expand/close the card
         requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

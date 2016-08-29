@@ -8,7 +8,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -49,8 +48,8 @@ import impulusecontrol.lend.AppUtils;
 import impulusecontrol.lend.Constants;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
-import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.RequestAdapter;
+import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.model.User;
 
 
@@ -126,9 +125,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         radiusList.add(.1);
         radiusList.add(.25);
         radiusList.add(.5);
-        radiusList.add(1.0);
-        radiusList.add(5.0);
-        radiusList.add(10.0);
+        radiusList.add(1D);
+        radiusList.add(5D);
+        radiusList.add(10D);
 
         // Creating adapter for spinner
         ArrayAdapter<Double> dataAdapter = new ArrayAdapter<Double>(context, android.R.layout.simple_spinner_item, radiusList);
@@ -165,7 +164,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);

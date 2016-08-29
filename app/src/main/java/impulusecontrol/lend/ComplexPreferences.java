@@ -14,8 +14,6 @@ import java.lang.reflect.Type;
 public class ComplexPreferences {
     private static ComplexPreferences complexPreferences;
     private static Gson GSON = new Gson();
-    Type typeOfObject = new TypeToken<Object>() {
-    }.getType();
     private Context context;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -30,12 +28,10 @@ public class ComplexPreferences {
     }
 
     public static ComplexPreferences getComplexPreferences(Context context, String namePreferences, int mode) {
-
-//		if (complexPreferences == null) {
-        complexPreferences = new ComplexPreferences(context,
-                namePreferences, mode);
-//		}
-
+        if (complexPreferences == null) {
+            complexPreferences = new ComplexPreferences(context,
+                    namePreferences, mode);
+        }
         return complexPreferences;
     }
 
@@ -60,7 +56,6 @@ public class ComplexPreferences {
     }
 
     public <T> T getObject(String key, Class<T> a) {
-
         String gson = preferences.getString(key, null);
         if (gson == null) {
             return null;

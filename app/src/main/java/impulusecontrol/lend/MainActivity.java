@@ -36,7 +36,7 @@ import layout.NewRequestDialogFragment;
 /**
  * Created by kerrk on 7/17/16.
  */
-public class LandingActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
         NewRequestDialogFragment.OnFragmentInteractionListener,
@@ -54,7 +54,7 @@ public class LandingActivity extends AppCompatActivity
      */
     private View mLayout;
 
-    public static final String TAG = "LandingActivity";
+    public static final String TAG = "MainActivity";
 
     /**
      * Id to identify the fine location permission request.
@@ -94,7 +94,6 @@ public class LandingActivity extends AppCompatActivity
         Rect clickableArea = new Rect();
         newRequestButton.getHitRect(clickableArea);
         // Extend the touch area of the ImageButton beyond its bounds
-        // on the right and bottom.
         //TODO: this doesn't work
         clickableArea.left += 400;
         clickableArea.bottom += 400;
@@ -108,35 +107,13 @@ public class LandingActivity extends AppCompatActivity
             ((View) newRequestButton.getParent()).setTouchDelegate(touchDelegate);
         }
 
-
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
         setmBottomBarListener();
 
-        user = PrefUtils.getCurrentUser(LandingActivity.this);
-        Log.e("user access token: ", user.getAccessToken());
-        Log.e("user name: ", user.getName());
-
-        // this isn't necessary ....just testing the server setup
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
-                    int responseCode = conn.getResponseCode();
-                    Log.e("response: ", "GET Response Code :: " + responseCode);
-                } catch (IOException e) {
-                    Log.e("ERROR!!!!! ", e.getMessage());
-                }
-                return null;
-            }
-
-        }.execute();
+        user = PrefUtils.getCurrentUser(MainActivity.this);
+        Log.i("user access token: ", user.getAccessToken() + " ****************");
+        Log.i("user name: ", user.getName() + " ****************");
     }
 
     public void showDialog(View view) {
@@ -150,7 +127,7 @@ public class LandingActivity extends AppCompatActivity
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    if(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
+                    if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
                                 .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
@@ -163,7 +140,7 @@ public class LandingActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    if(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
+                    if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
                                 .show(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
@@ -178,7 +155,7 @@ public class LandingActivity extends AppCompatActivity
                 } else {
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    if(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
+                    if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
                                 .show(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
@@ -196,7 +173,7 @@ public class LandingActivity extends AppCompatActivity
 
             public void hideOtherFragments(String current, int leaveAnimation) {
                 if (!current.equals(Constants.HOME_FRAGMENT_TAG)) {
-                    if(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null){
+                    if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(0, leaveAnimation)
                                 .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
@@ -204,7 +181,7 @@ public class LandingActivity extends AppCompatActivity
                     }
                 }
                 if (!current.equals(Constants.HISTORY_FRAGMENT_TAG)) {
-                    if(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null){
+                    if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(0, leaveAnimation)
                                 .hide(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
@@ -212,7 +189,7 @@ public class LandingActivity extends AppCompatActivity
                     }
                 }
                 if (!current.equals(Constants.ACCOUNT_FRAGMENT_TAG)) {
-                    if(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null){
+                    if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(0, leaveAnimation)
                                 .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
@@ -270,7 +247,7 @@ public class LandingActivity extends AppCompatActivity
                     .setAction(R.string.ok, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            ActivityCompat.requestPermissions(LandingActivity.this,
+                            ActivityCompat.requestPermissions(MainActivity.this,
                                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                     REQUEST_FINE_LOCATION);
                         }
@@ -285,7 +262,7 @@ public class LandingActivity extends AppCompatActivity
     }
 
     public void goToHistory() {
-        HistoryFragment fragment = (HistoryFragment)fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+        HistoryFragment fragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
         if (fragment != null) {
             fragment.parentScroll.scrollTo(0, 0);
         }

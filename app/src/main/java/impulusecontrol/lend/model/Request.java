@@ -3,12 +3,7 @@ package impulusecontrol.lend.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import impulusecontrol.lend.BaseEntity;
-import impulusecontrol.lend.Category;
 
 /**
  * Created by kerrk on 8/7/16.

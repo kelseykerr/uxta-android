@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 
+import impulusecontrol.lend.model.BaseEntity;
 import impulusecontrol.lend.model.Request;
 
 /**
@@ -31,6 +32,7 @@ public class AppUtils {
             List<Request> pojos = mapper.readValue(jsonString, new TypeReference<List<Request>>() {});
             return pojos;
         } catch (IOException e) {
+            Log.e("***", "error converting string to response list: " + e.getMessage());
             throw new IOException(e);
         }
     }

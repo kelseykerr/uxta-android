@@ -76,7 +76,7 @@ public class AccountFragment extends Fragment {
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
 
         // fetching facebook's profile picture
-        new AsyncTask<Void,Void,Void>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 URL imageURL = null;
@@ -86,7 +86,7 @@ public class AccountFragment extends Fragment {
                     e.printStackTrace();
                 }
                 try {
-                    bitmap  = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+                    bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -116,19 +116,13 @@ public class AccountFragment extends Fragment {
 
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
-        TextView myAwesomeTextView = (TextView)view.findViewById(R.id.user_profile_name);
+        TextView myAwesomeTextView = (TextView) view.findViewById(R.id.user_profile_name);
         myAwesomeTextView.setText(user.getName());
         LinearLayoutManager llm = new LinearLayoutManager(context);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);;
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        ;
         return view;
 
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override

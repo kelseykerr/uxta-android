@@ -1,34 +1,26 @@
 package layout;
 
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,18 +34,18 @@ import java.util.Date;
 import java.util.List;
 
 import impulusecontrol.lend.AppUtils;
-import impulusecontrol.lend.Category;
 import impulusecontrol.lend.Constants;
-import impulusecontrol.lend.LandingActivity;
+import impulusecontrol.lend.MainActivity;
 import impulusecontrol.lend.PrefUtils;
 import impulusecontrol.lend.R;
+import impulusecontrol.lend.model.Category;
 import impulusecontrol.lend.model.Request;
 import impulusecontrol.lend.model.User;
 
 /**
  * Created by kerrk on 8/23/16.
  */
-public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener  {
+public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private User user;
     private Context context;
     Spinner typeSpinner;
@@ -94,8 +86,8 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         types.add("service");
         View view = inflater.inflate(R.layout.fragment_new_request, container, false);
         ArrayAdapter<String> typeAdapter;
-        typeSpinner= (Spinner) view.findViewById(R.id.request_type);
-        typeAdapter= new ArrayAdapter<String>(context, R.layout.spinner_item, types);
+        typeSpinner = (Spinner) view.findViewById(R.id.request_type);
+        typeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, types);
         typeSpinner.setAdapter(typeAdapter);
         typeSpinner.setOnItemSelectedListener(this);
 
@@ -197,11 +189,11 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
             newRequest.setType(Request.Type.item);
             newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
         } else {
-           newRequest.setType(Request.Type.service);
+            newRequest.setType(Request.Type.service);
         }
         if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
-            for (Category c:categories) {
+            for (Category c : categories) {
                 if (c.getName().equals(cat)) {
                     newRequest.setCategory(c);
                 }
@@ -226,8 +218,8 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("POST");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
-                    conn.setRequestProperty("Content-Type","application/json");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty("Content-Type", "application/json");
 
                     Request newRequest = createNewRequestObject();
                     ObjectMapper mapper = new ObjectMapper();
@@ -252,7 +244,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 201) {
                     dismiss();
-                    ((LandingActivity)getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory();
                 }
             }
         }.execute();
@@ -269,16 +261,16 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
-                    conn.setRequestProperty("x-auth-token", user.getAccessToken());
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         ObjectMapper mapper = new ObjectMapper();
-
-                            categories = mapper.readValue(output, new TypeReference<List<Category>>() {});
-                            categoryNames.add("select a category...");
-                            for (int i = 0; i < categories.size(); i++) {
-                                categoryNames.add(categories.get(i).getName());
-                            }
+                        categories = mapper.readValue(output, new TypeReference<List<Category>>() {
+                        });
+                        categoryNames.add(Constants.SELECT_CATEGORY_STRING);
+                        for (int i = 0; i < categories.size(); i++) {
+                            categoryNames.add(categories.get(i).getName());
+                        }
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to fetch " +
                                 "categories from server, please try again later!");
@@ -297,7 +289,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         String value = (String) parent.getItemAtPosition(position);
 
         // Get requests within that radius
-        if(value.equals("service")) {
+        if (value.equals("service")) {
             rentalSpinner.setVisibility(View.GONE);
         } else {
             rentalSpinner.setVisibility(View.VISIBLE);

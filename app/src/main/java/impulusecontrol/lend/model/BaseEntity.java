@@ -1,4 +1,4 @@
-package impulusecontrol.lend;
+package impulusecontrol.lend.model;
 
 import java.io.Serializable;
 

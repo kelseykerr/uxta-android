@@ -20,9 +20,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     private List<Request> requests;
 
-    // This object helps you save/restore the open/close state of each view
-    private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
-
     public RequestAdapter(List<Request> requests) {
         this.requests = requests;
     }
@@ -35,13 +32,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
-        // Save/restore the open/close state.
-        // You need to provide a String id which uniquely defines the data object.
-        //viewBinderHelper.bind(requestViewHolder.swipeRevealLayout, r.getId());
-        User currUser = PrefUtils.getCurrentUser(requestViewHolder.context);
-        String userName = currUser.getUserId().equals(r.getUser().getUserId()) ? "" : r.getUser().getFirstName() + " ";
-
-        String htmlString = userName + "requested a <b>" +
+        String htmlString = r.getUser().getFirstName() + " requested a <b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
@@ -75,8 +66,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected TextView vCategoryName;
         protected TextView vPostedDate;
         protected TextView vDescription;
-        protected SwipeRevealLayout swipeRevealLayout;
-        //private View deleteLayout;
         protected Context context;
 
         public RequestViewHolder(Context context, View v) {
@@ -85,10 +74,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView)  v.findViewById(R.id.category_name);
             vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            //swipeRevealLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
-            //deleteLayout = v.findViewById(R.id.delete_layout);
             this.context = context;
-
         }
     }
 }
