@@ -135,6 +135,7 @@ public class HistoryFragment extends Fragment {
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         recentRequests = AppUtils.jsonStringToRequestList(output);
+                        Log.e("**", recentRequests.size() + "***re size");
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to fetch " +
                                 "requests from server, please try again later!");

@@ -27,5 +27,17 @@
         android:src="@drawable/ic_add_box_white_24dp"
         />
 
+    <TextView
+        android:id="@+id/list_map_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginEnd="10dp"
+        android:singleLine="true"
+        android:text="list"
+        android:textColor="@color/white"
+        android:onClick="switchListMapView"
+        android:textSize="20sp" />
+
 
 </android.support.v7.widget.Toolbar>

@@ -2,11 +2,11 @@ package impulusecontrol.lend;
 
 import android.Manifest;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
@@ -18,14 +18,13 @@ import android.view.MenuItem;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import org.w3c.dom.Text;
 
 import impulusecontrol.lend.model.User;
 import layout.AccountFragment;
@@ -47,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
     private ImageButton newRequestButton;
+    private TextView listMapText;
+    String currentText = "list";
     FragmentManager fragmentManager = getFragmentManager();
 
     /**
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
-
+        listMapText = (TextView) findViewById(R.id.list_map_text);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setTitle("");
@@ -122,11 +123,25 @@ public class MainActivity extends AppCompatActivity
         newFragment.show(getFragmentManager(), "dialog");
     }
 
+    public void switchListMapView(View view) {
+        HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+        if (currentText.equals("list")) {
+            listMapText.setText("map");
+            currentText = "map";
+            homeFragment.toggleView("list");
+        } else {
+            listMapText.setText("list");
+            currentText = "list";
+            homeFragment.toggleView("map");
+        }
+    }
+
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
+                    listMapText.setVisibility(View.VISIBLE);
                     if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
@@ -140,6 +155,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
+                    listMapText.setVisibility(View.INVISIBLE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
@@ -153,6 +169,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
+                    listMapText.setVisibility(View.INVISIBLE);
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {

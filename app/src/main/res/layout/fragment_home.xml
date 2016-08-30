@@ -11,10 +11,60 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
+            android:id="@+id/request_search_layout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.40"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
             android:layout_marginTop="55dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/radius_spinner_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="Requests within"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <Spinner
+                android:id="@+id/radius_spinner"
+                android:layout_toRightOf="@+id/radius_spinner_label"
+                android:layout_width="wrap_content"
+                android:background="@color/white"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:prompt="@string/radius_spinner_title"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/radius_spinner"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="miles"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/radius_spinner"
+                android:layout_marginTop="15dip"
+                android:text="no requests were found within this radius"
+                android:textStyle="italic"
+                android:id="@+id/no_results"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map_view"
+            android:layout_below="@+id/map"
             android:background="#ffffff">
             <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                 android:name="com.google.android.gms.maps.MapFragment"
@@ -22,75 +72,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </RelativeLayout>
+
+
+
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.60"
+            android:layout_height="match_parent"
+            android:id="@+id/list_view"
             android:background="#ffffff">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/request_search_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:elevation="4dp"
-                android:gravity="center"
-                android:paddingBottom="24dp">
-
-                <TextView
-                    android:id="@+id/radius_spinner_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dip"
-                    android:text="Requests within"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="5dp"/>
-
-                <Spinner
-                    android:id="@+id/radius_spinner"
-                    android:layout_toRightOf="@+id/radius_spinner_label"
-                    android:layout_width="wrap_content"
-                    android:background="@color/white"
-                    android:layout_marginTop="10dip"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/radius_spinner_title"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/radius_spinner"
-                    android:layout_marginTop="10dip"
-                    android:text="miles"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="5dp"/>
-
-                <!--<android.support.v7.widget.SearchView
-                    android:id="@+id/request_search"
-                    android:layout_below="@+id/radius_spinner_label"
-                    android:icon="@drawable/ic_search_white_24dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:showAsAction="always"/> -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/radius_spinner"
-                    android:layout_marginTop="15dip"
-                    android:text="no requests were found within this radius"
-                    android:textStyle="italic"
-                    android:id="@+id/no_results"/>
-
-            </RelativeLayout>
-
                 <android.support.v7.widget.RecyclerView
-                    android:layout_below="@+id/request_search_layout"
                     android:id="@+id/request_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

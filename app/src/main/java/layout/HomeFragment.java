@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -84,6 +86,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private RequestAdapter requestAdapter;
     private List<Marker> requestMarkers = new ArrayList<>();
     private TextView noResults;
+    private ScrollView listView;
+    private RelativeLayout requestMapView;
 
 
     private OnFragmentInteractionListener mListener;
@@ -113,6 +117,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         ft = fm.beginTransaction();
         mapFragment.getMapAsync(this);
         user = PrefUtils.getCurrentUser(context);
+        listView = (ScrollView) v.findViewById(R.id.list_view);
+        listView.setVisibility(View.GONE);
+        requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
 
         // Spinner element
         Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
@@ -381,5 +388,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void toggleView(String v) {
+        if (v.equals("list")) {
+            listView.setVisibility(View.VISIBLE);
+            requestMapView.setVisibility(View.GONE);
+        } else {
+            requestMapView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        }
     }
 }
