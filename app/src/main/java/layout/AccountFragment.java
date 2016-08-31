@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import impulusecontrol.lend.LoginActivity;
-import impulusecontrol.lend.PrefUtils;
-import impulusecontrol.lend.R;
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.LoginActivity;
+import superstartupteam.nearby.PrefUtils;
+import superstartupteam.nearby.R;
+import superstartupteam.nearby.model.User;
 
 /**
  * A simple {@link Fragment} subclass.

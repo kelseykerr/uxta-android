@@ -1,4 +1,4 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.util.Log;
 
@@ -12,8 +12,8 @@ import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 
-import impulusecontrol.lend.model.BaseEntity;
-import impulusecontrol.lend.model.Request;
+import superstartupteam.nearby.model.BaseEntity;
+import superstartupteam.nearby.model.Request;
 
 /**
  * Created by kerrk on 8/21/16.

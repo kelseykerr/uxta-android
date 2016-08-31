@@ -1,4 +1,4 @@
-package impulusecontrol.lend.model;
+package superstartupteam.nearby.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

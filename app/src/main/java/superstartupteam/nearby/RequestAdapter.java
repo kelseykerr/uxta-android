@@ -1,4 +1,4 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,13 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.chauthai.swipereveallayout.SwipeRevealLayout;
-import com.chauthai.swipereveallayout.ViewBinderHelper;
-
 import java.util.List;
 
-import impulusecontrol.lend.model.Request;
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.model.Request;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 

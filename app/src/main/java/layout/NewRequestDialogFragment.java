@@ -33,14 +33,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import impulusecontrol.lend.AppUtils;
-import impulusecontrol.lend.Constants;
-import impulusecontrol.lend.MainActivity;
-import impulusecontrol.lend.PrefUtils;
-import impulusecontrol.lend.R;
-import impulusecontrol.lend.model.Category;
-import impulusecontrol.lend.model.Request;
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.AppUtils;
+import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
+import superstartupteam.nearby.PrefUtils;
+import superstartupteam.nearby.R;
+import superstartupteam.nearby.model.Category;
+import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/23/16.

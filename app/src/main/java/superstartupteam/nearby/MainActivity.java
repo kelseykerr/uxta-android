@@ -1,8 +1,7 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.Manifest;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -24,9 +23,7 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-import org.w3c.dom.Text;
-
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;

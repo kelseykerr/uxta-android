@@ -1,4 +1,4 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import impulusecontrol.lend.model.Request;
+import superstartupteam.nearby.model.Request;
 
 /**
  * Created by kerrk on 8/28/16.

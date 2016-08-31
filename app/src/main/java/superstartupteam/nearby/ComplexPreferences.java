@@ -1,12 +1,9 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 
 /**
  * Created by kerrk on 7/17/16.

@@ -1,4 +1,4 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.model.User;
 
 public class LoginActivity extends AppCompatActivity {
 

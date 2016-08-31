@@ -1,10 +1,10 @@
-package impulusecontrol.lend;
+package superstartupteam.nearby;
 
 import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import impulusecontrol.lend.model.User;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 7/17/16.

@@ -1,4 +1,4 @@
-package impulusecontrol.lend.model;
+package superstartupteam.nearby.model;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package impulusecontrol.lend.model;
+package superstartupteam.nearby.model;
 
 /**
  * Created by kerrk on 7/16/16.
