@@ -28,6 +28,7 @@ import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewRequestDialogFragment;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity
         user = PrefUtils.getCurrentUser(MainActivity.this);
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
+        Log.i("****TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
     }
 
     public void showDialog(View view) {

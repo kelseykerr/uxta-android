@@ -43,4 +43,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
     compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.0'
+    compile 'com.google.firebase:firebase-core:9.4.0'
+    compile 'com.google.firebase:firebase-messaging:9.4.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
