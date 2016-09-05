@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
         user = PrefUtils.getCurrentUser(MainActivity.this);
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
-        Log.i("****TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
+        Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
     }
 
     public void showDialog(View view) {
