@@ -1,9 +1,20 @@
 package superstartupteam.nearby.service;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import superstartupteam.nearby.AppUtils;
+import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.PrefUtils;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 9/1/16.
@@ -37,8 +48,30 @@ public class NearbyInstanceIdService extends FirebaseInstanceIdService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
+    private void sendRegistrationToServer(final String token) {
+        final Context context = this;
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/fcmToken/" + token);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    User user = PrefUtils.getCurrentUser(context);
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    int responseCode = conn.getResponseCode();
+                    Log.i("PUT /fcmToken", "Response Code : " + responseCode);
+                    if (responseCode != 204) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update user's fcm token: " + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
     }
 
 }
