@@ -63,6 +63,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected TextView vPostedDate;
         protected TextView vDescription;
         protected Context context;
+        protected TextView vMakeOfferButton;
 
         public RequestViewHolder(Context context, View v) {
             super(v);
@@ -70,7 +71,14 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView)  v.findViewById(R.id.category_name);
             vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
+            vMakeOfferButton = (TextView) v.findViewById(R.id.make_offer_button);
             this.context = context;
+
+            vMakeOfferButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    
+                }
+            });
         }
     }
 }

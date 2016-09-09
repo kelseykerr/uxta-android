@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -88,6 +91,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private TextView noResults;
     private ScrollView listView;
     private RelativeLayout requestMapView;
+    private TextView newOfferBtn;
 
 
     private OnFragmentInteractionListener mListener;
@@ -153,7 +157,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
+
+        newOfferBtn = (TextView) v.findViewById(R.id.make_offer_button);
+        newOfferBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(v);
+            }
+        });
         return v;
+    }
+
+    public void showDialog(View view) {
+        DialogFragment newFragment = NewOfferDialogFragment
+                .newInstance(requestAdapter.getItemId());
+        newFragment.show(getFragmentManager(), "dialog");
     }
 
     private void getRequests(final Double radius) {
