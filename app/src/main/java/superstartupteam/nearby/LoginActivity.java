@@ -1,6 +1,7 @@
 package superstartupteam.nearby;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.CallbackManager;
@@ -17,6 +18,10 @@ import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import superstartupteam.nearby.model.User;
 
@@ -40,16 +45,31 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onPostResume() {
         super.onPostResume();
+        if(user != null && user.getAccessToken() != null){
+            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
     }
 
     @Override
     public void onStart() {
-        super.onStart();  // Always call the superclass method first
-    }
+        super.onStart();
+        if(user != null && user.getAccessToken() != null){
+            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
+    } // Always call the superclass method first
 
     @Override
     public void onRestart() {
         super.onRestart();
+        if(user != null && user.getAccessToken() != null){
+            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
     }
 
 
@@ -61,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
-        if(user != null && user.getAccessToken() != null){
+        if(user != null && user.getAccessToken() != null && user.getId() != null){
             Log.i("Current token: ", user.getAccessToken() + " ****************");
             Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(homeIntent);
@@ -94,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                                     user.setGender(gender);
                                     user.setUserId(loginResult.getAccessToken().getUserId());
                                     user.setAccessToken(loginResult.getAccessToken().getToken());
-                                    PrefUtils.setCurrentUser(user, LoginActivity.this);
+                                    getUserInfoFromServer();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -121,6 +141,35 @@ public class LoginActivity extends AppCompatActivity {
                 info.setText("Login attempt failed.");
             }
         });
+    }
+
+    public void getUserInfoFromServer() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    String output = AppUtils.getResponseContent(conn);
+                    try {
+                        User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
+                        //TODO: populate other fields here so they can be used in the account section
+                        user.setId(userFromServer.getId());
+                        PrefUtils.setCurrentUser(user, LoginActivity.this);
+                    } catch (IOException e) {
+                        Log.e("Error", "Received an error while trying to read " +
+                                "user info from server: " + e.getMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not get user info from server: " + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
     }
 
 

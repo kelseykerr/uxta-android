@@ -121,6 +121,7 @@ public class HistoryFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    //TODO: change this to getHistory and call the /users/me/history endpoint
     public void getRequests() {
         new AsyncTask<Void, Void, Void>() {
             @Override

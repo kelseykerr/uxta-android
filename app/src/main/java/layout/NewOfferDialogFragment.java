@@ -224,6 +224,11 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         double offer = Double.parseDouble(offerPrice.getText().toString());
         response.setOfferPrice(offer);
         String offerType = offerTypeSpinner.getSelectedItem().toString();
+        if (offerType.equals("per day")) {
+            offerType= "per_day";
+        } else if (offerType.equals("per hour")) {
+            offerType = "per_hour";
+        }
         response.setPriceType(offerType);
         return response;
     }
