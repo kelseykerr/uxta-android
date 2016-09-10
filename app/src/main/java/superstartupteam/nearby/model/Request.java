@@ -31,6 +31,8 @@ public class Request extends BaseEntity {
 
     private Double longitude;
 
+    private String status;
+
     @JsonProperty("location")
     private Location location = new Location();
 
@@ -124,7 +126,13 @@ public class Request extends BaseEntity {
         this.location = location;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public static class Location {
 

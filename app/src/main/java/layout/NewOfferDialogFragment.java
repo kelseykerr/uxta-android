@@ -1,7 +1,10 @@
 package layout;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -88,7 +91,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         offerTypes.add("per hour");
         offerTypes.add("per day");
         ArrayAdapter<String> offerTypeAdapter;
-        offerTypeSpinner = (Spinner) view.findViewById(R.id.request_type);
+        offerTypeSpinner = (Spinner) view.findViewById(R.id.offer_type);
         offerTypeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, offerTypes);
         offerTypeSpinner.setAdapter(offerTypeAdapter);
         offerTypeSpinner.setOnItemSelectedListener(this);
@@ -114,10 +117,16 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            //TODO: This doesn't work!!
+            dialog.getWindow().setWindowAnimations(R.style.RequestDialog);
+
         }
     }
 
@@ -156,8 +165,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
                     Response newResponse = createNewResponseObject();
                     ObjectMapper mapper = new ObjectMapper();
-                    String requestJson = mapper.writeValueAsString(newResponse);
-                    byte[] outputInBytes = requestJson.getBytes("UTF-8");
+                    String responseJson = mapper.writeValueAsString(newResponse);
+                    Log.i("response json: ", responseJson);
+                    byte[] outputInBytes = responseJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
                     os.close();

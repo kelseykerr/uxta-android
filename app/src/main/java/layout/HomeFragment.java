@@ -91,8 +91,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private TextView noResults;
     private ScrollView listView;
     private RelativeLayout requestMapView;
-    private TextView newOfferBtn;
-
 
     private OnFragmentInteractionListener mListener;
 
@@ -157,19 +155,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
-
-        newOfferBtn = (TextView) v.findViewById(R.id.make_offer_button);
-        newOfferBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDialog(v);
-            }
-        });
         return v;
     }
 
-    public void showDialog(View view) {
+    public void showDialog(String itemId) {
         DialogFragment newFragment = NewOfferDialogFragment
-                .newInstance(requestAdapter.getItemId());
+                .newInstance(itemId);
         newFragment.show(getFragmentManager(), "dialog");
     }
 
@@ -305,7 +296,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             currLocationMarker = map.addMarker(markerOptions);
             getRequests(.1);
             if (recList != null) {
-                requestAdapter = new RequestAdapter(requests);
+                requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
             }
         }

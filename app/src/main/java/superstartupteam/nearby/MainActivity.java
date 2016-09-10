@@ -23,6 +23,7 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import layout.NewOfferDialogFragment;
 import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
@@ -37,7 +38,8 @@ public class MainActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
         NewRequestDialogFragment.OnFragmentInteractionListener,
-        HistoryFragment.OnFragmentInteractionListener {
+        HistoryFragment.OnFragmentInteractionListener,
+        NewOfferDialogFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
