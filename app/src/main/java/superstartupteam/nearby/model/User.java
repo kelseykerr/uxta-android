@@ -33,7 +33,7 @@ public class User extends BaseEntity {
 
     private String zip;
 
-    private String _id;
+    private String fullName;
 
     public User() {
 
@@ -151,11 +151,11 @@ public class User extends BaseEntity {
         this.zip = zip;
     }
 
-    public String get_id() {
-        return _id;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void set_id(String _id) {
-        this._id = _id;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

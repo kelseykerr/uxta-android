@@ -24,6 +24,7 @@ import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.HistoryCardAdapter;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
+import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
 
@@ -38,7 +39,7 @@ import superstartupteam.nearby.model.User;
 public class HistoryFragment extends Fragment {
     private Context context;
     private User user;
-    private List<Request> recentRequests = new ArrayList<>();
+    private List<History> recentHistory = new ArrayList<>();
     private RecyclerView requestHistoryList;
     private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
@@ -66,7 +67,7 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        historyCardAdapter = new HistoryCardAdapter(recentRequests);
+        historyCardAdapter = new HistoryCardAdapter(recentHistory);
         super.onCreate(savedInstanceState);
     }
 
@@ -126,7 +127,7 @@ public class HistoryFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/requests");
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
@@ -134,8 +135,8 @@ public class HistoryFragment extends Fragment {
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
                     try {
-                        recentRequests = AppUtils.jsonStringToRequestList(output);
-                        Log.e("**", recentRequests.size() + "***re size");
+                        recentHistory = AppUtils.jsonStringToHistoryList(output);
+                        Log.e("**", recentHistory.size() + "***re size");
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to fetch " +
                                 "requests from server, please try again later!");
@@ -149,7 +150,7 @@ public class HistoryFragment extends Fragment {
             @Override
             protected void onPostExecute(Void result) {
                 if (historyCardAdapter != null) {
-                    historyCardAdapter.swap(recentRequests);
+                    historyCardAdapter.swap(recentHistory);
                 }
             }
         }.execute();

@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -89,7 +92,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private ScrollView listView;
     private RelativeLayout requestMapView;
 
-
     private OnFragmentInteractionListener mListener;
 
     public HomeFragment() {
@@ -156,6 +158,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         return v;
     }
 
+    public void showDialog(String itemId) {
+        DialogFragment newFragment = NewOfferDialogFragment
+                .newInstance(itemId);
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
     private void getRequests(final Double radius) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -213,7 +221,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(currLocationMarker.getPosition());
 
-                //TODO: up android version & use java 8 streams here
                 for (Request request : requests) {
                     LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -288,7 +295,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             currLocationMarker = map.addMarker(markerOptions);
             getRequests(.1);
             if (recList != null) {
-                requestAdapter = new RequestAdapter(requests);
+                requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
             }
         }

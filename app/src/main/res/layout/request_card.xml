@@ -81,10 +81,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/posted_date"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:layout_marginTop="6dp"
                     android:text="description"
                     android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/make_offer_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/description"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="6dp"
+                    android:background="#4EE2EC"
+                    android:padding="10dp"
+                    android:text="make an offer"
+                    android:layout_marginBottom="6dp"
+                    android:textColor="#fff" />
+
+
             </RelativeLayout>
 
         </FrameLayout>
