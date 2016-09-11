@@ -221,7 +221,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(currLocationMarker.getPosition());
 
-                //TODO: up android version & use java 8 streams here
                 for (Request request : requests) {
                     LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
