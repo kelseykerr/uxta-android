@@ -18,6 +18,9 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import superstartupteam.nearby.model.User;
 
 public class LoginActivity extends AppCompatActivity {
@@ -63,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         user = PrefUtils.getCurrentUser(LoginActivity.this);
         if(user != null && user.getAccessToken() != null){
             Log.i("Current token: ", user.getAccessToken() + " ****************");
+
             Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(homeIntent);
             finish();
@@ -95,6 +99,13 @@ public class LoginActivity extends AppCompatActivity {
                                     user.setUserId(loginResult.getAccessToken().getUserId());
                                     user.setAccessToken(loginResult.getAccessToken().getToken());
                                     PrefUtils.setCurrentUser(user, LoginActivity.this);
+
+/*                                    List<String> arrNames = new ArrayList<String>;
+                                    arrNames=object.names();
+                                    for (int i=0; i<arrNames.size(); i++) {
+                                        Log.i("JSON Names: ", arrNames[i] + "<---- name from JSON object");
+                                    }
+*/
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
