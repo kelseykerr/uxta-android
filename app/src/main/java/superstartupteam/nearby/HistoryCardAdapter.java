@@ -56,6 +56,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
             requestViewHolder.vPostedDate.setText(diff);
             requestViewHolder.vCategoryName.setText("");
+            requestViewHolder.vDescription.setText("");
         }
         // description and category will appear when the card is clicked/expanded
         requestViewHolder.vDescription.setVisibility(View.GONE);
