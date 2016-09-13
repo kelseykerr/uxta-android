@@ -21,5 +21,10 @@
         <item>select a category...</item>
         <item>tools</item>
     </string-array>
+    <string-array name="offer_type_array">
+        <item>flat</item>
+        <item>per hour</item>
+        <item>per day</item>
+    </string-array>
 
 </resources>

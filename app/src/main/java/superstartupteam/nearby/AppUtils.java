@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import superstartupteam.nearby.model.BaseEntity;
+import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
 
 /**
@@ -33,6 +34,17 @@ public class AppUtils {
             return pojos;
         } catch (IOException e) {
             Log.e("***", "error converting string to response list: " + e.getMessage());
+            throw new IOException(e);
+        }
+    }
+
+    public static List<History> jsonStringToHistoryList(String jsonString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            List<History> pojos = mapper.readValue(jsonString, new TypeReference<List<History>>() {});
+            return pojos;
+        } catch (IOException e) {
+            Log.e("***", "error converting string to history list: " + e.getMessage());
             throw new IOException(e);
         }
     }

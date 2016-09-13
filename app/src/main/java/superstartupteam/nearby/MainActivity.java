@@ -3,9 +3,11 @@ package superstartupteam.nearby;
 import android.Manifest;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
@@ -20,14 +22,29 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import layout.NewOfferDialogFragment;
+import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewRequestDialogFragment;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -36,7 +53,8 @@ public class MainActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
         NewRequestDialogFragment.OnFragmentInteractionListener,
-        HistoryFragment.OnFragmentInteractionListener {
+        HistoryFragment.OnFragmentInteractionListener,
+        NewOfferDialogFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
@@ -110,9 +128,18 @@ public class MainActivity extends AppCompatActivity
         setmBottomBarListener();
 
         user = PrefUtils.getCurrentUser(MainActivity.this);
+        if (user == null || user.getAccessToken() == null) {
+            if(user != null && user.getAccessToken() != null){
+                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(loginIntent);
+                finish();
+            }
+        }
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
+        Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
     }
+
 
     public void showDialog(View view) {
         DialogFragment newFragment = NewRequestDialogFragment

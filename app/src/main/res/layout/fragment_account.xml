@@ -88,6 +88,20 @@
                     android:text="Logout"
                     android:textColor="#fff" />
 
+                <TextView
+                    android:id="@+id/updateAccount_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/user_city_zip"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/logout_button"
+                    android:background="#4EE2EC"
+                    android:padding="10dp"
+                    android:text="Update Account"
+                    android:textColor="#fff" />
+
             </RelativeLayout>
 
         </RelativeLayout>

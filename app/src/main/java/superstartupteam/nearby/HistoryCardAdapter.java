@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,39 +14,54 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/28/16.
  */
 public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.HistoryCardViewHolder> {
-    private List<Request> requests;
+    private List<History> recentHistory;
+    private User user;
 
-    public HistoryCardAdapter(List<Request> requests) {
-        this.requests = requests;
+    public HistoryCardAdapter(List<History> recentHistory) {
+        this.recentHistory = recentHistory;
     }
 
     @Override
     public int getItemCount() {
-        return requests.size();
+        return recentHistory.size();
     }
 
     @Override
     public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
-        Request r = requests.get(i);
-        String htmlString = "requested a <b>" +
-                r.getItemName() + "</b>";
-        requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
-        String diff = AppUtils.getTimeDiffString(r.getPostDate());
-        requestViewHolder.vPostedDate.setText(diff);
+        History h = recentHistory.get(i);
+        Request r = h.getRequest();
+        if (user.getId().equals(r.getUser().getId())) {
+            String htmlString = "requested a <b>" +
+                    r.getItemName() + "</b>";
+            requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
+            String diff = AppUtils.getTimeDiffString(r.getPostDate());
+            requestViewHolder.vPostedDate.setText(diff);
+            if (r.getCategory() != null)  {
+                requestViewHolder.vCategoryName.setText(r.getCategory().getName());
+            }
+        } else {
+            String buyerName = r.getUser().getFirstName() != null ?
+                    r.getUser().getFirstName() : r.getUser().getFullName();
+            String htmlString = "offered a <b>" +
+                    r.getItemName() + "</b> to " + buyerName;
+            String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
+            requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
+            requestViewHolder.vPostedDate.setText(diff);
+            requestViewHolder.vCategoryName.setText("");
+            requestViewHolder.vDescription.setText("");
+        }
         // description and category will appear when the card is clicked/expanded
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
-        if (r.getCategory() == null) {
-            requestViewHolder.vCategoryName.setVisibility(View.GONE);
-        } else {
-            requestViewHolder.vCategoryName.setText(r.getCategory().getName());
-        }
+
         //this click method will expand/close the card
         requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +73,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     @Override
     public HistoryCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        user = PrefUtils.getCurrentUser(viewGroup.getContext());
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.my_history_card, viewGroup, false);
@@ -64,9 +81,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         return new HistoryCardViewHolder(context, itemView);
     }
 
-    public void swap(List<Request> newRequests){
-        requests.clear();
-        requests.addAll(newRequests);
+    public void swap(List<History> newHistory){
+        recentHistory.clear();
+        recentHistory.addAll(newHistory);
         notifyDataSetChanged();
     }
 

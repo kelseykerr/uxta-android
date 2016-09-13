@@ -39,6 +39,7 @@ public class AccountFragment extends Fragment {
     private Context context;
     private Bitmap bitmap;
     private TextView btnLogout;
+    private TextView updateAccount;
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
@@ -100,6 +101,7 @@ public class AccountFragment extends Fragment {
             }
         }.execute();
 
+
         btnLogout = (TextView) view.findViewById(R.id.logout_button);
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -114,12 +116,31 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        updateAccount = (TextView) view.findViewById(R.id.logout_button);
+
+        updateAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                user.setAddress("new Street address");
+                user.setAddressLine2("new City/Zip"));
+                //TODO create putUserInformationToServerRoutine
+                //     create new form for user to enter this data
+            }
+        });
+
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
         TextView myAwesomeTextView = (TextView) view.findViewById(R.id.user_profile_name);
         myAwesomeTextView.setText(user.getName());
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        TextView mAddressStreet = (TextView) view.findViewById(R.id.user_home_address_street);
+        mAddressStreet.setText(user.getAddress());
+
+        TextView mAddressCityZip = (TextView) view.findViewById(R.id.user_city_zip);
+        mAddressCityZip.setText(user.getAddressLine2());
+
         ;
         return view;
 
