@@ -122,7 +122,7 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 user.setAddress("new Street address");
-                user.setAddressLine2("new City/Zip"));
+                user.setAddressLine2("new City/Zip");
                 //TODO create putUserInformationToServerRoutine
                 //     create new form for user to enter this data
             }
