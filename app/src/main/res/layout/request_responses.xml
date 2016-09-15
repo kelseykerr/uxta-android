@@ -7,7 +7,6 @@
     android:id="@+id/responder_name"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="8dp"
     android:text="" />
 
     <TextView
@@ -15,32 +14,27 @@
         android:layout_toEndOf="@id/responder_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text=" offered you their " />
-
-    <TextView
-        android:id="@+id/item_name"
-        android:layout_toEndOf="@id/offer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="" />
+        android:text=" made an offer for " />
 
     <TextView
         android:id="@+id/offer_text_2"
-        android:layout_toEndOf="@id/item_name"
+        android:layout_toEndOf="@id/offer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text=" for $" />
+        android:text=" $" />
 
     <TextView
         android:id="@+id/offer_amount"
         android:layout_toEndOf="@id/offer_text_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:text=" " />
 
+    <TextView
+        android:id="@+id/offer_type"
+        android:layout_toEndOf="@id/offer_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" " />
 
 </RelativeLayout>

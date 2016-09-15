@@ -80,11 +80,6 @@ public class HistoryFragment extends Fragment {
         this.view = view;
         getRequests();
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
-        /*requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-        requestHistoryList.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(context);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        requestHistoryList.setLayoutManager(llm);*/
         return view;
 
     }
@@ -164,7 +159,7 @@ public class HistoryFragment extends Fragment {
                         objs.add(h);
                     }
                     requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-                    requestHistoryList.setHasFixedSize(true);
+                    //requestHistoryList.setHasFixedSize(true);
                     LinearLayoutManager llm = new LinearLayoutManager(context);
                     llm.setOrientation(LinearLayoutManager.VERTICAL);
                     requestHistoryList.setLayoutManager(llm);

@@ -50,8 +50,12 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     public void onBindChildViewHolder(final ResponseViewHolder responseViewHolder, int i, Object obj) {
         Response r = (Response) obj;
         responseViewHolder.mOfferAmount.setText(r.getOfferPrice().toString());
-        responseViewHolder.mResponderName.setText("test user");
-
+        responseViewHolder.mResponderName.setText(r.getSeller().getFirstName());
+        if (r.getPriceType().equals("per_hour")) {
+            responseViewHolder.mPriceType.setText(" per hour");
+        } else if (r.getPriceType().equals("per_day")) {
+            responseViewHolder.mPriceType.setText(" per day");
+        }
     }
 
     @Override
@@ -81,22 +85,11 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         // description and category will appear when the card is clicked/expanded
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
-
-        //this click method will expand/close the card
-        /*requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestViewHolder.onClick(v);
-            }
-        });*/
     }
 
     @Override
     public HistoryCardViewHolder onCreateParentViewHolder(ViewGroup viewGroup) {
         user = PrefUtils.getCurrentUser(viewGroup.getContext());
-        /*View itemView = LayoutInflater.
-                from(viewGroup.getContext()).
-                inflate(R.layout.my_history_card, viewGroup, false);*/
         Context context = viewGroup.getContext();
         View view = mInflater.inflate(R.layout.my_history_card, viewGroup, false);
         return new HistoryCardViewHolder(context, view);
@@ -104,9 +97,6 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
 
     @Override
     public ResponseViewHolder onCreateChildViewHolder(ViewGroup viewGroup) {
-        /*View itemView = LayoutInflater.
-                from(viewGroup.getContext()).
-                inflate(R.layout.request_responses, viewGroup, false);*/
         View view = mInflater.inflate(R.layout.request_responses, viewGroup, false);
         return new ResponseViewHolder(view);
     }
@@ -122,13 +112,14 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         public TextView mResponderName;
         public TextView mItemName;
         public TextView mOfferAmount;
+        public TextView mPriceType;
 
         public ResponseViewHolder(View itemView) {
             super(itemView);
             mResponderName = (TextView) itemView.findViewById(R.id.responder_name);
             mItemName = (TextView) itemView.findViewById(R.id.item_name);
             mOfferAmount = (TextView) itemView.findViewById(R.id.offer_amount);
-
+            mPriceType = (TextView) itemView.findViewById(R.id.offer_type);
         }
     }
 
