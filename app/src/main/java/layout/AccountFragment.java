@@ -116,7 +116,7 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        updateAccount = (TextView) view.findViewById(R.id.logout_button);
+        updateAccount = (TextView) view.findViewById(R.id.updateAccount_button);
 
         updateAccount.setOnClickListener(new View.OnClickListener() {
             @Override

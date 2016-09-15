@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -25,7 +27,7 @@ import superstartupteam.nearby.HistoryCardAdapter;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.History;
-import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -67,7 +69,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        historyCardAdapter = new HistoryCardAdapter(recentHistory);
         super.onCreate(savedInstanceState);
     }
 
@@ -76,15 +77,14 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
+        this.view = view;
+        getRequests();
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
-        requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
+        /*requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
         requestHistoryList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        requestHistoryList.setLayoutManager(llm);
-        requestHistoryList.setAdapter(historyCardAdapter);
-        getRequests();
-        this.view = view;
+        requestHistoryList.setLayoutManager(llm);*/
         return view;
 
     }
@@ -136,7 +136,13 @@ public class HistoryFragment extends Fragment {
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         recentHistory = AppUtils.jsonStringToHistoryList(output);
-                        Log.e("**", recentHistory.size() + "***re size");
+                        for (History h:recentHistory) {
+                            List<Object> resp = new ArrayList<Object>();
+                            for (Response r:h.getResponses()) {
+                                resp.add(r);
+                            }
+                            h.setChildObjectList(resp);
+                        }
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to fetch " +
                                 "requests from server, please try again later!");
@@ -151,6 +157,23 @@ public class HistoryFragment extends Fragment {
             protected void onPostExecute(Void result) {
                 if (historyCardAdapter != null) {
                     historyCardAdapter.swap(recentHistory);
+                } else {
+                    List<ParentObject> objs = new ArrayList<ParentObject>();
+                    for (History h:recentHistory) {
+                        Log.e("*#resp:", h.getResponses().size() + "***resp length");
+                        objs.add(h);
+                    }
+                    requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
+                    requestHistoryList.setHasFixedSize(true);
+                    LinearLayoutManager llm = new LinearLayoutManager(context);
+                    llm.setOrientation(LinearLayoutManager.VERTICAL);
+                    requestHistoryList.setLayoutManager(llm);
+
+                    historyCardAdapter = new HistoryCardAdapter(context, objs);
+                    historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
+                    historyCardAdapter.setParentClickableViewAnimationDefaultDuration();
+                    historyCardAdapter.setParentAndIconExpandOnClick(true);
+                    requestHistoryList.setAdapter(historyCardAdapter);
                 }
             }
         }.execute();

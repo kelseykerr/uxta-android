@@ -45,6 +45,7 @@ dependencies {
     compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.0'
     compile 'com.google.firebase:firebase-core:9.4.0'
     compile 'com.google.firebase:firebase-messaging:9.4.0'
+    compile 'com.bignerdranch.android:expandablerecyclerview:1.0.3'
 }
 
 apply plugin: 'com.google.gms.google-services'

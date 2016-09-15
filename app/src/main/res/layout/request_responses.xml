@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#cbcbcb">
+
+    <TextView
+    android:id="@+id/responder_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:text="" />
+
+    <TextView
+        android:id="@+id/offer_text"
+        android:layout_toEndOf="@id/responder_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text=" offered you their " />
+
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_toEndOf="@id/offer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/offer_text_2"
+        android:layout_toEndOf="@id/item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text=" for $" />
+
+    <TextView
+        android:id="@+id/offer_amount"
+        android:layout_toEndOf="@id/offer_text_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text=" " />
+
+
+</RelativeLayout>

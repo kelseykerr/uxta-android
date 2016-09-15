@@ -10,33 +10,53 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapterHelper;
+import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+import com.bignerdranch.expandablerecyclerview.Model.ParentWrapper;
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/28/16.
  */
-public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.HistoryCardViewHolder> {
+public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAdapter.HistoryCardViewHolder, HistoryCardAdapter.ResponseViewHolder> {
     private List<History> recentHistory;
     private User user;
+    private LayoutInflater mInflater;
 
-    public HistoryCardAdapter(List<History> recentHistory) {
-        this.recentHistory = recentHistory;
+    public HistoryCardAdapter(Context context, List<ParentObject> parentItemList) {
+        super(context, parentItemList);
+        List<History> objs = new ArrayList<>();
+        for (ParentObject p: parentItemList) {
+            objs.add((History) p);
+        }
+        this.recentHistory = objs;
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
-    public int getItemCount() {
-        return recentHistory.size();
+    public void onBindChildViewHolder(final ResponseViewHolder responseViewHolder, int i, Object obj) {
+        Response r = (Response) obj;
+        responseViewHolder.mOfferAmount.setText(r.getOfferPrice().toString());
+        responseViewHolder.mResponderName.setText("test user");
+
     }
 
     @Override
-    public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
-        History h = recentHistory.get(i);
+    public void onBindParentViewHolder(final HistoryCardViewHolder requestViewHolder, int i, Object obj) {
+        History h = (History) obj;
         Request r = h.getRequest();
         if (user.getId().equals(r.getUser().getId())) {
             String htmlString = "requested a <b>" +
@@ -63,22 +83,32 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
 
         //this click method will expand/close the card
-        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+        /*requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 requestViewHolder.onClick(v);
             }
-        });
+        });*/
     }
 
     @Override
-    public HistoryCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public HistoryCardViewHolder onCreateParentViewHolder(ViewGroup viewGroup) {
         user = PrefUtils.getCurrentUser(viewGroup.getContext());
-        View itemView = LayoutInflater.
+        /*View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
-                inflate(R.layout.my_history_card, viewGroup, false);
+                inflate(R.layout.my_history_card, viewGroup, false);*/
         Context context = viewGroup.getContext();
-        return new HistoryCardViewHolder(context, itemView);
+        View view = mInflater.inflate(R.layout.my_history_card, viewGroup, false);
+        return new HistoryCardViewHolder(context, view);
+    }
+
+    @Override
+    public ResponseViewHolder onCreateChildViewHolder(ViewGroup viewGroup) {
+        /*View itemView = LayoutInflater.
+                from(viewGroup.getContext()).
+                inflate(R.layout.request_responses, viewGroup, false);*/
+        View view = mInflater.inflate(R.layout.request_responses, viewGroup, false);
+        return new ResponseViewHolder(view);
     }
 
     public void swap(List<History> newHistory){
@@ -87,16 +117,30 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         notifyDataSetChanged();
     }
 
+    public static class ResponseViewHolder extends ChildViewHolder {
+
+        public TextView mResponderName;
+        public TextView mItemName;
+        public TextView mOfferAmount;
+
+        public ResponseViewHolder(View itemView) {
+            super(itemView);
+            mResponderName = (TextView) itemView.findViewById(R.id.responder_name);
+            mItemName = (TextView) itemView.findViewById(R.id.item_name);
+            mOfferAmount = (TextView) itemView.findViewById(R.id.offer_amount);
+
+        }
+    }
 
 
-    public static class HistoryCardViewHolder extends RecyclerView.ViewHolder {
+    public static class HistoryCardViewHolder extends ParentViewHolder {
         protected TextView vItemName;
         protected TextView vCategoryName;
         protected TextView vPostedDate;
         protected TextView vDescription;
         protected Context context;
-        private int mOriginalHeight = 0;
-        private boolean isViewExpanded = false;
+        private ImageButton vParentDropDownArrow;
+
         protected CardView cardView;
 
         public HistoryCardViewHolder(Context context, View v) {
@@ -106,36 +150,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
             cardView = (CardView) itemView.findViewById(R.id.my_history_card_view);
-
+            vParentDropDownArrow = (ImageButton) itemView.findViewById(R.id.parent_list_item_expand_arrow);
             this.context = context;
-        }
-
-        public void onClick(final View v) {
-            if (mOriginalHeight == 0) {
-                mOriginalHeight = v.getHeight();
-            }
-            ValueAnimator valueAnimator;
-            if (!isViewExpanded) {
-                isViewExpanded = true;
-                vDescription.setVisibility(View.VISIBLE);
-                vCategoryName.setVisibility(View.VISIBLE);
-                valueAnimator = ValueAnimator.ofInt(mOriginalHeight, mOriginalHeight + (int) (mOriginalHeight * 1.5));
-            } else {
-                isViewExpanded = false;
-                vDescription.setVisibility(View.GONE);
-                vCategoryName.setVisibility(View.GONE);
-                valueAnimator = ValueAnimator.ofInt(mOriginalHeight + (int) (mOriginalHeight * 1.5), mOriginalHeight);
-            }
-                valueAnimator.setDuration(300);
-                valueAnimator.setInterpolator(new LinearInterpolator());
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        Integer value = (Integer) animation.getAnimatedValue();
-                        v.getLayoutParams().height = value.intValue();
-                        v.requestLayout();
-                    }
-                });
-                valueAnimator.start();
         }
     }
 }
