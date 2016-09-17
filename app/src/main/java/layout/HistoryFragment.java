@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
@@ -78,7 +79,7 @@ public class HistoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         this.view = view;
-        getRequests();
+        getRequests(this);
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
         return view;
 
@@ -117,7 +118,19 @@ public class HistoryFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public void getRequests() {
+    public void showRequestDialog(History h) {
+        DialogFragment newFragment = NewRequestDialogFragment
+                .newInstance(h.getRequest());
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void showResponseDialog(Response r) {
+        DialogFragment newFragment = ViewOfferDialogFragment
+                .newInstance(r);
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void getRequests(final HistoryFragment thisFragment) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -155,7 +168,6 @@ public class HistoryFragment extends Fragment {
                 } else {
                     List<ParentObject> objs = new ArrayList<ParentObject>();
                     for (History h:recentHistory) {
-                        Log.e("*#resp:", h.getResponses().size() + "***resp length");
                         objs.add(h);
                     }
                     requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
@@ -164,10 +176,10 @@ public class HistoryFragment extends Fragment {
                     llm.setOrientation(LinearLayoutManager.VERTICAL);
                     requestHistoryList.setLayoutManager(llm);
 
-                    historyCardAdapter = new HistoryCardAdapter(context, objs);
+                    historyCardAdapter = new HistoryCardAdapter(context, objs, thisFragment);
                     historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
                     historyCardAdapter.setParentClickableViewAnimationDefaultDuration();
-                    historyCardAdapter.setParentAndIconExpandOnClick(true);
+                    historyCardAdapter.setParentAndIconExpandOnClick(false);
                     requestHistoryList.setAdapter(historyCardAdapter);
                 }
             }

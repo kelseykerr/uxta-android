@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/my_history_card_view"
@@ -8,7 +8,6 @@
     app:cardPreventCornerOverlap="false"
     android:clickable="true"
     app:cardUseCompatPadding="true"
-    android:paddingBottom="15dp"
     card_view:cardElevation="0dp">
 
     <FrameLayout
@@ -25,53 +24,81 @@
                 android:id="@+id/item_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="6dp"
                 android:gravity="center_vertical"
                 android:text=""
-                android:textSize="18dp" />
-
-            <TextView
-                android:id="@+id/posted_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/item_name"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:text=""
-                android:textSize="14dp" />
+                android:textSize="18sp"/>
 
             <TextView
                 android:id="@+id/category_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/posted_date"
-                android:layout_marginLeft="5dp"
+                android:layout_below="@id/item_name"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="6dp"
                 android:gravity="center_vertical"
                 android:text=""
-                android:textSize="14dp" />
-
+                android:textSize="14sp"/>
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/category_name"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="50dp"
                 android:layout_marginTop="6dp"
                 android:text=""
-                android:textSize="14dp" />
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/posted_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/description"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/history_card_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/posted_date"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:textStyle="italic"
+                android:text=""
+                android:textSize="14sp" />
+
 
             <ImageButton
                 android:id="@+id/parent_list_item_expand_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignEnd="@id/item_name"
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
+
+            <ImageButton
+                android:id="@+id/edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignEnd="@id/history_card_status"
+                android:layout_below="@id/parent_list_item_expand_arrow"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/white"
+                android:src="@drawable/ic_mode_edit_black_24dp" />
+
         </RelativeLayout>
 
     </FrameLayout>
 
-</android.support.v7.widget.CardView>
+</FrameLayout>

@@ -40,6 +40,7 @@ import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Category;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -48,22 +49,31 @@ import superstartupteam.nearby.model.User;
 public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private User user;
     private Context context;
-    Spinner typeSpinner;
+    private Spinner typeSpinner;
     private OnFragmentInteractionListener mListener;
     private List<Category> categories;
     private List<String> categoryNames = new ArrayList<>();
-    Spinner categorySpinner;
-    Spinner rentalSpinner;
-    Button requestBtn;
-    EditText itemName;
-    EditText description;
-    View view;
+    private Spinner categorySpinner;
+    private Spinner rentalSpinner;
+    private Button requestBtn;
+    private EditText itemName;
+    private EditText description;
+    private View view;
+    public static Request request;
 
     public NewRequestDialogFragment() {
 
     }
 
     public static NewRequestDialogFragment newInstance() {
+        NewRequestDialogFragment fragment = new NewRequestDialogFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static NewRequestDialogFragment newInstance(Request r) {
+        request = r;
         NewRequestDialogFragment fragment = new NewRequestDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -81,16 +91,12 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        List<String> types = new ArrayList<>();
-        types.add("item");
-        types.add("service");
         View view = inflater.inflate(R.layout.fragment_new_request, container, false);
-        ArrayAdapter<String> typeAdapter;
-        typeSpinner = (Spinner) view.findViewById(R.id.request_type);
-        typeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, types);
-        typeSpinner.setAdapter(typeAdapter);
-        typeSpinner.setOnItemSelectedListener(this);
 
+        if (request != null) {
+            Button btn = (Button) view.findViewById(R.id.create_request_button);
+            btn.setText("update request");
+        }
         itemName = (EditText) view.findViewById(R.id.request_name);
         description = (EditText) view.findViewById(R.id.request_description);
 
@@ -113,7 +119,11 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                createRequest(v);
+                if (request != null) {
+                    updateRequest();
+                } else {
+                    createRequest(v);
+                }
             }
         });
 
@@ -143,6 +153,19 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
             ((View) cancelText.getParent()).setTouchDelegate(touchDelegate);
         }
         this.view = view;
+        if (request != null) {
+            itemName.setText(request.getItemName());
+            if (request.getRental()) {
+                rentalSpinner.setSelection(0);
+            } else {
+                rentalSpinner.setSelection(1);
+            }
+            // TODO: update this as we add categories
+            if (request.getCategory() != null) {
+                categorySpinner.setSelection(1);
+            }
+            description.setText(request.getDescription());
+        }
         return view;
     }
 
@@ -181,6 +204,20 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         void onFragmentInteraction(Uri uri);
     }
 
+    private void updateRequestObject() {
+        request.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
+        if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
+            String cat = categorySpinner.getSelectedItem().toString();
+            for (Category c : categories) {
+                if (c.getName().equals(cat)) {
+                    request.setCategory(c);
+                }
+            }
+        }
+        request.setItemName(itemName.getText().toString());
+        request.setDescription(description.getText().toString());
+    }
+
     private Request createNewRequestObject() {
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
@@ -204,6 +241,55 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         newRequest.setLongitude(PrefUtils.latLng.longitude);
         newRequest.setLocation(null);
         return newRequest;
+    }
+
+    private void updateRequest() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty("Content-Type", "application/json");
+
+                    updateRequestObject();
+                    ObjectMapper mapper = new ObjectMapper();
+                    // we don't need to update the location or user info
+                    Request r = new Request();
+                    r = request;
+                    r.setUser(null);
+                    r.setLocation(null);
+                    String requestJson = mapper.writeValueAsString(r);
+                    Log.i("updated request: ", requestJson);
+                    byte[] outputInBytes = requestJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+                    Log.i("PUT /api/requests", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update request: " + e.getMessage());
+                }
+                return responseCode;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                if (responseCode == 200) {
+                    dismiss();
+                    ((MainActivity) getActivity()).goToHistory();
+                }
+            }
+        }.execute();
     }
 
     private void createRequest(View v) {

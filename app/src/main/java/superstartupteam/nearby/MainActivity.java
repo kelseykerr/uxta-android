@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
@@ -22,29 +21,16 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-import layout.NewOfferDialogFragment;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
+import layout.NewOfferDialogFragment;
 import layout.NewRequestDialogFragment;
-import com.google.firebase.iid.FirebaseInstanceId;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 7/17/16.
