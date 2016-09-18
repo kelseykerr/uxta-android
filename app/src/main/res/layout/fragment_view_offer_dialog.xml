@@ -26,16 +26,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/cancel_offer"
-            android:layout_marginTop="65dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="73dp"
+            android:layout_marginLeft="15dp"
             android:text="$" />
 
         <EditText
             android:id="@+id/response_offer_price"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="60dp"
             android:layout_toEndOf="@+id/money_sign"
             android:inputType="numberDecimal"
@@ -48,19 +46,113 @@
             android:id="@+id/offer_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="25dp"
-            android:layout_below="@+id/money_sign"
+            android:layout_marginStart="15dp"
+            android:textColor="@color/colorAccent"
+            android:layout_toEndOf="@+id/response_offer_price"
+            android:layout_marginTop="75dp"
             android:entries="@array/offer_type_array" />
+
+        <TextView
+            android:id="@+id/pickup_location_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/money_sign"
+            android:textSize="18sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="15dp"
+            android:text="Pickup Location" />
+
+        <EditText
+            android:id="@+id/pickup_location"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/pickup_location_label"
+            android:inputType="text"
+            android:layout_marginStart="15dp"
+            android:maxLines="2"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"
+            android:textColorHint="@color/mutedGrey" />
+
+        <TextView
+            android:id="@+id/pickup_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/pickup_location"
+            android:layout_marginTop="25dp"
+            android:textSize="18sp"
+            android:layout_marginStart="15dp"
+            android:text="Pickup Time:" />
+
+        <TextView
+            android:id="@+id/pickup_time"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:text=""
+            android:layout_below="@id/pickup_location"
+            android:layout_toEndOf="@+id/pickup_time_label"
+            android:layout_marginTop="28dp"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/return_location_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/pickup_time_label"
+            android:textSize="18sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="15dp"
+            android:text="Return Location" />
+
+        <EditText
+            android:id="@+id/return_location"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/return_location_label"
+            android:inputType="text"
+            android:layout_marginStart="15dp"
+            android:maxLines="2"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"
+            android:textColorHint="@color/mutedGrey" />
+
+        <TextView
+            android:id="@+id/return_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/return_location"
+            android:layout_marginTop="25dp"
+            android:textSize="18sp"
+            android:layout_marginStart="15dp"
+            android:text="Return Time:" />
+
+        <TextView
+            android:id="@+id/return_time"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:text=""
+            android:layout_below="@id/return_location"
+            android:layout_toEndOf="@+id/return_time_label"
+            android:layout_marginTop="28dp"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
+
 
         <Button
             android:layout_width="match_parent"
-            android:layout_below="@id/offer_type"
+            android:layout_below="@id/return_time_label"
             android:layout_height="wrap_content"
             android:text="accept/update offer"
             android:id="@+id/accept_offer_button"
             android:textColor="#ffffff"
+            android:layout_marginTop="45dp"
             android:background="@color/colorPrimary" />
 
         <Button

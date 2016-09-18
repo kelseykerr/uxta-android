@@ -17,8 +17,6 @@ import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +56,9 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             responseViewHolder.mPriceType.setText(" per hour");
         } else if (r.getPriceType().equals("per_day")) {
             responseViewHolder.mPriceType.setText(" per day");
+        }
+        if (r.getResponseStatus().equals(Response.Status.CLOSED)) {
+            responseViewHolder.mResponseDetailsButton.setVisibility(View.GONE);
         }
         responseViewHolder.mResponseStatus.setText(r.getResponseStatus().toString());
         responseViewHolder.mResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
@@ -118,9 +119,10 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             requestViewHolder.vDescription.setVisibility(View.GONE);
             requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
             // only edit if the offer is pending
-            if (!resp.getResponseStatus().equals("PENDING")) {
+            if (!resp.getResponseStatus().equals(Response.Status.PENDING)) {
                 requestViewHolder.vEditButton.setVisibility(View.GONE);
             }
+            requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
         }
     }
 

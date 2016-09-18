@@ -96,6 +96,8 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
             btn.setText("update request");
+            TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
+            dialogTitle.setText("Edit Request");
         }
         itemName = (EditText) view.findViewById(R.id.request_name);
         description = (EditText) view.findViewById(R.id.request_description);

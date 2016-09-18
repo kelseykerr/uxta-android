@@ -182,17 +182,17 @@ public class MainActivity extends AppCompatActivity
                     listMapText.setVisibility(View.INVISIBLE);
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
+                    /*if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
                                 .show(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
                                 .commit();
-                    } else {
+                    } else {*/
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
                                 .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                                 .commit();
-                    }
+                    //}
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
                 }
                 currentMenuItem = menuItemId;

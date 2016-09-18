@@ -28,6 +28,7 @@ import superstartupteam.nearby.HistoryCardAdapter;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.History;
+import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
@@ -125,8 +126,15 @@ public class HistoryFragment extends Fragment {
     }
 
     public void showResponseDialog(Response r) {
+        String requestId = r.getRequestId();
+        Request request = null;
+        for (History h: recentHistory) {
+            if (h.getRequest() != null && h.getRequest().getId().equals(requestId)) {
+                request = h.getRequest();
+            }
+        }
         DialogFragment newFragment = ViewOfferDialogFragment
-                .newInstance(r);
+                .newInstance(r, request);
         newFragment.show(getFragmentManager(), "dialog");
     }
 
@@ -178,7 +186,7 @@ public class HistoryFragment extends Fragment {
 
                     historyCardAdapter = new HistoryCardAdapter(context, objs, thisFragment);
                     historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
-                    historyCardAdapter.setParentClickableViewAnimationDefaultDuration();
+                    historyCardAdapter.setParentClickableViewAnimationDuration(0);
                     historyCardAdapter.setParentAndIconExpandOnClick(false);
                     requestHistoryList.setAdapter(historyCardAdapter);
                 }

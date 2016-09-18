@@ -20,14 +20,33 @@
             android:layout_height="wrap_content"
             android:background="@drawable/request_card_background">
 
+            <ImageButton
+                android:id="@+id/parent_list_item_expand_arrow"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_height="150dp"
+                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/rectangle_icon_background_grey"
+                android:src="@drawable/ic_keyboard_arrow_down_white_24dp" />
+
+            <ImageButton
+                android:id="@+id/edit_button"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/parent_list_item_expand_arrow"
+                android:layout_height="150dp"
+                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/rectangle_icon_background_darker_grey"
+                android:src="@drawable/ic_mode_edit_white_24dp" />
+
             <TextView
                 android:id="@+id/item_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="50dp"
+                android:layout_marginEnd="88dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
                 android:text=""
                 android:textSize="18sp"/>
 
@@ -40,17 +59,17 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center_vertical"
                 android:text=""
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/category_name"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="50dp"
+                android:layout_marginEnd="88dp"
                 android:layout_marginTop="6dp"
                 android:text=""
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/posted_date"
@@ -61,7 +80,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center_vertical"
                 android:text=""
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/history_card_status"
@@ -74,28 +93,6 @@
                 android:textStyle="italic"
                 android:text=""
                 android:textSize="14sp" />
-
-
-            <ImageButton
-                android:id="@+id/parent_list_item_expand_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignEnd="@id/item_name"
-                android:layout_margin="8dp"
-                android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
-
-            <ImageButton
-                android:id="@+id/edit_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignEnd="@id/history_card_status"
-                android:layout_below="@id/parent_list_item_expand_arrow"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:src="@drawable/ic_mode_edit_black_24dp" />
 
         </RelativeLayout>
 
