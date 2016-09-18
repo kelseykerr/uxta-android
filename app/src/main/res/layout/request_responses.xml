@@ -31,13 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/offer_text_2"
-        android:text=" " />
-
-    <TextView
-        android:id="@+id/offer_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/offer_amount"
+        android:layout_marginEnd="44dp"
         android:text=" " />
 
     <TextView
@@ -47,19 +41,16 @@
         android:paddingLeft="20dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/responder_name"
+        android:layout_marginEnd="44dp"
         android:text=" " />
-
 
     <ImageButton
         android:id="@+id/view_response_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignEnd="@id/history_card_status"
-        android:layout_below="@id/response_status"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="20dp"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="10dp"
         android:src="@drawable/ic_arrow_forward_black_24dp" />
 
 

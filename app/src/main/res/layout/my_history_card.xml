@@ -40,6 +40,15 @@
                 android:background="@drawable/rectangle_icon_background_darker_grey"
                 android:src="@drawable/ic_mode_edit_white_24dp" />
 
+            <ImageButton
+                android:id="@+id/view_response_button"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_forward_black_24dp" />
+
             <TextView
                 android:id="@+id/item_name"
                 android:layout_width="wrap_content"

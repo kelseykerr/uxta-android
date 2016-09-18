@@ -37,7 +37,7 @@ public class NearbyInstanceIdService extends FirebaseInstanceIdService {
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
-        sendRegistrationToServer(refreshedToken);
+        NearbyInstanceIdService.sendRegistrationToServer(refreshedToken, this);
     }
 
     /**
@@ -48,8 +48,7 @@ public class NearbyInstanceIdService extends FirebaseInstanceIdService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(final String token) {
-        final Context context = this;
+    public static void sendRegistrationToServer(final String token, final Context context) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

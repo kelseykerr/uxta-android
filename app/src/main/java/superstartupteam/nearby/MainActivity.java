@@ -3,6 +3,7 @@ package superstartupteam.nearby;
 import android.Manifest;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -29,8 +30,9 @@ import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewOfferDialogFragment;
-import layout.NewRequestDialogFragment;
+import layout.RequestDialogFragment;
 import superstartupteam.nearby.model.User;
+import superstartupteam.nearby.service.NearbyInstanceIdService;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -38,7 +40,7 @@ import superstartupteam.nearby.model.User;
 public class MainActivity extends AppCompatActivity
         implements AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
-        NewRequestDialogFragment.OnFragmentInteractionListener,
+        RequestDialogFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
         NewOfferDialogFragment.OnFragmentInteractionListener {
 
@@ -124,11 +126,12 @@ public class MainActivity extends AppCompatActivity
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
+        NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
     }
 
 
     public void showDialog(View view) {
-        DialogFragment newFragment = NewRequestDialogFragment
+        DialogFragment newFragment = RequestDialogFragment
                 .newInstance();
         newFragment.show(getFragmentManager(), "dialog");
     }
@@ -179,20 +182,23 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
+                    //TODO: destroy old ones or just refresh call to getHistory
                     listMapText.setVisibility(View.INVISIBLE);
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    /*if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
+                    HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+                    if (historyFragment != null) {
+                        historyFragment.getHistory(historyFragment);
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
-                                .show(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
+                                .show(historyFragment)
                                 .commit();
-                    } else {*/
+                    } else {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
                                 .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                                 .commit();
-                    //}
+                    }
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
                 }
                 currentMenuItem = menuItemId;
@@ -227,6 +233,19 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
+                if (menuItemId == R.id.bottomBarHistoryItem) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+                    if (historyFragment != null) {
+                        fragmentTransaction.remove(historyFragment);
+                    }
+                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
+                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
+                    fragmentTransaction
+                            .setCustomAnimations(firstAnim, secondAnim)
+                            .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
+                            .commit();
+                }
             }
         });
     }
@@ -288,12 +307,14 @@ public class MainActivity extends AppCompatActivity
         // END_INCLUDE(fine_location_permission_request)
     }
 
-    public void goToHistory() {
+    public void goToHistory(String message) {
         HistoryFragment fragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
         if (fragment != null) {
             fragment.parentScroll.scrollTo(0, 0);
+            HistoryFragment.snackbarMessage = message;
         }
         mBottomBar.selectTabAtPosition(1, true);
+
     }
 
 }

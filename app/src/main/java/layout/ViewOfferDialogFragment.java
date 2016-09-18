@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private TextView pickupTime;
     private TextView returnTime;
     private User user;
+    private View view;
 
 
     public ViewOfferDialogFragment() {
@@ -130,6 +132,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
         pickupLocation.setText(response.getExchangeLocation());
         returnLocation = (EditText) view.findViewById(R.id.return_location);
+        returnLocation.setText(response.getReturnLocation());
         returnTime = (TextView) view.findViewById(R.id.return_time);
         if (!request.getRental()) {
             returnLocation.setVisibility(View.GONE);
@@ -169,6 +172,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 declineResponse();
             }
         });
+        this.view = view;
         return view;
     }
 
@@ -219,7 +223,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully declined offer");
                 }
             }
         }.execute();
@@ -267,8 +271,12 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
+                    ((MainActivity) getActivity()).goToHistory("successfully updated offer");
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "could not update offer", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
         }.execute();

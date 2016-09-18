@@ -174,7 +174,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 try {
                     URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + radius +
                             "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
-                            "&includeMine=false");
+                            "&includeMine=false&expired=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);

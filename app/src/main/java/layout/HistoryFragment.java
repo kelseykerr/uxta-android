@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -48,6 +49,7 @@ public class HistoryFragment extends Fragment {
     private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
     private View view;
+    public static String snackbarMessage = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -80,8 +82,13 @@ public class HistoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         this.view = view;
-        getRequests(this);
+        getHistory(this);
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
+        if (snackbarMessage != null) {
+            Snackbar snackbar = Snackbar
+                    .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
         return view;
 
     }
@@ -120,7 +127,7 @@ public class HistoryFragment extends Fragment {
     }
 
     public void showRequestDialog(History h) {
-        DialogFragment newFragment = NewRequestDialogFragment
+        DialogFragment newFragment = RequestDialogFragment
                 .newInstance(h.getRequest());
         newFragment.show(getFragmentManager(), "dialog");
     }
@@ -138,7 +145,7 @@ public class HistoryFragment extends Fragment {
         newFragment.show(getFragmentManager(), "dialog");
     }
 
-    public void getRequests(final HistoryFragment thisFragment) {
+    public void getHistory(final HistoryFragment thisFragment) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

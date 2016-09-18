@@ -1,8 +1,7 @@
 package superstartupteam.nearby;
 
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
@@ -57,10 +57,14 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         } else if (r.getPriceType().equals("per_day")) {
             responseViewHolder.mPriceType.setText(" per day");
         }
-        if (r.getResponseStatus().equals(Response.Status.CLOSED)) {
+
+        if (r.getResponseStatus().toString().toLowerCase().equals("closed")) {
             responseViewHolder.mResponseDetailsButton.setVisibility(View.GONE);
+        } else {
+            responseViewHolder.mResponseDetailsButton.setVisibility(View.VISIBLE);
         }
         responseViewHolder.mResponseStatus.setText(r.getResponseStatus().toString());
+        setResponseStatusColor(responseViewHolder.mResponseStatus, r.getResponseStatus().toString());
         responseViewHolder.mResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 historyFragment.showResponseDialog(r);
@@ -74,6 +78,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         Request r = h.getRequest();
         // this is a request the user made
         if (user.getId().equals(r.getUser().getId())) {
+            requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
             String htmlString = "requested a <b>" +
                     r.getItemName() + "</b>";
             requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -91,6 +96,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                 requestViewHolder.vDescription.setVisibility(View.GONE);
             }
             requestViewHolder.vStatus.setText(r.getStatus());
+            setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
             /*
              * only display the edit button if the request is open...they shouldn't need to edit
              * closed requests
@@ -98,14 +104,27 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             if (!r.getStatus().equals("OPEN")) {
                 requestViewHolder.vEditButton.setVisibility(View.GONE);
             } else {
+                requestViewHolder.vEditButton.setVisibility(View.VISIBLE);
                 requestViewHolder.vEditButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         historyFragment.showRequestDialog(h);
                     }
                 });
             }
+            if (h.getResponses() == null || h.getResponses().size() < 1) {
+                requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
+                if (r.getStatus().equals("OPEN")) {
+                    RelativeLayout.LayoutParams lp =
+                            (RelativeLayout.LayoutParams) requestViewHolder.vEditButton.getLayoutParams();
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+                    requestViewHolder.vEditButton.setLayoutParams(lp);
+                }
+            } else {
+                requestViewHolder.vParentDropDownArrow.setVisibility(View.VISIBLE);
+            }
         } else { //this is an offer the user made
-            Response resp = h.getResponses().get(0);
+            requestViewHolder.vEditButton.setVisibility(View.GONE);
+            final Response resp = h.getResponses().get(0);
             String buyerName = r.getUser().getFirstName() != null ?
                     r.getUser().getFirstName() : r.getUser().getFullName();
             String htmlString = "offered a <b>" +
@@ -118,11 +137,17 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             requestViewHolder.vDescription.setText("");
             requestViewHolder.vDescription.setVisibility(View.GONE);
             requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
-            // only edit if the offer is pending
-            if (!resp.getResponseStatus().equals(Response.Status.PENDING)) {
-                requestViewHolder.vEditButton.setVisibility(View.GONE);
-            }
+            setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
             requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
+            if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
+                requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+            } else {
+                requestViewHolder.vResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        historyFragment.showResponseDialog(resp);
+                    }
+                });
+            }
         }
     }
 
@@ -146,6 +171,36 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         notifyDataSetChanged();
     }
 
+    private void setResponseStatusColor(TextView responseStatus, String status) {
+        status = status.toLowerCase();
+        switch (status) {
+            case "accepted":
+                responseStatus.setTextColor(Color.BLUE);
+                break;
+            case "pending":
+                responseStatus.setTextColor(Color.parseColor("#FFF380"));
+                break;
+            case "closed":
+                responseStatus.setTextColor(Color.RED);
+                break;
+        }
+    }
+
+    private void setRequestStatusColor(TextView requestStatus, String status) {
+        status = status.toLowerCase();
+        switch (status) {
+            case "open":
+                requestStatus.setTextColor(Color.GREEN);
+                break;
+            case "closed":
+                requestStatus.setTextColor(Color.RED);
+                break;
+            case "fulfilled":
+                requestStatus.setTextColor(Color.BLUE);
+                break;
+        }
+    }
+
     public static class ResponseViewHolder extends ChildViewHolder {
 
         public TextView mResponderName;
@@ -160,7 +215,6 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             mResponderName = (TextView) itemView.findViewById(R.id.responder_name);
             mItemName = (TextView) itemView.findViewById(R.id.item_name);
             mOfferAmount = (TextView) itemView.findViewById(R.id.offer_amount);
-            mPriceType = (TextView) itemView.findViewById(R.id.offer_type);
             mResponseStatus = (TextView) itemView.findViewById(R.id.response_status);
             mResponseDetailsButton = (ImageButton) itemView.findViewById(R.id.view_response_button);
         }
@@ -176,6 +230,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         private ImageButton vParentDropDownArrow;
         private ImageButton vEditButton;
         private TextView vStatus;
+        private ImageButton vResponseDetailsButton;
 
         protected FrameLayout cardView;
 
@@ -189,6 +244,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             vParentDropDownArrow = (ImageButton) itemView.findViewById(R.id.parent_list_item_expand_arrow);
             vStatus = (TextView) v.findViewById(R.id.history_card_status);
             vEditButton = (ImageButton) v.findViewById(R.id.edit_button);
+            vResponseDetailsButton = (ImageButton) itemView.findViewById(R.id.view_response_button);
             this.context = context;
         }
     }

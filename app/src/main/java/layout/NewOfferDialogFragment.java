@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,8 +57,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private Button submitOfferBtn;
     private EditText offerPrice;
     private List<String> offerTypes = new ArrayList<>();
-
-
+    private View view;
 
 
     public NewOfferDialogFragment() {
@@ -114,6 +114,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                 return false;
             }
         });
+        this.view = view;
         return view;
     }
 
@@ -174,7 +175,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
                     responseCode = conn.getResponseCode();
                     Log.i("POST /responses", "Response Code : " + responseCode);
-                    if (responseCode != 201) {
+                    if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
@@ -185,9 +186,20 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 201) {
+                if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully created offer");
+                } else if (responseCode == 406) {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "You already created an offer for this request.", Snackbar.LENGTH_LONG)
+                            .setAction("SHOW OFFERS", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dismiss();
+                                    ((MainActivity) getActivity()).goToHistory(null);
+                                }
+                            });
+                    snackbar.show();
                 }
             }
         }.execute();

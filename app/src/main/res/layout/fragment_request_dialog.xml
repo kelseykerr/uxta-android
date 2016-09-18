@@ -82,8 +82,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="create request"
+        android:layout_marginBottom="15dp"
         android:id="@+id/create_request_button"
         android:textColor="#ffffff"
         android:background="@color/colorPrimary" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="close this request"
+        android:id="@+id/close_request_button"
+        android:textColor="#ffffff"
+        android:background="@color/colorAccent" />
 
 </LinearLayout>

@@ -40,13 +40,12 @@ import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Category;
 import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/23/16.
  */
-public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class RequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private User user;
     private Context context;
     private Spinner typeSpinner;
@@ -56,25 +55,26 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     private Spinner categorySpinner;
     private Spinner rentalSpinner;
     private Button requestBtn;
+    private Button closeRequestBtn;
     private EditText itemName;
     private EditText description;
     private View view;
     public static Request request;
 
-    public NewRequestDialogFragment() {
+    public RequestDialogFragment() {
 
     }
 
-    public static NewRequestDialogFragment newInstance() {
-        NewRequestDialogFragment fragment = new NewRequestDialogFragment();
+    public static RequestDialogFragment newInstance() {
+        RequestDialogFragment fragment = new RequestDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static NewRequestDialogFragment newInstance(Request r) {
+    public static RequestDialogFragment newInstance(Request r) {
         request = r;
-        NewRequestDialogFragment fragment = new NewRequestDialogFragment();
+        RequestDialogFragment fragment = new RequestDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -91,7 +91,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_new_request, container, false);
+        View view = inflater.inflate(R.layout.fragment_request_dialog, container, false);
 
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
@@ -129,6 +129,17 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
             }
         });
 
+        closeRequestBtn = (Button) view.findViewById(R.id.close_request_button);
+        if (request == null) {
+            closeRequestBtn.setVisibility(View.GONE);
+        } else {
+            closeRequestBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    request.setExpireDate(new Date());
+                    updateRequest();
+                }
+            });
+        }
         TextView cancelText = (TextView) view.findViewById(R.id.cancel_request);
         cancelText.setOnTouchListener(new View.OnTouchListener() {
 
@@ -224,12 +235,8 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
-        if (typeSpinner.getSelectedItem().toString().equals("item")) {
-            newRequest.setType(Request.Type.item);
-            newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
-        } else {
-            newRequest.setType(Request.Type.service);
-        }
+        newRequest.setType(Request.Type.item);
+        newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
         if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {
@@ -288,7 +295,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully updated request");
                 }
             }
         }.execute();
@@ -319,7 +326,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
 
                     responseCode = conn.getResponseCode();
                     Log.i("POST /api/requests", "Response Code : " + responseCode);
-                    if (responseCode != 201) {
+                    if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
@@ -330,9 +337,9 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 201) {
+                if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully created request");
                 }
             }
         }.execute();
