@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.text.Html;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -63,6 +66,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private TextView returnTime;
     private User user;
     private View view;
+    private TextView pickupLabel;
+    private TextView returnLabel;
 
 
     public ViewOfferDialogFragment() {
@@ -83,15 +88,29 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     }
 
     @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            // request a window without the title
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        }
+        return dialog;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        user = PrefUtils.getCurrentUser(context);
         View view = inflater.inflate(R.layout.fragment_view_offer_dialog, container, false);
         pickupTime = (TextView) view.findViewById(R.id.pickup_time);
         if (response.getExchangeTime() != null) {
             pickupTime.setText(response.getExchangeTime().toString());
         } else {
-            String htmlString = "<b>SET</b>";
+            String htmlString = "Pickup Time";
+            pickupLabel = (TextView) view.findViewById(R.id.pickup_time_label);
+            pickupLabel.setVisibility(View.GONE);
             pickupTime.setText(Html.fromHtml(htmlString));
+            pickupTime.setTextSize(18);
         }
 
         pickupTime.setOnTouchListener(new View.OnTouchListener() {
@@ -118,6 +137,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                             Date newPickupTime = new Date(calendar.getTimeInMillis());
                             pickupTime.setText(newPickupTime.toString());
+                            pickupLabel.setVisibility(View.VISIBLE);
                             alertDialog.dismiss();
                         }
                     });
@@ -137,11 +157,10 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         if (!request.getRental()) {
             returnLocation.setVisibility(View.GONE);
             returnTime.setVisibility(View.GONE);
-            TextView returnLocationLabel = (TextView) view.findViewById(R.id.return_location_label);
-            returnLocationLabel.setVisibility(View.GONE);
             TextView returnTimeLabel = (TextView) view.findViewById(R.id.return_time_label);
             returnTimeLabel.setVisibility(View.GONE);
         } else {
+            this.view = view;
             setDateTimeFunctionality(returnTime, false);
         }
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
@@ -172,6 +191,9 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 declineResponse();
             }
         });
+        if (response.getSellerId().equals(user.getId())) {
+            rejectRequestBtn.setText("withdraw offer");
+        }
         this.view = view;
         return view;
     }
@@ -246,6 +268,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                     if (request.getUser().getId().equals(user.getId())) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                    } else {
+                        response.setSellerStatus(Response.SellerStatus.ACCEPTED);
                     }
                     ObjectMapper mapper = new ObjectMapper();
                     Response r = response;
@@ -310,7 +334,11 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         if (pickup ? response.getExchangeTime() != null : response.getReturnTime() != null) {
             textView.setText(pickup ? response.getExchangeTime().toString() : response.getReturnTime().toString());
         } else {
-            String htmlString = "<b>SET</b>";
+            String htmlString = "Return Time";
+            textView.setText(Html.fromHtml(htmlString));
+            returnLabel = (TextView) view.findViewById(R.id.return_time_label);
+            returnLabel.setVisibility(View.GONE);
+            textView.setTextSize(18);
             textView.setText(Html.fromHtml(htmlString));
         }
 
@@ -338,6 +366,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                             Date newPickupTime = new Date(calendar.getTimeInMillis());
                             textView.setText(newPickupTime.toString());
+                            returnLabel.setVisibility(View.VISIBLE);
                             alertDialog.dismiss();
                         }
                     });
@@ -371,6 +400,19 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
     }
 
     @Override

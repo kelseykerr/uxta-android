@@ -239,6 +239,7 @@ public class MainActivity extends AppCompatActivity
                     if (historyFragment != null) {
                         fragmentTransaction.remove(historyFragment);
                     }
+                    HistoryFragment.snackbarMessage = null;
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction

@@ -1,24 +1,25 @@
 package layout;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -88,6 +89,16 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
     }
 
     @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            // request a window without the title
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        }
+        return dialog;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -140,31 +151,13 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                 }
             });
         }
-        TextView cancelText = (TextView) view.findViewById(R.id.cancel_request);
-        cancelText.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_request);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                request = null;
                 dismiss();
-                return false;
             }
         });
-        Rect clickableArea = new Rect();
-        cancelText.getHitRect(clickableArea);
-        // Extend the touch area of
-        // the ImageButton beyond its bounds
-        // on the right and bottom.
-        clickableArea.left += 200;
-        clickableArea.bottom += 200;
-        clickableArea.top += 200;
-        clickableArea.right += 200;
-        TouchDelegate touchDelegate = new TouchDelegate(clickableArea,
-                cancelText);
-        // Sets the TouchDelegate on the parent view, such that touches
-        // within the touch delegate bounds are routed to the child.
-        if (View.class.isInstance(cancelText.getParent())) {
-            ((View) cancelText.getParent()).setTouchDelegate(touchDelegate);
-        }
         this.view = view;
         if (request != null) {
             itemName.setText(request.getItemName());
@@ -205,6 +198,19 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
     }
 
     @Override

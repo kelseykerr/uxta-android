@@ -8,6 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="EditTextTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimary</item>
+    </style>
+
     <style name="RequestDialog" parent="@android:style/Theme.Dialog">
         <item name="android:windowAnimationStyle">@style/RequestDialogAnimation</item>
     </style>
@@ -19,6 +25,11 @@
 
     <style parent="@android:style/Widget.Spinner" name="SpinnerAsEditText">
         <item name="android:background">@android:drawable/edit_text</item>
+    </style>
+
+    <style name="TextAppearence.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 
