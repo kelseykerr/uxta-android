@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/response_section_background"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <TextView
+        android:id="@+id/responder_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/offer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/responder_name"
+        android:text=" made an offer for " />
+
+    <TextView
+        android:id="@+id/offer_text_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/offer_text"
+        android:text=" $" />
+
+    <TextView
+        android:id="@+id/offer_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/offer_text_2"
+        android:layout_marginEnd="44dp"
+        android:text=" " />
+
+    <TextView
+        android:id="@+id/response_status"
+        android:layout_width="wrap_content"
+        android:textStyle="italic"
+        android:paddingLeft="20dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/responder_name"
+        android:layout_marginEnd="44dp"
+        android:text=" " />
+
+    <ImageButton
+        android:id="@+id/view_response_button"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="10dp"
+        android:background="@color/white"
+        android:tint="@color/colorAccent"
+        android:src="@drawable/ic_chevron_right_black_24dp" />
+
+
+
+</RelativeLayout>

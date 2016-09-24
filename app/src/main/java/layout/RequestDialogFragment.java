@@ -1,24 +1,25 @@
 package layout;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -45,26 +46,36 @@ import superstartupteam.nearby.model.User;
 /**
  * Created by kerrk on 8/23/16.
  */
-public class NewRequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class RequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private User user;
     private Context context;
-    Spinner typeSpinner;
+    private Spinner typeSpinner;
     private OnFragmentInteractionListener mListener;
     private List<Category> categories;
     private List<String> categoryNames = new ArrayList<>();
-    Spinner categorySpinner;
-    Spinner rentalSpinner;
-    Button requestBtn;
-    EditText itemName;
-    EditText description;
-    View view;
+    private Spinner categorySpinner;
+    private Spinner rentalSpinner;
+    private Button requestBtn;
+    private Button closeRequestBtn;
+    private EditText itemName;
+    private EditText description;
+    private View view;
+    public static Request request;
 
-    public NewRequestDialogFragment() {
+    public RequestDialogFragment() {
 
     }
 
-    public static NewRequestDialogFragment newInstance() {
-        NewRequestDialogFragment fragment = new NewRequestDialogFragment();
+    public static RequestDialogFragment newInstance() {
+        RequestDialogFragment fragment = new RequestDialogFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static RequestDialogFragment newInstance(Request r) {
+        request = r;
+        RequestDialogFragment fragment = new RequestDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -78,19 +89,27 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     }
 
     @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            // request a window without the title
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        }
+        return dialog;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        List<String> types = new ArrayList<>();
-        types.add("item");
-        types.add("service");
-        View view = inflater.inflate(R.layout.fragment_new_request, container, false);
-        ArrayAdapter<String> typeAdapter;
-        typeSpinner = (Spinner) view.findViewById(R.id.request_type);
-        typeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, types);
-        typeSpinner.setAdapter(typeAdapter);
-        typeSpinner.setOnItemSelectedListener(this);
+        View view = inflater.inflate(R.layout.fragment_request_dialog, container, false);
 
+        if (request != null) {
+            Button btn = (Button) view.findViewById(R.id.create_request_button);
+            btn.setText("update request");
+            TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
+            dialogTitle.setText("Edit Request");
+        }
         itemName = (EditText) view.findViewById(R.id.request_name);
         description = (EditText) view.findViewById(R.id.request_description);
 
@@ -113,36 +132,46 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                createRequest(v);
+                if (request != null) {
+                    updateRequest();
+                } else {
+                    createRequest(v);
+                }
             }
         });
 
-        TextView cancelText = (TextView) view.findViewById(R.id.cancel_request);
-        cancelText.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                dismiss();
-                return false;
-            }
-        });
-        Rect clickableArea = new Rect();
-        cancelText.getHitRect(clickableArea);
-        // Extend the touch area of
-        // the ImageButton beyond its bounds
-        // on the right and bottom.
-        clickableArea.left += 200;
-        clickableArea.bottom += 200;
-        clickableArea.top += 200;
-        clickableArea.right += 200;
-        TouchDelegate touchDelegate = new TouchDelegate(clickableArea,
-                cancelText);
-        // Sets the TouchDelegate on the parent view, such that touches
-        // within the touch delegate bounds are routed to the child.
-        if (View.class.isInstance(cancelText.getParent())) {
-            ((View) cancelText.getParent()).setTouchDelegate(touchDelegate);
+        closeRequestBtn = (Button) view.findViewById(R.id.close_request_button);
+        if (request == null) {
+            closeRequestBtn.setVisibility(View.GONE);
+        } else {
+            closeRequestBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    request.setExpireDate(new Date());
+                    updateRequest();
+                }
+            });
         }
+        ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_request);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                request = null;
+                dismiss();
+            }
+        });
         this.view = view;
+        if (request != null) {
+            itemName.setText(request.getItemName());
+            if (request.getRental()) {
+                rentalSpinner.setSelection(0);
+            } else {
+                rentalSpinner.setSelection(1);
+            }
+            // TODO: update this as we add categories
+            if (request.getCategory() != null) {
+                categorySpinner.setSelection(1);
+            }
+            description.setText(request.getDescription());
+        }
         return view;
     }
 
@@ -171,6 +200,19 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -181,16 +223,26 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         void onFragmentInteraction(Uri uri, int arg1);
     }
 
+    private void updateRequestObject() {
+        request.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
+        if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
+            String cat = categorySpinner.getSelectedItem().toString();
+            for (Category c : categories) {
+                if (c.getName().equals(cat)) {
+                    request.setCategory(c);
+                }
+            }
+        }
+        request.setItemName(itemName.getText().toString());
+        request.setDescription(description.getText().toString());
+    }
+
     private Request createNewRequestObject() {
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
-        if (typeSpinner.getSelectedItem().toString().equals("item")) {
-            newRequest.setType(Request.Type.item);
-            newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
-        } else {
-            newRequest.setType(Request.Type.service);
-        }
+        newRequest.setType(Request.Type.item);
+        newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
         if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {
@@ -204,6 +256,55 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
         newRequest.setLongitude(PrefUtils.latLng.longitude);
         newRequest.setLocation(null);
         return newRequest;
+    }
+
+    private void updateRequest() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty("Content-Type", "application/json");
+
+                    updateRequestObject();
+                    ObjectMapper mapper = new ObjectMapper();
+                    // we don't need to update the location or user info
+                    Request r = new Request();
+                    r = request;
+                    r.setUser(null);
+                    r.setLocation(null);
+                    String requestJson = mapper.writeValueAsString(r);
+                    Log.i("updated request: ", requestJson);
+                    byte[] outputInBytes = requestJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+                    Log.i("PUT /api/requests", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update request: " + e.getMessage());
+                }
+                return responseCode;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                if (responseCode == 200) {
+                    dismiss();
+                    ((MainActivity) getActivity()).goToHistory("successfully updated request");
+                }
+            }
+        }.execute();
     }
 
     private void createRequest(View v) {
@@ -231,7 +332,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
 
                     responseCode = conn.getResponseCode();
                     Log.i("POST /api/requests", "Response Code : " + responseCode);
-                    if (responseCode != 201) {
+                    if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
@@ -242,9 +343,9 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 201) {
+                if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully created request");
                 }
             }
         }.execute();

@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -138,6 +140,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         radiusList.add(5D);
         radiusList.add(10D);
 
+        Log.e("**", context + "..........");
+
         // Creating adapter for spinner
         ArrayAdapter<Double> dataAdapter = new ArrayAdapter<Double>(context, android.R.layout.simple_spinner_item, radiusList);
 
@@ -174,7 +178,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 try {
                     URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + radius +
                             "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
-                            "&includeMine=false");
+                            "&includeMine=false&expired=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
@@ -368,6 +372,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onAttach(Context context) {
+        Log.e("***", context + ".....on attach");
         this.context = context;
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -377,6 +382,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     + " must implement OnFragmentInteractionListener");
         }
     }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
+    }
+
 
     @Override
     public void onDetach() {

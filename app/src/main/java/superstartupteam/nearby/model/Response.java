@@ -54,6 +54,8 @@ public class Response {
 
     private List<Message> messages;
 
+    private User seller;
+
     public static enum PriceType {
         FLAT, PER_HOUR, PER_DAY
     }
@@ -198,5 +200,13 @@ public class Response {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public User getSeller() {
+        return seller;
+    }
+
+    public void setSeller(User seller) {
+        this.seller = seller;
     }
 }

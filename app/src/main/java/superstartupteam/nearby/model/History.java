@@ -1,16 +1,22 @@
 package superstartupteam.nearby.model;
 
+import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by kerrk on 9/10/16.
  */
-public class History {
+public class History implements ParentObject {
 
     private Request request;
 
     private List<Response> responses;
+
+    private List<Object> children;
 
     public History() {
 
@@ -30,5 +36,22 @@ public class History {
 
     public void setResponses(List<Response> responses) {
         this.responses = responses;
+    }
+
+    @Override
+    public List<Object> getChildObjectList() {
+        List<Object> objs = new ArrayList<>();
+        for (Response r:responses) {
+            objs.add((Object) r);
+        }
+        return objs;
+    }
+
+    @Override
+    public void setChildObjectList(List<Object> list) {
+        List<Response> responses = new ArrayList<>();
+        for (Object o:list) {
+            responses.add((Response) o);
+        }
     }
 }

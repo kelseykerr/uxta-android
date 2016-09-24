@@ -1,10 +1,14 @@
 package layout;
 
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
+import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -26,6 +32,7 @@ import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -44,6 +51,7 @@ public class HistoryFragment extends Fragment {
     private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
     private View view;
+    public static String snackbarMessage = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -67,7 +75,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        historyCardAdapter = new HistoryCardAdapter(recentHistory);
         super.onCreate(savedInstanceState);
     }
 
@@ -76,15 +83,14 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
-        parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
-        requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-        requestHistoryList.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(context);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        requestHistoryList.setLayoutManager(llm);
-        requestHistoryList.setAdapter(historyCardAdapter);
-        getRequests();
         this.view = view;
+        getHistory(this);
+        parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
+        if (snackbarMessage != null) {
+            Snackbar snackbar = Snackbar
+                    .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
         return view;
 
     }
@@ -99,6 +105,19 @@ public class HistoryFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -122,7 +141,26 @@ public class HistoryFragment extends Fragment {
         void onFragmentInteraction(Uri uri, int arg1);
     }
 
-    public void getRequests() {
+    public void showRequestDialog(History h) {
+        DialogFragment newFragment = RequestDialogFragment
+                .newInstance(h.getRequest());
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void showResponseDialog(Response r) {
+        String requestId = r.getRequestId();
+        Request request = null;
+        for (History h: recentHistory) {
+            if (h.getRequest() != null && h.getRequest().getId().equals(requestId)) {
+                request = h.getRequest();
+            }
+        }
+        DialogFragment newFragment = ViewOfferDialogFragment
+                .newInstance(r, request);
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void getHistory(final HistoryFragment thisFragment) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -136,7 +174,13 @@ public class HistoryFragment extends Fragment {
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         recentHistory = AppUtils.jsonStringToHistoryList(output);
-                        Log.e("**", recentHistory.size() + "***re size");
+                        for (History h:recentHistory) {
+                            List<Object> resp = new ArrayList<Object>();
+                            for (Response r:h.getResponses()) {
+                                resp.add(r);
+                            }
+                            h.setChildObjectList(resp);
+                        }
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to fetch " +
                                 "requests from server, please try again later!");
@@ -151,6 +195,22 @@ public class HistoryFragment extends Fragment {
             protected void onPostExecute(Void result) {
                 if (historyCardAdapter != null) {
                     historyCardAdapter.swap(recentHistory);
+                } else {
+                    List<ParentObject> objs = new ArrayList<ParentObject>();
+                    for (History h:recentHistory) {
+                        objs.add(h);
+                    }
+                    requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
+                    //requestHistoryList.setHasFixedSize(true);
+                    LinearLayoutManager llm = new LinearLayoutManager(context);
+                    llm.setOrientation(LinearLayoutManager.VERTICAL);
+                    requestHistoryList.setLayoutManager(llm);
+
+                    historyCardAdapter = new HistoryCardAdapter(context, objs, thisFragment);
+                    historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
+                    historyCardAdapter.setParentClickableViewAnimationDuration(0);
+                    historyCardAdapter.setParentAndIconExpandOnClick(false);
+                    requestHistoryList.setAdapter(historyCardAdapter);
                 }
             }
         }.execute();

@@ -1,5 +1,7 @@
 package layout;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -7,17 +9,23 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -56,8 +64,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private Button submitOfferBtn;
     private EditText offerPrice;
     private List<String> offerTypes = new ArrayList<>();
-
-
+    private View view;
 
 
     public NewOfferDialogFragment() {
@@ -70,6 +77,16 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         args.putString("REQUEST_ID", requestId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            // request a window without the title
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        }
+        return dialog;
     }
 
     @Override
@@ -86,7 +103,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_offer_dialog, container, false);
-
         offerTypes.add("flat");
         offerTypes.add("per hour");
         offerTypes.add("per day");
@@ -105,15 +121,14 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
 
-        TextView cancelText = (TextView) view.findViewById(R.id.cancel_offer);
-        cancelText.setOnTouchListener(new View.OnTouchListener() {
+        ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_offer);
 
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 dismiss();
-                return false;
             }
         });
+        this.view = view;
         return view;
     }
 
@@ -126,7 +141,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
             //TODO: This doesn't work!!
             dialog.getWindow().setWindowAnimations(R.style.RequestDialog);
-
         }
     }
 
@@ -140,6 +154,19 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public final void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onAttachToContext(activity);
+        }
+    }
+
+    protected void onAttachToContext(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -174,7 +201,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
                     responseCode = conn.getResponseCode();
                     Log.i("POST /responses", "Response Code : " + responseCode);
-                    if (responseCode != 201) {
+                    if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
@@ -185,9 +212,20 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 201) {
+                if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory();
+                    ((MainActivity) getActivity()).goToHistory("successfully created offer");
+                } else if (responseCode == 406) {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "You already created an offer for this request.", Snackbar.LENGTH_LONG)
+                            .setAction("SHOW OFFERS", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dismiss();
+                                    ((MainActivity) getActivity()).goToHistory(null);
+                                }
+                            });
+                    snackbar.show();
                 }
             }
         }.execute();
