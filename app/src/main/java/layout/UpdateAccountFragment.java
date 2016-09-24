@@ -2,6 +2,9 @@ package layout;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,43 +14,49 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.facebook.login.LoginManager;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.HistoryCardAdapter;
+import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.History;
-import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HistoryFragment.OnFragmentInteractionListener} interface
+ * {@link AccountFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HistoryFragment#newInstance} factory method to
+ * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HistoryFragment extends Fragment {
+public class UpdateAccountFragment extends Fragment {
     private Context context;
+    private Bitmap bitmap;
     private User user;
-    private List<History> recentHistory = new ArrayList<>();
+    private TextView doneButton;
     private RecyclerView requestHistoryList;
-    private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
     private View view;
 
+    private TextView mAddressStreet;
+    private TextView mAddressCityZip;
+
     private OnFragmentInteractionListener mListener;
 
-    public HistoryFragment() {
+    public UpdateAccountFragment() {
         // Required empty public constructor
     }
 
@@ -55,10 +64,10 @@ public class HistoryFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment HistoryFragment.
+     * @return A new instance of fragment AccountFragment.
      */
-    public static HistoryFragment newInstance() {
-        HistoryFragment fragment = new HistoryFragment();
+    public static UpdateAccountFragment newInstance() {
+        UpdateAccountFragment fragment = new UpdateAccountFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -67,26 +76,34 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        historyCardAdapter = new HistoryCardAdapter(recentHistory);
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_history, container, false);
-        parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
-        requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-        requestHistoryList.setHasFixedSize(true);
+        View view = inflater.inflate(R.layout.fragment_update_account, container, false);
+        parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
+
+        TextView myAwesomeTextView = (TextView) view.findViewById(R.id.newAddressLabel);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        requestHistoryList.setLayoutManager(llm);
-        requestHistoryList.setAdapter(historyCardAdapter);
-        getRequests();
-        this.view = view;
-        return view;
 
+        doneButton = (TextView) view.findViewById(R.id.doneButton);
+
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Deliver done-with-update request to MainActivity so that it can return Account fragment
+                Uri url = Uri.parse("http://www.google.com");
+                int arg = 2;
+                mListener.onFragmentInteraction(url, arg );
+
+            }
+        });
+        return view;
     }
 
     @Override
@@ -119,40 +136,7 @@ public class HistoryFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri, int arg1);
+        public void onFragmentInteraction(Uri url, int arg1);
     }
 
-    public void getRequests() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    String output = AppUtils.getResponseContent(conn);
-                    try {
-                        recentHistory = AppUtils.jsonStringToHistoryList(output);
-                        Log.e("**", recentHistory.size() + "***re size");
-                    } catch (IOException e) {
-                        Log.e("Error", "Received an error while trying to fetch " +
-                                "requests from server, please try again later!");
-                    }
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get requests: " + e.getMessage());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                if (historyCardAdapter != null) {
-                    historyCardAdapter.swap(recentHistory);
-                }
-            }
-        }.execute();
-    }
 }

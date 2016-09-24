@@ -178,7 +178,7 @@ public class NewRequestDialogFragment extends DialogFragment implements AdapterV
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri, int arg1);
     }
 
     private Request createNewRequestObject() {

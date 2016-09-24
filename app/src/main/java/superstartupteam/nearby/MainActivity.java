@@ -34,6 +34,7 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import layout.NewOfferDialogFragment;
+import layout.UpdateAccountFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity
         HomeFragment.OnFragmentInteractionListener,
         NewRequestDialogFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
-        NewOfferDialogFragment.OnFragmentInteractionListener {
+        NewOfferDialogFragment.OnFragmentInteractionListener,
+        UpdateAccountFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;
@@ -237,6 +239,14 @@ public class MainActivity extends AppCompatActivity
                                 .commit();
                     }
                 }
+                if (!current.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)) {
+                    if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(0, leaveAnimation)
+                                .hide(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
+                                .commit();
+                    }
+                }
             }
 
             @Override
@@ -262,8 +272,60 @@ public class MainActivity extends AppCompatActivity
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    public void onFragmentInteraction(Uri uri) {
-        //nothing
+    public void onFragmentInteraction(Uri url, int arg1) {
+
+        Log.i ("MainActivity", "onFragmentInteraction> arg = " + arg1);
+
+        if (arg1 == 1){
+
+            listMapText.setVisibility(View.INVISIBLE);
+
+            // Hide Account Fragment
+            if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, R.animator.exit_to_right)
+                        .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            }
+
+            if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
+                        .show(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            } else {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
+                        .add(R.id.content_frame, UpdateAccountFragment.newInstance(), Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)
+                        .commit();
+            }
+
+        }
+        if (arg1 == 2){
+
+            listMapText.setVisibility(View.INVISIBLE);
+
+            // Hide Update Account Fragment
+            if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, R.animator.exit_to_left)
+                        .hide(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            }
+
+            if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_right)
+                        .show(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            } else {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_right)
+                        .add(R.id.content_frame, UpdateAccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                        .commit();
+            }
+
+        }
     }
 
     /**

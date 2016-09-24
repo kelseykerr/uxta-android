@@ -1,0 +1,97 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:descendantFocusability="beforeDescendants"
+    android:layout_height="match_parent"
+    tools:context="layout.UpdateAccountFragment">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:focusable="true"
+        android:id="@+id/update_account_parent_scrollview"
+        android:focusableInTouchMode="true"
+        android:descendantFocusability="beforeDescendants"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:id="@+id/RelativeLayout1"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <!-- ===================== -->
+            <!--      New Address      -->
+            <!-- ===================== -->
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:id="@+id/newAddressLabel"
+                android:text="New Address"
+                android:layout_marginTop="76dp"
+                android:layout_marginLeft="130dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignBaseline="@+id/newAddress">
+            </TextView>
+
+
+            <EditText
+                android:id="@+id/newAddressEditField"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="76dp"
+                android:layout_toEndOf="@+id/newAddressLabel"
+                android:hint="# Street"
+                android:textSize="15dp"
+                android:inputType="textShortMessage">
+                <requestFocus />
+            </EditText>
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:id="@+id/newAddressLine2Label"
+                android:text="City, Zip"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="130dp"
+                android:layout_below="@+id/newAddressLabel"
+                android:layout_alignParentLeft="true">
+            </TextView>
+
+
+            <EditText
+                android:id="@+id/newAddressLine2EditField"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="17dp"
+                android:layout_toEndOf="@+id/newAddressLine2Label"
+                android:layout_below="@+id/newAddressEditField"
+                android:hint="City, Zip"
+                android:textSize="15dp"
+                android:inputType="textShortMessage">
+                <requestFocus />
+            </EditText>
+
+            <!-- ===================== -->
+            <!--      Done Button      -->
+            <!-- ===================== -->
+
+            <Button
+                android:id="@+id/doneButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/newAddressLine2EditField"
+                android:text="Done" />
+
+        </RelativeLayout>
+    </ScrollView>
+
+</FrameLayout>

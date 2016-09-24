@@ -8,6 +8,8 @@ public class Constants {
 
     public static final String ACCOUNT_FRAGMENT_TAG = "account";
 
+    public static final String UPDATE_ACCOUNT_FRAGMENT_TAG = "updateAccount";
+
     public static final String HISTORY_FRAGMENT_TAG = "history";
 
     public static final String NEARBY_API_PATH = "http://ec2-54-152-71-22.compute-1.amazonaws.com/api";

@@ -206,7 +206,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri, int arg1);
     }
 
     @Override

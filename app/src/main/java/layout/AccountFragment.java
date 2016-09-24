@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
@@ -43,6 +45,11 @@ public class AccountFragment extends Fragment {
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
+
+    private TextView mAddressStreet;
+    private TextView mAddressCityZip;
+
+    private boolean updateAccountRequest;
 
     private OnFragmentInteractionListener mListener;
 
@@ -75,6 +82,8 @@ public class AccountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
+
+        updateAccountRequest = false;
 
         // fetching facebook's profile picture
         new AsyncTask<Void, Void, Void>() {
@@ -116,7 +125,7 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        updateAccount = (TextView) view.findViewById(R.id.logout_button);
+        updateAccount = (TextView) view.findViewById(R.id.updateAccount_button);
 
         updateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +133,15 @@ public class AccountFragment extends Fragment {
                 user.setAddress("new Street address");
                 user.setAddressLine2("new City/Zip");
                 //TODO create putUserInformationToServerRoutine
-                //     create new form for user to enter this data
+                //TODO create new form for user to enter this data
+
+                Log.i ("updateAccount", " Retrieving updated account info, address = " + user.getAddress());
+
+                // Deliver the update request to MainActivity so that it can instantiate the updateAccount fragment
+                Uri url = Uri.parse("http://www.google.com");
+                int arg = 1;
+                mListener.onFragmentInteraction(url, arg );
+
             }
         });
 
@@ -135,10 +152,10 @@ public class AccountFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 
-        TextView mAddressStreet = (TextView) view.findViewById(R.id.user_home_address_street);
+        mAddressStreet = (TextView) view.findViewById(R.id.user_home_address_street);
         mAddressStreet.setText(user.getAddress());
 
-        TextView mAddressCityZip = (TextView) view.findViewById(R.id.user_city_zip);
+        mAddressCityZip = (TextView) view.findViewById(R.id.user_city_zip);
         mAddressCityZip.setText(user.getAddressLine2());
 
         ;
@@ -176,7 +193,7 @@ public class AccountFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        public void onFragmentInteraction(Uri url, int arg1);
     }
 
 }
