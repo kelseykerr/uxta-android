@@ -110,7 +110,6 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             pickupLabel = (TextView) view.findViewById(R.id.pickup_time_label);
             pickupLabel.setVisibility(View.GONE);
             pickupTime.setText(Html.fromHtml(htmlString));
-            pickupTime.setTextSize(18);
         }
 
         pickupTime.setOnTouchListener(new View.OnTouchListener() {

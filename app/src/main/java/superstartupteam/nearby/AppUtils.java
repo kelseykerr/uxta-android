@@ -51,7 +51,6 @@ public class AppUtils {
 
     public static String getResponseContent(HttpURLConnection conn) throws IOException {
         int responseCode = conn.getResponseCode();
-        Log.i("GET /api/requests", "Response Code : " + responseCode);
         BufferedReader br;
         if (responseCode <= 200  && responseCode <= 299) {
             br = new BufferedReader(new InputStreamReader((conn.getInputStream())));

@@ -159,7 +159,9 @@ public class MainActivity extends AppCompatActivity
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
                     listMapText.setVisibility(View.VISIBLE);
-                    if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
+                    HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                    if (homeFragment != null) {
+                        homeFragment.getRequests(null);
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
                                 .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))

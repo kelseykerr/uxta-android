@@ -3,7 +3,6 @@ package superstartupteam.nearby;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -178,7 +177,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                 responseStatus.setTextColor(Color.BLUE);
                 break;
             case "pending":
-                responseStatus.setTextColor(Color.parseColor("#FFF380"));
+                responseStatus.setTextColor(Color.parseColor("#FFD700"));
                 break;
             case "closed":
                 responseStatus.setTextColor(Color.RED);
