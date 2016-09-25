@@ -364,8 +364,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 /* not sure why this is here
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            int arg1=0;
-            mListener.onFragmentInteraction(uri, arg1);
+            int nextFragment=0;
+            mListener.onFragmentInteraction(uri, nextFragment);
         }
     }
 */
@@ -415,7 +415,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri, int arg1);
+        void onFragmentInteraction(Uri uri, String nextFragment);
     }
 
     public void toggleView(String v) {

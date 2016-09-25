@@ -280,11 +280,11 @@ public class MainActivity extends AppCompatActivity
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    public void onFragmentInteraction(Uri url, int arg1) {
+    public void onFragmentInteraction(Uri url, String nextFragment) {
 
-        Log.i ("MainActivity", "onFragmentInteraction> arg = " + arg1);
+        Log.i ("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
-        if (arg1 == 1){
+        if (nextFragment == Constants.UPDATE_ACCOUNT_FRAGMENT_TAG){
 
             listMapText.setVisibility(View.INVISIBLE);
 
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
-        if (arg1 == 2){
+        if (nextFragment == Constants.ACCOUNT_FRAGMENT_TAG){
 
             listMapText.setVisibility(View.INVISIBLE);
 

@@ -141,8 +141,8 @@ public class AccountFragment extends Fragment {
 
                 // Deliver the update request to MainActivity so that it can instantiate the updateAccount fragment
                 Uri url = Uri.parse("http://www.google.com");
-                int arg = 1;
-                mListener.onFragmentInteraction(url, arg );
+                String nextFrament = Constants.UPDATE_ACCOUNT_FRAGMENT_TAG;
+                mListener.onFragmentInteraction(url, nextFrament );
 
             }
         });
@@ -208,7 +208,7 @@ public class AccountFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri url, int arg1);
+        public void onFragmentInteraction(Uri url, String nextFragment);
     }
 
 }
