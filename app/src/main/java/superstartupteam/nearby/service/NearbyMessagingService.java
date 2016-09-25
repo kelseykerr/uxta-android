@@ -67,7 +67,7 @@ public class NearbyMessagingService extends FirebaseMessagingService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_ic_notification)
+                .setSmallIcon(R.drawable.ic_grade_black_24dp)
                 .setContentTitle("FCM Message")
                 .setContentText(messageBody)
                 .setAutoCancel(true)

@@ -36,12 +36,12 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/white">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@drawable/request_card_background">
 
                 <TextView
@@ -90,14 +90,13 @@
                     android:id="@+id/make_offer_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/description"
+                    android:layout_below="@id/description"
+                    android:paddingBottom="10dp"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="6dp"
-                    android:background="#4EE2EC"
-                    android:padding="10dp"
                     android:text="make an offer"
                     android:layout_marginBottom="6dp"
-                    android:textColor="#fff" />
+                    android:textColor="@color/colorPrimary" />
 
 
             </RelativeLayout>

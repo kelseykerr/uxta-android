@@ -2,6 +2,7 @@ package layout;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -23,11 +24,13 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,6 +39,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import superstartupteam.nearby.Constants;
@@ -65,6 +71,12 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private EditText offerPrice;
     private List<String> offerTypes = new ArrayList<>();
     private View view;
+    private EditText pickupLocation;
+    private TextView pickupTimeLabel;
+    private TextView pickupTime;
+    private TextView returnLocation;
+    private TextView returnTimeLabel;
+    private TextView returnTime;
 
 
     public NewOfferDialogFragment() {
@@ -120,6 +132,20 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
 
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
+        pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
+        pickupTimeLabel = (TextView) view.findViewById(R.id.pickup_time_label);
+        pickupTimeLabel.setVisibility(View.GONE);
+        pickupTime = (TextView) view.findViewById(R.id.pickup_time);
+        pickupTime.setText("Pickup Time");
+
+        returnLocation = (EditText) view.findViewById(R.id.return_location);
+        returnTimeLabel = (TextView) view.findViewById(R.id.return_time_label);
+        returnTimeLabel.setVisibility(View.GONE);
+        returnTime = (TextView) view.findViewById(R.id.return_time);
+        returnTime.setText("Return Time");
+
+        setDateFunctionality(pickupTime, pickupTimeLabel);
+        setDateFunctionality(returnTime, returnTimeLabel);
 
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_offer);
 
@@ -259,6 +285,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         Response response = new Response();
         response.setRequestId(requestId);
         response.setSellerId(user.getId());
+        response.setExchangeLocation(pickupLocation.getText().toString());
         double offer = Double.parseDouble(offerPrice.getText().toString());
         response.setOfferPrice(offer);
         String offerType = offerTypeSpinner.getSelectedItem().toString();
@@ -269,5 +296,44 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         }
         response.setPriceType(offerType);
         return response;
+    }
+
+    private void setDateFunctionality(final TextView time, final TextView label) {
+
+        time.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View arg0, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    // date time picker
+                    final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
+                    final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+
+                    dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
+                            TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
+
+                            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                                    datePicker.getMonth(),
+                                    datePicker.getDayOfMonth(),
+                                    timePicker.getCurrentHour(),
+                                    timePicker.getCurrentMinute());
+
+                            Date newPickupTime = new Date(calendar.getTimeInMillis());
+                            time.setText(newPickupTime.toString());
+                            label.setVisibility(View.VISIBLE);
+                            alertDialog.dismiss();
+                        }
+                    });
+                    alertDialog.setView(dateTimeView);
+                    alertDialog.show();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }

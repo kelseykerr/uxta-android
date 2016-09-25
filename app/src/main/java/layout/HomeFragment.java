@@ -19,8 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -93,6 +91,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private TextView noResults;
     private ScrollView listView;
     private RelativeLayout requestMapView;
+    private Double currentRadius;
 
     private OnFragmentInteractionListener mListener;
 
@@ -140,8 +139,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         radiusList.add(5D);
         radiusList.add(10D);
 
-        Log.e("**", context + "..........");
-
         // Creating adapter for spinner
         ArrayAdapter<Double> dataAdapter = new ArrayAdapter<Double>(context, android.R.layout.simple_spinner_item, radiusList);
 
@@ -159,6 +156,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
+        getRequests(currentRadius);
         return v;
     }
 
@@ -168,7 +166,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         newFragment.show(getFragmentManager(), "dialog");
     }
 
-    private void getRequests(final Double radius) {
+    public void getRequests(final Double radius) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -176,7 +174,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     return null;
                 }
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + radius +
+                    Double r = radius != null ? radius : currentRadius;
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + r +
                             "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
                             "&includeMine=false&expired=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -185,6 +184,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
+                    int responseCode = conn.getResponseCode();
+                    Log.e("GET /requests", "Response Code : " + responseCode);
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);
                     } catch (IOException e) {
@@ -249,6 +250,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // On selecting a radius from the spinner
         Double radius = (Double) parent.getItemAtPosition(position);
+        currentRadius = radius;
         // Get requests within that radius
         getRequests(radius);
 
@@ -372,7 +374,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onAttach(Context context) {
-        Log.e("***", context + ".....on attach");
         this.context = context;
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {

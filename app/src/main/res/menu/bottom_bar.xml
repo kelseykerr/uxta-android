@@ -2,7 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/bottomBarHomeItem"
-        android:icon="@drawable/ic_home_white_24dp"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:tint="@color/white"
         android:title="home"/>
     <!--<item
         android:id="@+id/bottomBarItemTwo"
@@ -10,7 +11,8 @@
         android:title="Search" /> -->
     <item
         android:id="@+id/bottomBarHistoryItem"
-        android:icon="@drawable/ic_history_white_24dp"
+        android:icon="@drawable/ic_history_black_24dp"
+        android:tint="@color/white"
         android:title="history"/>
 
     <!--<item
@@ -21,7 +23,8 @@
 
     <item
         android:id="@+id/bottomBarAccountItem"
-        android:icon="@drawable/ic_person_outline_white_24dp"
+        android:icon="@drawable/ic_perm_identity_black_24dp"
+        android:tint="@color/white"
         android:title="account" />
 
 
