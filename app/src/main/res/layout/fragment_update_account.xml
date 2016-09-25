@@ -78,18 +78,32 @@
             </EditText>
 
             <!-- ===================== -->
-            <!--      Done Button      -->
+            <!--      Cancel Button      -->
             <!-- ===================== -->
 
             <Button
-                android:id="@+id/doneButton"
+                android:id="@+id/cancelAccountUpdateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="130dp"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/newAddressLine2EditField"
+                android:text="CANCEL" />
+
+            <!-- ===================== -->
+            <!--      Apply Button      -->
+            <!-- ===================== -->
+
+            <Button
+                android:id="@+id/applyAccountUpdateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
+                android:layout_toEndOf="@+id/cancelAccountUpdateButton"
                 android:layout_below="@+id/newAddressLine2EditField"
-                android:text="Done" />
+                android:text="APPLY" />
 
         </RelativeLayout>
     </ScrollView>

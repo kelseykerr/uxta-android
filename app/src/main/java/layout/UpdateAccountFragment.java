@@ -19,19 +19,24 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.HistoryCardAdapter;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.History;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -46,7 +51,8 @@ public class UpdateAccountFragment extends Fragment {
     private Context context;
     private Bitmap bitmap;
     private User user;
-    private TextView doneButton;
+    private TextView applyButton;
+    private TextView cancelButton;
     private RecyclerView requestHistoryList;
     public ScrollView parentScroll;
     private View view;
@@ -84,25 +90,46 @@ public class UpdateAccountFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_update_account, container, false);
+        final View view = inflater.inflate(R.layout.fragment_update_account, container, false);
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
         TextView myAwesomeTextView = (TextView) view.findViewById(R.id.newAddressLabel);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 
-        doneButton = (TextView) view.findViewById(R.id.doneButton);
+        applyButton = (TextView) view.findViewById(R.id.applyAccountUpdateButton);
+        cancelButton = (TextView) view.findViewById(R.id.cancelAccountUpdateButton);
 
-        doneButton.setOnClickListener(new View.OnClickListener() {
+        applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Deliver done-with-update request to MainActivity so that it can return Account fragment
                 Uri url = Uri.parse("http://www.google.com");
                 String nextFragment = Constants.ACCOUNT_FRAGMENT_TAG;
-                mListener.onFragmentInteraction(url, nextFragment );
 
+                TextView newAddress = (TextView) view.findViewById(R.id.newAddressEditField);
+                user.setAddress(newAddress.getText().toString());
+
+                TextView newAddress2 = (TextView) view.findViewById(R.id.newAddressLine2EditField);
+                user.setAddress(newAddress2.getText().toString());
+
+                putAccountInfo();
+
+                mListener.onFragmentInteraction(url, nextFragment);
             }
         });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Deliver done-with-update request to MainActivity so that it can return Account fragment
+                Uri url = Uri.parse("http://www.google.com");
+                String nextFragment = Constants.ACCOUNT_FRAGMENT_TAG;
+
+                mListener.onFragmentInteraction(url, nextFragment);
+            }
+        });
+
         return view;
     }
 
@@ -139,4 +166,48 @@ public class UpdateAccountFragment extends Fragment {
         public void onFragmentInteraction(Uri url, String nextFragment);
     }
 
+    private void putAccountInfo() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
+                try {
+/*
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/???/");      // KELS - any qualifiers on URL??
+
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken()???);
+                    conn.setRequestProperty("Content-Type", "application/json");
+
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    POJO Update?? u;                                     // KELS -  want to create an account object??
+                    u.setAddress(user.getAddress());
+                    u.setAddress2 (user.getAddressLine2());
+
+                    String updateJson = mapper.writeValueAsString(u);
+                    Log.i("updated response: ", udpateJson);
+                    byte[] outputInBytes = updateJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+*/
+                    Log.i("PUT /responses", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+//                        throw new IOException(conn.getResponseMessage());
+                        throw new IOException("null");
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update account: " + e.getMessage());
+                }
+                return 0;
+            }
+
+        };
+    }
 }
