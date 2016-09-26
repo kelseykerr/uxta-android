@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:focusable="true"
-    android:layout_marginTop="60dp"
+    android:layout_marginTop="58dp"
     android:focusableInTouchMode="true"
     android:descendantFocusability="beforeDescendants"
     android:layout_height="match_parent"

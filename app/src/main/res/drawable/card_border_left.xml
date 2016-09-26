@@ -6,15 +6,20 @@
         android:right="-3dp"
         android:top="-3dp">
         <shape xmlns:android="http://schemas.android.com/apk/res/android">
-            <solid android:color="@color/white" />
+            <solid android:color="#FFD700" />
             <stroke
                 android:width="2dip"
                 android:color="#B1BCBE" />
             <padding
                 android:bottom="2dip"
-                android:left="0dip"
-                android:right="2dip"
+                android:left="5dip"
+                android:right="0dip"
                 android:top="0dip" />
+        </shape>
+    </item>
+    <item android:left="8dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#ffffff" />
         </shape>
     </item>
 </layer-list>

@@ -16,6 +16,8 @@ public class History implements ParentObject {
 
     private List<Response> responses;
 
+    private Transaction transaction;
+
     private List<Object> children;
 
     public History() {
@@ -36,6 +38,14 @@ public class History implements ParentObject {
 
     public void setResponses(List<Response> responses) {
         this.responses = responses;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 
     @Override
