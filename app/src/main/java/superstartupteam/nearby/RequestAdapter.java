@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -48,11 +49,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         } else {
             requestViewHolder.vCategoryName.setText(r.getCategory().getName());
         }
-        if (r.getDescription() == null) {
-            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p.addRule(RelativeLayout.BELOW, R.id.posted_date);
-            requestViewHolder.vMakeOfferButton.setLayoutParams(p);
+        if (r.getDescription() == null || r.getDescription().length() == 0) {
             requestViewHolder.vDescription.setVisibility(View.GONE);
 
         } else {
@@ -91,7 +88,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected TextView vPostedDate;
         protected TextView vDescription;
         protected Context context;
-        protected TextView vMakeOfferButton;
+        protected ImageButton vMakeOfferButton;
 
         public RequestViewHolder(Context context, View v) {
             super(v);
@@ -99,7 +96,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView)  v.findViewById(R.id.category_name);
             vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            vMakeOfferButton = (TextView) v.findViewById(R.id.make_offer_button);
+            vMakeOfferButton = (ImageButton) v.findViewById(R.id.make_offer_button);
             this.context = context;
         }
     }

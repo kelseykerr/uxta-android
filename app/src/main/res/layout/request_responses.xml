@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/response_section_background"
+    android:background="@drawable/response_border_left"
     android:paddingBottom="10dp"
+    android:paddingLeft="15dp"
     android:paddingTop="10dp">
 
     <TextView

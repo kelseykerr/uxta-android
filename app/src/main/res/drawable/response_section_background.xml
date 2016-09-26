@@ -2,18 +2,18 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:bottom="0dp"
-        android:left="-3dp"
-        android:right="-3dp"
+        android:left="-10dp"
+        android:right="-10dp"
         android:top="-3dp">
         <shape xmlns:android="http://schemas.android.com/apk/res/android">
             <solid android:color="#ffffff" />
             <stroke
-                android:width="2dip"
+                android:width="1dip"
                 android:color="#B1BCBE" />
             <padding
-                android:bottom="2dip"
-                android:left="0dip"
-                android:right="2dip"
+                android:bottom="1dip"
+                android:left="10dip"
+                android:right="10dip"
                 android:top="0dip" />
         </shape>
     </item>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/my_history_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardPreventCornerOverlap="false"
-    android:clickable="true"
     app:cardUseCompatPadding="true"
-    card_view:cardElevation="0dp">
+    android:clickable="true"
+    card_view:cardElevation="5dp">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -17,8 +17,7 @@
         <RelativeLayout
             android:id="@+id/card_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/request_card_background">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/parent_list_item_expand_arrow"
@@ -124,4 +123,4 @@
 
     </FrameLayout>
 
-</FrameLayout>
+</android.support.v7.widget.CardView>

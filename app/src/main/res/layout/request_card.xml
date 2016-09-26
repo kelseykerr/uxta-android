@@ -42,7 +42,19 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="6dp"
                 android:background="@drawable/request_card_background">
+
+                <ImageButton
+                    android:id="@+id/make_offer_button"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="10dp"
+                    android:background="@color/white"
+                    android:tint="@color/colorPrimary"
+                    android:src="@drawable/ic_rate_review_black_24dp" />
 
                 <TextView
                     android:id="@+id/item_name"
@@ -51,8 +63,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="6dp"
                     android:gravity="center_vertical"
-                    android:text="item name"
-                    android:textSize="18dp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/category_name"
@@ -60,10 +71,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/item_name"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
                     android:gravity="center_vertical"
-                    android:text="category name"
-                    android:textSize="14dp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/posted_date"
@@ -71,10 +82,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/category_name"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
                     android:gravity="center_vertical"
-                    android:text="posted date"
-                    android:textSize="14dp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/description"
@@ -82,21 +93,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/posted_date"
                     android:layout_marginStart="5dp"
-                    android:layout_marginTop="6dp"
-                    android:text="description"
-                    android:textSize="14dp" />
-
-                <TextView
-                    android:id="@+id/make_offer_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/description"
-                    android:paddingBottom="10dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="6dp"
-                    android:text="make an offer"
-                    android:layout_marginBottom="6dp"
-                    android:textColor="@color/colorPrimary" />
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:textSize="14sp" />
 
 
             </RelativeLayout>

@@ -1,12 +1,16 @@
 package superstartupteam.nearby;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -224,13 +228,13 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         status = status.toLowerCase();
         switch (status) {
             case "accepted":
-                responseStatus.setTextColor(Color.BLUE);
+                responseStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
             case "pending":
                 responseStatus.setTextColor(Color.parseColor("#FFD700"));
                 break;
             case "closed":
-                responseStatus.setTextColor(Color.RED);
+                responseStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
         }
     }
@@ -242,10 +246,10 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                 requestStatus.setTextColor(Color.GREEN);
                 break;
             case "closed":
-                requestStatus.setTextColor(Color.RED);
+                requestStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
             case "fulfilled":
-                requestStatus.setTextColor(Color.BLUE);
+                requestStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
         }
     }
@@ -282,6 +286,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         private ImageButton vResponseDetailsButton;
         public RelativeLayout mCardBackground;
         public ImageButton mExchangeIcon;
+        private CardView historyCard;
 
 
         protected FrameLayout cardView;
@@ -300,6 +305,8 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             this.context = context;
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
             mExchangeIcon = (ImageButton) v.findViewById(R.id.exchange_icon);
+            historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
+            historyCard.setMaxCardElevation(7);
 
         }
     }
