@@ -39,7 +39,7 @@ import superstartupteam.nearby.model.User;
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountFragment extends Fragment {
+public class AccountFragment extends Fragment implements View.OnFocusChangeListener {
     private Context context;
     private Bitmap bitmap;
     private TextView btnLogout;
@@ -86,6 +86,8 @@ public class AccountFragment extends Fragment {
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
 
         updateAccountRequest = false;
+
+        view.setOnFocusChangeListener(this);
 
         // fetching facebook's profile picture
         new AsyncTask<Void, Void, Void>() {
@@ -157,6 +159,8 @@ public class AccountFragment extends Fragment {
         mAddressStreet = (TextView) view.findViewById(R.id.user_home_address_street);
         mAddressStreet.setText(user.getAddress());
 
+        Log.i (Constants.ACCOUNT_FRAGMENT_TAG, "address=" + user.getAddress());
+
         mAddressCityZip = (TextView) view.findViewById(R.id.user_city_zip);
         mAddressCityZip.setText(user.getAddressLine2());
 
@@ -188,6 +192,21 @@ public class AccountFragment extends Fragment {
 
     protected void onAttachToContext(Context context) {
         this.context = context;
+    }
+
+    public void onFocusChange(View v, boolean hasFocus) {
+
+        Boolean isTrue = hasFocus;
+        if(isTrue){
+            user = PrefUtils.getCurrentUser(context);
+            mAddressStreet = (TextView) v.findViewById(R.id.user_home_address_street);
+            mAddressStreet.setText(user.getAddress());
+
+            Log.i (Constants.ACCOUNT_FRAGMENT_TAG, "address=" + user.getAddress());
+
+            mAddressCityZip = (TextView) v.findViewById(R.id.user_city_zip);
+            mAddressCityZip.setText(user.getAddressLine2());
+        }
     }
 
     @Override

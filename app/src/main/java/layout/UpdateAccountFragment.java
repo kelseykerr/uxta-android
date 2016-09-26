@@ -111,9 +111,11 @@ public class UpdateAccountFragment extends Fragment {
                 user.setAddress(newAddress.getText().toString());
 
                 TextView newAddress2 = (TextView) view.findViewById(R.id.newAddressLine2EditField);
-                user.setAddress(newAddress2.getText().toString());
+                user.setAddressLine2(newAddress2.getText().toString());
 
                 putAccountInfo();
+
+                PrefUtils.setCurrentUser(user, context);
 
                 mListener.onFragmentInteraction(url, nextFragment);
             }
@@ -168,39 +170,36 @@ public class UpdateAccountFragment extends Fragment {
 
     private void putAccountInfo() {
         new AsyncTask<Void, Void, Integer>() {
+
             @Override
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
+                Log.i (Constants.UPDATE_ACCOUNT_FRAGMENT_TAG, "In doInBackground");
                 try {
-/*
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/???/");      // KELS - any qualifiers on URL??
+
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/" + user.getUserId());
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken()???);
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     conn.setRequestProperty("Content-Type", "application/json");
 
                     ObjectMapper mapper = new ObjectMapper();
 
-                    POJO Update?? u;                                     // KELS -  want to create an account object??
-                    u.setAddress(user.getAddress());
-                    u.setAddress2 (user.getAddressLine2());
-
-                    String updateJson = mapper.writeValueAsString(u);
-                    Log.i("updated response: ", udpateJson);
+                    String updateJson = mapper.writeValueAsString(user);
+                    Log.i("updated account: ", updateJson);
                     byte[] outputInBytes = updateJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
                     os.close();
 
                     responseCode = conn.getResponseCode();
-*/
+
                     Log.i("PUT /responses", "Response Code : " + responseCode);
                     if (responseCode != 200) {
-//                        throw new IOException(conn.getResponseMessage());
-                        throw new IOException("null");
+                        throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not update account: " + e.getMessage());
