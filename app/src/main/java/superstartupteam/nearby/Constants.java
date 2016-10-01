@@ -18,4 +18,8 @@ public class Constants {
 
     public static final String AUTH_HEADER = "x-auth-token";
 
+    public static final String SCANNER_FRAGMENT_TAG = "scanner";
+
+    public static final String CODE_FRAGMENT_TAG = "code";
+
 }

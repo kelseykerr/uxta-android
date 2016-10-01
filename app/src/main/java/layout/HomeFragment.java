@@ -185,7 +185,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
                     int responseCode = conn.getResponseCode();
-                    Log.e("GET /requests", "Response Code : " + responseCode);
+                    Log.i("GET /requests", "Response Code : " + responseCode);
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);
                     } catch (IOException e) {

@@ -14,7 +14,7 @@ import superstartupteam.nearby.Constants;
 /**
  * Created by kerrk on 9/13/16.
  */
-public class GetResponses extends AsyncTask<String, Void, List<History>> {
+public class GetResponse extends AsyncTask<String, Void, List<History>> {
     public AsyncResponse delegate = null;
 
     @Override

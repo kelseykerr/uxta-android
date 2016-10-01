@@ -26,5 +26,7 @@
         <item>per hour</item>
         <item>per day</item>
     </string-array>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+
 
 </resources>

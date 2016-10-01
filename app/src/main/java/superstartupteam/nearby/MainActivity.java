@@ -27,9 +27,9 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 
+import layout.ConfirmExchangeSellerDialogFragment;
 import layout.NewOfferDialogFragment;
 import layout.UpdateAccountFragment;
-import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
 import layout.AccountFragment;
 import layout.HistoryFragment;
@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity
         RequestDialogFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
         NewOfferDialogFragment.OnFragmentInteractionListener,
-        UpdateAccountFragment.OnFragmentInteractionListener {
+        UpdateAccountFragment.OnFragmentInteractionListener,
+        ConfirmExchangeSellerDialogFragment.OnFragmentInteractionListener {
 
     private User user;
     private Toolbar toolbar;

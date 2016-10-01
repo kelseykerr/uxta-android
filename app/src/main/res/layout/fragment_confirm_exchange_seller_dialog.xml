@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/confirm_exchange_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="Confirm Exchange"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/cancel_confirm_request"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="left"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/white"
+            android:src="@drawable/x_svg"
+            android:tint="@color/colorAccent" />
+
+
+        <ProgressBar
+            android:id="@+id/loading_spinner"
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/confirm_exchange_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="125dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop" />
+
+
+        <ImageButton
+            android:id="@+id/qr_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/confirm_exchange_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp" />
+
+        <TextView
+            android:id="@+id/exchange_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/confirm_exchange_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:textSize="25sp"
+            android:visibility="gone"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="350dp"
+            android:text="show code"
+            android:id="@+id/show_code_button"
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimary" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_below="@id/show_code_button"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="refresh code"
+            android:id="@+id/refresh_code_button"
+            android:textColor="#ffffff"
+            android:background="@color/colorAccent" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>
