@@ -281,6 +281,19 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         response.setRequestId(requestId);
         response.setSellerId(user.getId());
         response.setExchangeLocation(pickupLocation.getText().toString());
+        try {
+            Date exchangeTime = new Date(pickupTime.getText().toString());
+            response.setExchangeTime(exchangeTime);
+        } catch (Exception e) {
+            Log.i("New Offer Dialog", "**exchange time wasn't set");
+        }
+        response.setReturnLocation(returnLocation.getText().toString());
+        try {
+            Date rTime = new Date(returnTime.getText().toString());
+            response.setReturnTime(rTime);
+        } catch (Exception e) {
+            Log.i("New Offer Dialog", "**return time wasn't set");
+        }
         double offer = Double.parseDouble(offerPrice.getText().toString());
         response.setOfferPrice(offer);
         String offerType = offerTypeSpinner.getSelectedItem().toString();

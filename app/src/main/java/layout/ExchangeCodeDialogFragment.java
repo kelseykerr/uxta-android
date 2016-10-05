@@ -3,7 +3,6 @@ package layout;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -41,10 +40,10 @@ import superstartupteam.nearby.model.User;
 /**
  * Created by kerrk on 9/27/16.
  */
-public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
+public class ExchangeCodeDialogFragment extends DialogFragment {
 
     private Context context;
-    private ConfirmExchangeSellerDialogFragment.OnFragmentInteractionListener mListener;
+    private ExchangeCodeDialogFragment.OnFragmentInteractionListener mListener;
     private String transactionId;
     private String exchangeCode;
     private User user;
@@ -56,11 +55,15 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
     private Button refreshCodeBtn;
     private TextView exchangeCodeView;
     private Boolean loading = false;
+    private String heading;
+    private TextView forgotBtn;
+    private boolean forgot = false;
 
-    public static ConfirmExchangeSellerDialogFragment newInstance(String transactionId) {
-        ConfirmExchangeSellerDialogFragment fragment = new ConfirmExchangeSellerDialogFragment();
+    public static ExchangeCodeDialogFragment newInstance(String transactionId, String heading) {
+        ExchangeCodeDialogFragment fragment = new ExchangeCodeDialogFragment();
         Bundle args = new Bundle();
         args.putString("TRANSACTION_ID", transactionId);
+        args.putString("HEADING", heading);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,6 +85,7 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             transactionId = getArguments().getString("TRANSACTION_ID");
+            heading = getArguments().getString("HEADING");
         }
 
     }
@@ -89,24 +93,18 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_confirm_exchange_seller_dialog, container, false);
+        View view = inflater.inflate(R.layout.fragment_confirm_exchange_dialog, container, false);
+        TextView dialogHeader = (TextView) view.findViewById(R.id.confirm_exchange_text);
+        dialogHeader.setText(heading);
         qrCodeView = (ImageButton) view.findViewById(R.id.qr_code);
         loadingSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_confirm_request);
         exchangeCodeView = (TextView) view.findViewById(R.id.exchange_code);
+
         switchCodeViewBtn = (Button) view.findViewById(R.id.show_code_button);
         switchCodeViewBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (qrCodeView.getVisibility() == View.VISIBLE) {
-                    qrCodeView.setVisibility(View.GONE);
-                    switchCodeViewBtn.setText("Show QR Code");
-                    exchangeCodeView.setText(exchangeCode);
-                    exchangeCodeView.setVisibility(View.VISIBLE);
-                } else {
-                    switchCodeViewBtn.setText("Show Code");
-                    exchangeCodeView.setVisibility(View.GONE);
-                    qrCodeView.setVisibility(View.VISIBLE);
-                }
+                switchCodeView();
             }
         });
         refreshCodeBtn = (Button) view.findViewById(R.id.refresh_code_button);
@@ -123,10 +121,36 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
+
+        forgotBtn = (TextView) view.findViewById(R.id.forgot_scan_btn);
+
+        forgotBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HistoryFragment callback = (HistoryFragment) getTargetFragment();
+                callback.showExchangeOverrideDialog(transactionId, heading, "If you forgot to " +
+                        "submit the exchange when it happened, enter the time the exchange occurred and " +
+                        "the other user will be asked to verify the exchange happened.");
+            }
+        });
+
         this.view = view;
         getExchangeCode(transactionId);
         return view;
 
+    }
+
+    private void switchCodeView() {
+        if (qrCodeView.getVisibility() == View.VISIBLE) {
+            qrCodeView.setVisibility(View.GONE);
+            switchCodeViewBtn.setText("Show QR Code");
+            exchangeCodeView.setText(exchangeCode);
+            exchangeCodeView.setVisibility(View.VISIBLE);
+        } else {
+            switchCodeViewBtn.setText("Show Code");
+            exchangeCodeView.setVisibility(View.GONE);
+            qrCodeView.setVisibility(View.VISIBLE);
+        }
     }
 
     Bitmap encodeAsBitmap(String str) throws WriterException {
@@ -168,8 +192,8 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
     public void onAttach(Context context) {
         this.context = context;
         super.onAttach(context);
-        if (context instanceof ConfirmExchangeSellerDialogFragment.OnFragmentInteractionListener) {
-            mListener = (ConfirmExchangeSellerDialogFragment.OnFragmentInteractionListener) context;
+        if (context instanceof ExchangeCodeDialogFragment.OnFragmentInteractionListener) {
+            mListener = (ExchangeCodeDialogFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -200,6 +224,7 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri, String nextFragment);
     }
+
 
     public void getExchangeCode(final String transactionId) {
         new AsyncTask<Void, Void, Bitmap>() {
@@ -238,7 +263,9 @@ public class ConfirmExchangeSellerDialogFragment extends DialogFragment {
             protected void onPostExecute(Bitmap b) {
                 bitmap = b;
                 qrCodeView.setImageBitmap(b);
-                qrCodeView.setVisibility(View.VISIBLE);
+                if (!forgot) {
+                    qrCodeView.setVisibility(View.VISIBLE);
+                }
                 loadingSpinner.setVisibility(View.GONE);
                 refreshCodeBtn.setEnabled(true);
 

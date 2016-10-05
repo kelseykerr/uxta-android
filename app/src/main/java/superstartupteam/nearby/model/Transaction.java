@@ -1,10 +1,13 @@
 package superstartupteam.nearby.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 
 /**
  * Created by kerrk on 9/24/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Transaction {
 
     private String id;
@@ -220,6 +223,7 @@ public class Transaction {
         public Date time;
         public Boolean buyerAccepted = false;
         public Boolean sellerAccepted = false;
+        public Boolean declined = false;
 
         public ExchangeOverride() {
 

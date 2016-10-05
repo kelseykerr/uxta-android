@@ -160,31 +160,45 @@ public class HistoryFragment extends Fragment {
         newFragment.show(getFragmentManager(), "dialog");
     }
 
-    public void showSellerExchangeDialog(Transaction t) {
-        ConfirmExchangeSellerDialogFragment fragment = ConfirmExchangeSellerDialogFragment
-                .newInstance(t.getId());
+    public void showExchangeCodeDialog(Transaction t, Boolean buyer) {
+        String heading = buyer ? "Confirm Return" : "Confirm Exchange";
+        ExchangeCodeDialogFragment fragment = ExchangeCodeDialogFragment
+                .newInstance(t.getId(), heading);
+        fragment.setTargetFragment(this, 0);
         fragment.show(getFragmentManager(), "dialog");
     }
 
-    public void showScanner(String transactionId) {
+    public void showScanner(String transactionId, Boolean buyer) {
         Intent i = new Intent(getActivity(), ScannerActivity.class);
         i.putExtra("TRANSACTION_ID", transactionId);
+        i.putExtra("HEADER", buyer ? "Confirm Exchange" : "Confirm Return");
         startActivityForResult(i, 2);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        getHistory(this);
         if (requestCode == 2 && data != null && data.getExtras() != null) {
-            Log.i("***", "*******here");
             String message = (String) data.getExtras().get("MESSAGE");
             Snackbar snackbar = Snackbar
                     .make(view, message, Snackbar.LENGTH_LONG);
             snackbar.show();
         }
+        getHistory(this);
     }
 
+    public void showConfirmChargeDialog(Double calculatedPrice, String description, String transactionId) {
+        ConfirmChargeDialogFragment frag = ConfirmChargeDialogFragment
+                .newInstance(calculatedPrice, description, transactionId);
+        frag.show(getFragmentManager(), "dialog");
+    }
+
+    public void showConfirmExchangeOverrideDialog(String exchangeTime, String description,
+                                                  String transactionId, boolean isSeller) {
+        ConfirmExchangeOverrideDialogFragment f = ConfirmExchangeOverrideDialogFragment
+                .newInstance(exchangeTime, description, transactionId, isSeller);
+        f.show(getFragmentManager(), "dialog");
+    }
 
     public void showResponseDialog(Response r) {
         String requestId = r.getRequestId();
@@ -197,6 +211,12 @@ public class HistoryFragment extends Fragment {
         DialogFragment newFragment = ViewOfferDialogFragment
                 .newInstance(r, request);
         newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void showExchangeOverrideDialog(String transactionId, String header, String description) {
+        ExchangeOverrideDialogFragment f = ExchangeOverrideDialogFragment
+                .newInstance(transactionId, header, description);
+        f.show(getFragmentManager(), "dialog");
     }
 
     public void getHistory(final HistoryFragment thisFragment) {

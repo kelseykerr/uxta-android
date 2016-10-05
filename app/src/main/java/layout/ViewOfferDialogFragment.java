@@ -105,6 +105,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         pickupTime = (TextView) view.findViewById(R.id.pickup_time);
         if (response.getExchangeTime() != null) {
             pickupTime.setText(response.getExchangeTime().toString());
+
         } else {
             String htmlString = "Pickup Time";
             pickupLabel = (TextView) view.findViewById(R.id.pickup_time_label);

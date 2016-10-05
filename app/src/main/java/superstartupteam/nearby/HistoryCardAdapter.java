@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,135 +78,12 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     public void onBindParentViewHolder(final HistoryCardViewHolder requestViewHolder, int i, Object obj) {
         final History h = (History) obj;
         Request r = h.getRequest();
-        if (h.getTransaction() != null && (h.getTransaction().getSellerAccepted() == null ||
-                !h.getTransaction().getSellerAccepted())) {
-            boolean isBuyer = user.getId().equals(r.getUser().getId());
-            final boolean isSeller = !isBuyer;
-            requestViewHolder.mExchangeIcon.setVisibility(View.VISIBLE);
-            requestViewHolder.mExchangeIcon.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    if (isSeller) {
-                        historyFragment.showSellerExchangeDialog(h.getTransaction());
-                    } else {
-                        historyFragment.showScanner(h.getTransaction().getId());
-                    }
-                }
-            });
-            requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.card_border_left));
-            requestViewHolder.vEditButton.setVisibility(View.GONE);
-            requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
-            requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
-            requestViewHolder.vPostedDate.setVisibility(View.GONE);
-            requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
-            requestViewHolder.vDescription.setVisibility(View.VISIBLE);
-            Response resp = null;
-            Transaction transaction = h.getTransaction();
-            for (Response res : h.getResponses()) {
-                if (res.getId().equals(transaction.getResponseId())) {
-                    resp = res;
-                    break;
-                }
-            }
-            String topDescription = null;
-            if (isBuyer) {
-                topDescription = (r.getRental() ? "Borrowing a " : "Buying a ") + r.getItemName() +
-                        " from " + resp.getSeller().getFirstName();
-            } else {
-                topDescription = (r.getRental() ? "Loaning a " : "Selling a ") + r.getItemName() +
-                        " to " + r.getUser().getFirstName();
-            }
-            requestViewHolder.vItemName.setText(topDescription);
-            if (!transaction.getExchanged()) {
-                String exchangeTime = "<b>exchange time:</b> " + resp.getExchangeTime();
-                requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
-                String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
-                requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
-                requestViewHolder.vStatus.setText("Awaiting initial exchange");
-            } else if (!transaction.getReturned() && r.getRental()) {
-                String returnTime = "<b>return time:</b> " + resp.getReturnTime();
-                requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
-                String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
-                requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));
-                requestViewHolder.vStatus.setText("Awaiting return");
-            }
-
+        if (h.getTransaction() != null) {
+            setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
-            requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
-            requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-            requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
-            requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
-            String htmlString = "requested a <b>" +
-                    r.getItemName() + "</b>";
-            requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
-            String diff = AppUtils.getTimeDiffString(r.getPostDate());
-            requestViewHolder.vPostedDate.setText(diff);
-            if (r.getCategory() != null) {
-                requestViewHolder.vCategoryName.setText(r.getCategory().getName());
-            } else {
-                requestViewHolder.vCategoryName.setVisibility(View.GONE);
-            }
-
-            if (r.getDescription() != null) {
-                requestViewHolder.vDescription.setText(r.getDescription());
-            } else {
-                requestViewHolder.vDescription.setVisibility(View.GONE);
-            }
-            requestViewHolder.vStatus.setText(r.getStatus());
-            setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
-            /*
-             * only display the edit button if the request is open...they shouldn't need to edit
-             * closed requests
-             */
-            if (!r.getStatus().equals("OPEN")) {
-                requestViewHolder.vEditButton.setVisibility(View.GONE);
-            } else {
-                requestViewHolder.vEditButton.setVisibility(View.VISIBLE);
-                requestViewHolder.vEditButton.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        historyFragment.showRequestDialog(h);
-                    }
-                });
-            }
-            if (h.getResponses() == null || h.getResponses().size() < 1) {
-                requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
-                if (r.getStatus().equals("OPEN")) {
-                    RelativeLayout.LayoutParams lp =
-                            (RelativeLayout.LayoutParams) requestViewHolder.vEditButton.getLayoutParams();
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                    requestViewHolder.vEditButton.setLayoutParams(lp);
-                }
-            } else {
-                requestViewHolder.vParentDropDownArrow.setVisibility(View.VISIBLE);
-            }
+           setUpRequestCard(requestViewHolder, r, h);
         } else { //this is an offer the user made
-            requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
-            requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-            requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
-            requestViewHolder.vEditButton.setVisibility(View.GONE);
-            final Response resp = h.getResponses().get(0);
-            String buyerName = r.getUser().getFirstName() != null ?
-                    r.getUser().getFirstName() : r.getUser().getFullName();
-            String htmlString = "offered a <b>" +
-                    r.getItemName() + "</b> to " + buyerName;
-            String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
-            requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
-            requestViewHolder.vPostedDate.setText(diff);
-            requestViewHolder.vCategoryName.setText("");
-            requestViewHolder.vCategoryName.setVisibility(View.GONE);
-            requestViewHolder.vDescription.setText("");
-            requestViewHolder.vDescription.setVisibility(View.GONE);
-            requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
-            setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
-            requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
-            if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
-                requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
-            } else {
-                requestViewHolder.vResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        historyFragment.showResponseDialog(resp);
-                    }
-                });
-            }
+            setUpOfferCard(requestViewHolder, r, h);
         }
     }
 
@@ -259,6 +135,221 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             case "fulfilled":
                 requestStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
+        }
+    }
+
+    private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+        requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+        requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
+        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
+        requestViewHolder.vEditButton.setVisibility(View.GONE);
+        final Response resp = h.getResponses().get(0);
+        String buyerName = r.getUser().getFirstName() != null ?
+                r.getUser().getFirstName() : r.getUser().getFullName();
+        String htmlString = "offered a <b>" +
+                r.getItemName() + "</b> to " + buyerName;
+        String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
+        requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
+        requestViewHolder.vPostedDate.setText(diff);
+        requestViewHolder.vCategoryName.setText("");
+        requestViewHolder.vCategoryName.setVisibility(View.GONE);
+        requestViewHolder.vDescription.setText("");
+        requestViewHolder.vDescription.setVisibility(View.GONE);
+        requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
+        setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
+        requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
+        if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
+            requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+        } else {
+            requestViewHolder.vResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            });
+        }
+    }
+
+    private void setUpRequestCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+        requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+        requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
+        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
+        requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+        String htmlString = "requested a <b>" +
+                r.getItemName() + "</b>";
+        requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
+        String diff = AppUtils.getTimeDiffString(r.getPostDate());
+        requestViewHolder.vPostedDate.setText(diff);
+        if (r.getCategory() != null) {
+            requestViewHolder.vCategoryName.setText(r.getCategory().getName());
+        } else {
+            requestViewHolder.vCategoryName.setVisibility(View.GONE);
+        }
+
+        if (r.getDescription() != null) {
+            requestViewHolder.vDescription.setText(r.getDescription());
+        } else {
+            requestViewHolder.vDescription.setVisibility(View.GONE);
+        }
+        requestViewHolder.vStatus.setText(r.getStatus());
+        setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
+            /*
+             * only display the edit button if the request is open...they shouldn't need to edit
+             * closed requests
+             */
+        if (!r.getStatus().equals("OPEN")) {
+            requestViewHolder.vEditButton.setVisibility(View.GONE);
+        } else {
+            requestViewHolder.vEditButton.setVisibility(View.VISIBLE);
+            requestViewHolder.vEditButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    historyFragment.showRequestDialog(h);
+                }
+            });
+        }
+        if (h.getResponses() == null || h.getResponses().size() < 1) {
+            requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
+            if (r.getStatus().equals("OPEN")) {
+                RelativeLayout.LayoutParams lp =
+                        (RelativeLayout.LayoutParams) requestViewHolder.vEditButton.getLayoutParams();
+                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+                requestViewHolder.vEditButton.setLayoutParams(lp);
+            }
+        } else {
+            requestViewHolder.vParentDropDownArrow.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setUpTransactionCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+        boolean isBuyer = user.getId().equals(r.getUser().getId());
+        final boolean isSeller = !isBuyer;
+        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.card_border_left));
+        requestViewHolder.vEditButton.setVisibility(View.GONE);
+        requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+        requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
+        requestViewHolder.vPostedDate.setVisibility(View.GONE);
+        requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
+        requestViewHolder.vDescription.setVisibility(View.VISIBLE);
+        Response resp = null;
+        final Transaction transaction = h.getTransaction();
+        for (Response res : h.getResponses()) {
+            if (res.getId().equals(transaction.getResponseId())) {
+                resp = res;
+                break;
+            }
+        }
+        String topDescription;
+        Boolean complete = r.getRental() ? transaction.getExchanged() && transaction.getReturned() :
+                transaction.getExchanged();
+        String beginning;
+        if (complete && r.getRental()) {
+            beginning = isBuyer ? "Borrowed a " : "Loaned a ";
+        } else if (complete) {
+            beginning = isBuyer ? "Bought a " : "Sold a ";
+        } else if (r.getRental()) {
+            beginning = isBuyer ? "Borrowing a " : "Loaning a ";
+        } else {
+            beginning = isBuyer ? "Buying a " : "Selling a ";
+        }
+        if (isBuyer) {
+            topDescription = beginning + r.getItemName() +
+                    " from " + resp.getSeller().getFirstName();
+        } else {
+            topDescription = beginning + r.getItemName() +
+                    " to " + r.getUser().getFirstName();
+        }
+        requestViewHolder.vItemName.setText(topDescription);
+        requestViewHolder.mExchangeIcon.setVisibility(View.VISIBLE);
+        requestViewHolder.mExchangeIcon.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (isSeller) {
+                    if (!transaction.getExchanged()) {
+                        historyFragment.showExchangeCodeDialog(h.getTransaction(), false);
+                    } else {
+                        historyFragment.showScanner(h.getTransaction().getId(), false);
+                    }
+                } else {
+                    if (!transaction.getExchanged()) {
+                        historyFragment.showScanner(h.getTransaction().getId(), true);
+                    } else {
+                        historyFragment.showExchangeCodeDialog(h.getTransaction(), true);
+                    }
+                }
+            }
+        });
+        if (!transaction.getExchanged()) {
+            String exchangeTime = "<b>exchange time:</b> " + resp.getExchangeTime();
+            requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
+            String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
+            requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
+            requestViewHolder.vStatus.setText("Awaiting initial exchange");
+            Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
+            if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
+                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+                requestViewHolder.vStatus.setText("Pending exchange override approval");
+                if (isBuyer) {
+                    String description = resp.getSeller().getFirstName() +
+                            " submitted an exchange override. Did you exchange the " +
+                            r.getItemName() + " at the time above?";
+                    historyFragment.showConfirmExchangeOverrideDialog(
+                            transaction.getExchangeOverride().time.toString(),
+                            description, transaction.getId(), isSeller);
+                }
+            }
+        } else if (!transaction.getReturned() && r.getRental()) {
+            String returnTime = "<b>return time:</b> " + resp.getReturnTime();
+            requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
+            String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
+            requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));
+            requestViewHolder.vStatus.setText("Awaiting return");
+            Transaction.ExchangeOverride returnOverride = transaction.getReturnOverride();
+            if (returnOverride != null && !returnOverride.sellerAccepted && !returnOverride.declined) {
+                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+                requestViewHolder.vStatus.setText("Pending return override approval");
+                if (isSeller) {
+                    String description = r.getUser().getFirstName() +
+                            " submitted a return override. Was the " +
+                            r.getItemName() + " returned at the time above?";
+                    historyFragment.showConfirmExchangeOverrideDialog(
+                            transaction.getExchangeOverride().time.toString(),
+                            description,
+                            transaction.getId(),
+                            isSeller);
+                }
+            }
+        } else if (r.getStatus().equals("TRANSACTION_PENDING")) {
+            String calculatedPrice = "<b>calculated price:</b> " + transaction.getCalculatedPrice();
+            requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
+            requestViewHolder.vDescription.setVisibility(View.GONE);
+            if (isBuyer) {
+                requestViewHolder.vStatus.setText("Processing Payment");
+                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+            } else {
+                final String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
+                        r.getItemName() + " to " + r.getUser().getFirstName();
+                historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
+                        description, transaction.getId());
+                requestViewHolder.vStatus.setText("CONFIRM CHARGE!");
+                requestViewHolder.vStatus.setTextColor(Color.parseColor("#E52B50"));
+                requestViewHolder.mExchangeIcon.setImageResource(R.drawable.ic_assignment_late_black_24dp);
+                requestViewHolder.mExchangeIcon.setColorFilter(Color.parseColor("#E52B50"));
+                requestViewHolder.mExchangeIcon.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
+                                description, transaction.getId());
+                    }
+                });
+            }
+        } else {
+            if (isBuyer) {
+                String price = "<b>Payment:</b> -$" + transaction.getFinalPrice();
+                requestViewHolder.vDescription.setText(Html.fromHtml(price));
+            } else {
+                String price = "<b>Payment:</b> $" + transaction.getFinalPrice();
+                requestViewHolder.vDescription.setText(Html.fromHtml(price));
+            }
+            requestViewHolder.vCategoryName.setVisibility(View.GONE);
+            requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+            requestViewHolder.vStatus.setText(r.getStatus());
         }
     }
 

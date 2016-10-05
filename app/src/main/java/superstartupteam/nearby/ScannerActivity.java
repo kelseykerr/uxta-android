@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -32,6 +33,7 @@ public class ScannerActivity extends AppCompatActivity implements
     private ImageButton backBtn;
     private String transactionId;
     private User user;
+    private String heading;
     FragmentManager fragmentManager = getFragmentManager();
 
 
@@ -46,8 +48,11 @@ public class ScannerActivity extends AppCompatActivity implements
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             transactionId = extras.getString("TRANSACTION_ID");
+            heading = extras.getString("HEADER");
         }
         setContentView(R.layout.activity_scanner);
+        TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
+        header.setText(heading);
         changeInputBtn = (Button) findViewById(R.id.change_input_button);
         backBtn = (ImageButton) findViewById(R.id.back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {
