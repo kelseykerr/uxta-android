@@ -3,19 +3,24 @@ package layout;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
@@ -58,6 +63,50 @@ public class HistoryFragment extends Fragment {
     public static String snackbarMessage = null;
 
     private OnFragmentInteractionListener mListener;
+    private LocalBroadcastManager mLocalBroadcastManager;
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("message");
+            Log.e("**", "got message: " + message);
+            Snackbar snackbar = Snackbar.make(view.getRootView(), message,
+                    Snackbar.LENGTH_LONG);
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                    snackbar.getView().getRootView().getLayoutParams();
+
+            params.setMargins(params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    params.bottomMargin + 150);
+
+            snackbar.getView().getRootView().setLayoutParams(params);
+            snackbar.show();
+        }
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        registerBroadcastReceiver();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        unregisterBroadcastReceiver();
+    }
+
+    private void registerBroadcastReceiver() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("NOTIFICATION_MESSAGE");
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    }
+
 
     public HistoryFragment() {
         // Required empty public constructor

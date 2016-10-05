@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -48,6 +50,9 @@ public class NearbyMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.i(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Intent intent = new Intent("NOTIFICATION_MESSAGE");
+            intent.putExtra("message", remoteMessage.getNotification().getBody());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM

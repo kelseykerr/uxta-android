@@ -137,7 +137,9 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                             Date newPickupTime = new Date(calendar.getTimeInMillis());
                             pickupTime.setText(newPickupTime.toString());
-                            pickupLabel.setVisibility(View.VISIBLE);
+                            if (pickupLabel != null) {
+                                pickupLabel.setVisibility(View.VISIBLE);
+                            }
                             alertDialog.dismiss();
                         }
                     });
@@ -317,13 +319,13 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         }
         response.setPriceType(type);
         response.setExchangeLocation(pickupLocation.getText().toString());
-        if (!pickupTime.getText().toString().equals("SET")) {
+        if (!pickupTime.getText().toString().equals("Pickup Time")) {
             Date eDate = new Date(pickupTime.getText().toString());
             response.setExchangeTime(eDate);
         }
         if (request.getRental()) {
             response.setReturnLocation(returnLocation.getText().toString());
-            if (!returnTime.getText().toString().equals("SET")) {
+            if (!returnTime.getText().toString().equals("Return Time")) {
                 Date eDate = new Date(returnTime.getText().toString());
                 response.setReturnTime(eDate);
             }
@@ -366,7 +368,9 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                             Date newPickupTime = new Date(calendar.getTimeInMillis());
                             textView.setText(newPickupTime.toString());
-                            returnLabel.setVisibility(View.VISIBLE);
+                            if (returnLabel != null) {
+                                returnLabel.setVisibility(View.VISIBLE);
+                            }
                             alertDialog.dismiss();
                         }
                     });

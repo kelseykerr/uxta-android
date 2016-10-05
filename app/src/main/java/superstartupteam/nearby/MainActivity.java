@@ -4,7 +4,10 @@ import android.Manifest;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -71,7 +75,6 @@ public class MainActivity extends AppCompatActivity
      * Id to identify the fine location permission request.
      */
     private static final int REQUEST_FINE_LOCATION = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +201,7 @@ public class MainActivity extends AppCompatActivity
                     HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
                     if (historyFragment != null) {
                         historyFragment.getHistory(historyFragment);
+                        Log.i("**", "**attempting to refresh history now!");
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(firstAnim, secondAnim)
                                 .show(historyFragment)
