@@ -1,5 +1,6 @@
 package superstartupteam.nearby.service;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -13,6 +14,9 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.List;
+import java.util.Map;
 
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.R;
@@ -45,6 +49,7 @@ public class NearbyMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.i(TAG, "Message data payload: " + remoteMessage.getData());
+            createNotification(remoteMessage.getData());
         }
 
         // Check if message contains a notification payload.
@@ -59,6 +64,53 @@ public class NearbyMessagingService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
+    private void createNotification(Map<String, String> payload) {
+        String type = payload.get("type");
+
+        if (isAppInForeground(this)) {
+            Intent intent = new Intent("NOTIFICATION_MESSAGE");
+            intent.putExtra("message", payload.get("message"));
+            intent.putExtra("type", type);
+            switch (type) {
+                case "response_update":
+                    intent.putExtra("request", payload.get("request"));
+                    intent.putExtra("response", payload.get("response"));
+                    break;
+                default:
+                    break;
+            }
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } else {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("type", type);
+            switch (type) {
+                case "response_update":
+                    intent.putExtra("request", payload.get("request"));
+                    intent.putExtra("response", payload.get("response"));
+                    break;
+                default:
+                    break;
+            }
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.nearby_pin_black)
+                    .setContentTitle(payload.get("title"))
+                    .setContentText(payload.get("message"))
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setContentIntent(pendingIntent);
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        }
+
+    }
+
     /**
      * Create and show a simple notification containing the received FCM message.
      *
@@ -70,10 +122,10 @@ public class NearbyMessagingService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_grade_black_24dp)
-                .setContentTitle("FCM Message")
+                .setSmallIcon(R.drawable.nearby_pin_black)
+                .setContentTitle("Nearby Message")
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
@@ -83,5 +135,20 @@ public class NearbyMessagingService extends FirebaseMessagingService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    private boolean isAppInForeground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return false;
+        }
+        final String packageName = context.getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

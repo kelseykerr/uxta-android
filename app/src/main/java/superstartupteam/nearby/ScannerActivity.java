@@ -159,13 +159,6 @@ public class ScannerActivity extends AppCompatActivity implements
                 } else {
                     Snackbar snackbar = Snackbar
                             .make(findViewById(R.id.scanner_layout), "Code did not match or is expired.", Snackbar.LENGTH_LONG);
-                            /*.setAction("SHOW OFFERS", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    dismiss();
-                                    ((MainActivity) getActivity()).goToHistory(null);
-                                }
-                            });*/
                     snackbar.show();
                 }
             }

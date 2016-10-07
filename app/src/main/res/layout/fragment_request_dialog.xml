@@ -98,7 +98,6 @@
             android:maxLength="200"
             android:maxLines="3"
             android:paddingBottom="16dp"
-            android:paddingTop="16dp"
             android:theme="@style/EditTextTheme"
             android:textColor="@color/colorAccent" />
     </android.support.design.widget.TextInputLayout>

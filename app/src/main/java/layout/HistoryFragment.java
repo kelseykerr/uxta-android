@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,7 +67,7 @@ public class HistoryFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            Log.e("**", "got message: " + message);
+            Log.i("**", "got message: " + message);
             Snackbar snackbar = Snackbar.make(view.getRootView(), message,
                     Snackbar.LENGTH_LONG);
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)

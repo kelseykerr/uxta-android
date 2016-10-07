@@ -4,10 +4,7 @@ import android.Manifest;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -15,7 +12,6 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,20 +22,25 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import java.io.IOException;
 
+import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
 import layout.ExchangeOverrideDialogFragment;
-import layout.NewOfferDialogFragment;
-import layout.UpdateAccountFragment;
-import superstartupteam.nearby.model.User;
-import layout.AccountFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
+import layout.NewOfferDialogFragment;
 import layout.RequestDialogFragment;
+import layout.UpdateAccountFragment;
+import layout.ViewOfferDialogFragment;
+import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
+import superstartupteam.nearby.model.User;
 import superstartupteam.nearby.service.NearbyInstanceIdService;
 
 /**
@@ -61,8 +62,13 @@ public class MainActivity extends AppCompatActivity
     private Integer currentMenuItem;
     private ImageButton newRequestButton;
     private TextView listMapText;
+    private String snackbarMessage;
     String currentText = "list";
     FragmentManager fragmentManager = getFragmentManager();
+    private String notificationType;
+    private Response response;
+    private Request request;
+    private boolean readNotification = false;
 
     /**
      * Root of the layout of this Activity.
@@ -75,6 +81,34 @@ public class MainActivity extends AppCompatActivity
      * Id to identify the fine location permission request.
      */
     private static final int REQUEST_FINE_LOCATION = 0;
+
+    private void checkNotificationOnOpen() {
+        notificationType = getIntent().getStringExtra("type");
+        if (notificationType != null) {
+            if (notificationType.equals("response_update")) {
+                String responseJson = getIntent().getStringExtra("response");
+                String requestJson = getIntent().getStringExtra("request");
+                try {
+                    response = new ObjectMapper().readValue(responseJson, Response.class);
+                    request = new ObjectMapper().readValue(requestJson, Request.class);
+                    DialogFragment newFragment = ViewOfferDialogFragment
+                            .newInstance(response, request);
+                    newFragment.show(getFragmentManager(), "dialog");
+                    readNotification = true;
+                } catch (IOException e) {
+                    Log.e("JSON ERROR", "**" + e.getMessage());
+                }
+                mBottomBar.selectTabAtPosition(1, false);
+                if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
+                    fragmentManager.beginTransaction()
+                            .setCustomAnimations(0, 0)
+                            .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
+                            .commit();
+                }
+            }
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +171,9 @@ public class MainActivity extends AppCompatActivity
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
+
+        checkNotificationOnOpen();
+        Log.e("***", mBottomBar.getCurrentTabPosition() + "**");
     }
 
 
@@ -159,11 +196,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
+                    Log.e("**", "**home");
                     listMapText.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
@@ -180,6 +219,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
+                    Log.e("**", "**history");
                     listMapText.setVisibility(View.INVISIBLE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
@@ -194,62 +234,10 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    //TODO: destroy old ones or just refresh call to getHistory
-                    listMapText.setVisibility(View.INVISIBLE);
-                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
-                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
-                    if (historyFragment != null) {
-                        historyFragment.getHistory(historyFragment);
-                        Log.i("**", "**attempting to refresh history now!");
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(firstAnim, secondAnim)
-                                .show(historyFragment)
-                                .commit();
-                    } else {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(firstAnim, secondAnim)
-                                .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
-                                .commit();
-                    }
+                    int secondAnim = selectHistoryFragment(menuItemId);
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
                 }
                 currentMenuItem = menuItemId;
-            }
-
-            public void hideOtherFragments(String current, int leaveAnimation) {
-                if (!current.equals(Constants.HOME_FRAGMENT_TAG)) {
-                    if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(0, leaveAnimation)
-                                .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
-                                .commit();
-                    }
-                }
-                if (!current.equals(Constants.HISTORY_FRAGMENT_TAG)) {
-                    if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(0, leaveAnimation)
-                                .hide(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
-                                .commit();
-                    }
-                }
-                if (!current.equals(Constants.ACCOUNT_FRAGMENT_TAG)) {
-                    if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(0, leaveAnimation)
-                                .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
-                                .commit();
-                    }
-                }
-                if (!current.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)) {
-                    if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(0, leaveAnimation)
-                                .hide(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
-                                .commit();
-                    }
-                }
             }
 
             @Override
@@ -260,7 +248,8 @@ public class MainActivity extends AppCompatActivity
                     if (historyFragment != null) {
                         fragmentTransaction.remove(historyFragment);
                     }
-                    HistoryFragment.snackbarMessage = null;
+                    HistoryFragment.snackbarMessage = snackbarMessage;
+                    snackbarMessage = null;
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction
@@ -272,6 +261,61 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    public void hideOtherFragments(String current, int leaveAnimation) {
+        if (!current.equals(Constants.HOME_FRAGMENT_TAG)) {
+            if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, leaveAnimation)
+                        .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
+                        .commit();
+            }
+        }
+        if (!current.equals(Constants.HISTORY_FRAGMENT_TAG)) {
+            if (fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, leaveAnimation)
+                        .hide(fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG))
+                        .commit();
+            }
+        }
+        if (!current.equals(Constants.ACCOUNT_FRAGMENT_TAG)) {
+            if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, leaveAnimation)
+                        .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            }
+        }
+        if (!current.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)) {
+            if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(0, leaveAnimation)
+                        .hide(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
+                        .commit();
+            }
+        }
+    }
+
+    private int selectHistoryFragment(int menuItemId) {
+        listMapText.setVisibility(View.INVISIBLE);
+        int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
+        int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
+        HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+        if (historyFragment != null) {
+            historyFragment.getHistory(historyFragment);
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(firstAnim, secondAnim)
+                    .show(historyFragment)
+                    .commit();
+        } else {
+            historyFragment = HistoryFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(firstAnim, secondAnim)
+                    .add(R.id.content_frame, historyFragment, Constants.HISTORY_FRAGMENT_TAG)
+                    .commit();
+        }
+        return secondAnim;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -387,6 +431,7 @@ public class MainActivity extends AppCompatActivity
             fragment.parentScroll.scrollTo(0, 0);
             HistoryFragment.snackbarMessage = message;
         }
+        snackbarMessage = message;
         mBottomBar.selectTabAtPosition(1, true);
 
     }

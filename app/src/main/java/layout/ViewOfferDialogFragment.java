@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -114,40 +115,9 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         }
 
         pickupTime.setOnTouchListener(new View.OnTouchListener() {
-
             @Override
             public boolean onTouch(View arg0, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // date time picker
-                    final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
-                    final AlertDialog alertDialog = new Builder(context).create();
-
-                    dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
-                            TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-
-                            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                                    datePicker.getMonth(),
-                                    datePicker.getDayOfMonth(),
-                                    timePicker.getCurrentHour(),
-                                    timePicker.getCurrentMinute());
-
-                            Date newPickupTime = new Date(calendar.getTimeInMillis());
-                            pickupTime.setText(newPickupTime.toString());
-                            if (pickupLabel != null) {
-                                pickupLabel.setVisibility(View.VISIBLE);
-                            }
-                            alertDialog.dismiss();
-                        }
-                    });
-                    alertDialog.setView(dateTimeView);
-                    alertDialog.show();
-                    return true;
-                }
-                return false;
+                return dateTimeSelector(event);
             }
         });
 
@@ -161,6 +131,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             returnTime.setVisibility(View.GONE);
             TextView returnTimeLabel = (TextView) view.findViewById(R.id.return_time_label);
             returnTimeLabel.setVisibility(View.GONE);
+            LinearLayout returnTimeLine = (LinearLayout) view.findViewById(R.id.return_time_underline);
+            returnTimeLine.setVisibility(View.GONE);
         } else {
             this.view = view;
             setDateTimeFunctionality(returnTime, false);
@@ -427,5 +399,40 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     }
 
     public void onNothingSelected(AdapterView<?> arg0) {
+    }
+
+    public boolean dateTimeSelector(MotionEvent event) {
+            if(event.getAction() == MotionEvent.ACTION_UP){
+                // date time picker
+                final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
+                final AlertDialog alertDialog = new Builder(context).create();
+
+                dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
+                        TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
+
+                        Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                                datePicker.getMonth(),
+                                datePicker.getDayOfMonth(),
+                                timePicker.getCurrentHour(),
+                                timePicker.getCurrentMinute());
+
+                        Date newPickupTime = new Date(calendar.getTimeInMillis());
+                        pickupTime.setText(newPickupTime.toString());
+                        if (pickupLabel != null) {
+                            pickupLabel.setVisibility(View.VISIBLE);
+                        }
+                        alertDialog.dismiss();
+                    }
+                });
+                alertDialog.setView(dateTimeView);
+                alertDialog.show();
+                return true;
+            }
+            return false;
+
     }
 }
