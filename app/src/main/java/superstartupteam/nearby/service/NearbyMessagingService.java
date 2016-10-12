@@ -71,14 +71,8 @@ public class NearbyMessagingService extends FirebaseMessagingService {
             Intent intent = new Intent("NOTIFICATION_MESSAGE");
             intent.putExtra("message", payload.get("message"));
             intent.putExtra("type", type);
-            switch (type) {
-                case "response_update":
-                    intent.putExtra("request", payload.get("request"));
-                    intent.putExtra("response", payload.get("response"));
-                    break;
-                default:
-                    break;
-            }
+            intent.putExtra("request", payload.get("request"));
+            intent.putExtra("response", payload.get("response"));
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         } else {
             Intent intent = new Intent(this, MainActivity.class);

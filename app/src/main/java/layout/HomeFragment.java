@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,9 +15,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
@@ -38,6 +41,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -362,15 +366,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         //ft.show(mapFragment).commit();
 
     }
-
-/* not sure why this is here
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            int nextFragment=0;
-            mListener.onFragmentInteraction(uri, nextFragment);
-        }
-    }
-*/
 
     @Override
     public void onAttach(Context context) {

@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -67,7 +68,6 @@ public class HistoryFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            Log.i("**", "got message: " + message);
             Snackbar snackbar = Snackbar.make(view.getRootView(), message,
                     Snackbar.LENGTH_LONG);
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
@@ -77,7 +77,35 @@ public class HistoryFragment extends Fragment {
                     params.topMargin,
                     params.rightMargin,
                     params.bottomMargin + 150);
+            String type = intent.getStringExtra("type");
+            View.OnClickListener mOnClickListener;
+            Response response = null;
+            Request request = null;
+            String responseJson = intent.getStringExtra("response");
+            String requestJson = intent.getStringExtra("request");
+            try {
+                response = new ObjectMapper().readValue(responseJson, Response.class);
+                request = new ObjectMapper().readValue(requestJson, Request.class);
+            } catch (IOException e) {
+                Log.e("JSON ERROR", "**" + e.getMessage());
+            }
 
+            switch (type) {
+                case "response_update":
+                    DialogFragment newFragment = null;
+                    newFragment = ViewOfferDialogFragment.newInstance(response, request);
+                    final DialogFragment frag = newFragment;
+                    mOnClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            frag.show(getFragmentManager(), "dialog");
+                        }
+                    };
+                    snackbar.setAction("view", mOnClickListener);
+                    break;
+                default:
+                    break;
+            }
             snackbar.getView().getRootView().setLayoutParams(params);
             snackbar.show();
         }

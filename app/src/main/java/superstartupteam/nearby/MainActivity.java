@@ -82,6 +82,11 @@ public class MainActivity extends AppCompatActivity
      */
     private static final int REQUEST_FINE_LOCATION = 0;
 
+    private boolean hasMessage() {
+        notificationType = getIntent().getStringExtra("type");
+        return notificationType != null;
+    }
+
     private void checkNotificationOnOpen() {
         notificationType = getIntent().getStringExtra("type");
         if (notificationType != null) {
@@ -97,13 +102,6 @@ public class MainActivity extends AppCompatActivity
                     readNotification = true;
                 } catch (IOException e) {
                     Log.e("JSON ERROR", "**" + e.getMessage());
-                }
-                mBottomBar.selectTabAtPosition(1, false);
-                if (fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG) != null) {
-                    fragmentManager.beginTransaction()
-                            .setCustomAnimations(0, 0)
-                            .hide(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
-                            .commit();
                 }
             }
         }
@@ -157,6 +155,10 @@ public class MainActivity extends AppCompatActivity
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
+        // if this is being opened from a notification message, default to history view
+        if (hasMessage()) {
+            mBottomBar.setDefaultTabPosition(1);
+        }
         setmBottomBarListener();
 
         user = PrefUtils.getCurrentUser(MainActivity.this);
@@ -173,7 +175,6 @@ public class MainActivity extends AppCompatActivity
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
 
         checkNotificationOnOpen();
-        Log.e("***", mBottomBar.getCurrentTabPosition() + "**");
     }
 
 
@@ -202,7 +203,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    Log.e("**", "**home");
                     listMapText.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    Log.e("**", "**history");
                     listMapText.setVisibility(View.INVISIBLE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
