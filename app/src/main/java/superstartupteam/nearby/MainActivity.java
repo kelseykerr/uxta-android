@@ -156,9 +156,10 @@ public class MainActivity extends AppCompatActivity
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
         // if this is being opened from a notification message, default to history view
-        if (hasMessage()) {
+        if (hasMessage() && !notificationType.equals("request_notification")) {
             mBottomBar.setDefaultTabPosition(1);
         }
+        //TODO: if request_notification, the radius should be set to the user's settings
         setmBottomBarListener();
 
         user = PrefUtils.getCurrentUser(MainActivity.this);

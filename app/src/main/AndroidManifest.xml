@@ -57,6 +57,13 @@
         </service>
 
         <activity android:name=".ScannerActivity"></activity>
+
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <receiver android:name=".ConnectivityReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
