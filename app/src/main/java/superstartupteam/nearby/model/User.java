@@ -1,5 +1,7 @@
 package superstartupteam.nearby.model;
 
+import java.util.List;
+
 /**
  * Created by kerrk on 7/16/16.
  */
@@ -34,6 +36,20 @@ public class User extends BaseEntity {
     private String zip;
 
     private String fullName;
+
+    private Double homeLongitude;
+
+    private Double homeLatitude;
+
+    private Boolean newRequestNotificationsEnabled;
+
+    private Double notificationRadius;
+
+    private List<String> notificationKeywords;
+
+    private Boolean currentLocationNotifications;
+
+    private Boolean homeLocationNotifications;
 
     public User() {
 
@@ -157,5 +173,61 @@ public class User extends BaseEntity {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Double getHomeLongitude() {
+        return homeLongitude;
+    }
+
+    public void setHomeLongitude(Double homeLongitude) {
+        this.homeLongitude = homeLongitude;
+    }
+
+    public Double getHomeLatitude() {
+        return homeLatitude;
+    }
+
+    public void setHomeLatitude(Double homeLatitude) {
+        this.homeLatitude = homeLatitude;
+    }
+
+    public Boolean getNewRequestNotificationsEnabled() {
+        return newRequestNotificationsEnabled;
+    }
+
+    public void setNewRequestNotificationsEnabled(Boolean newRequestNotificationsEnabled) {
+        this.newRequestNotificationsEnabled = newRequestNotificationsEnabled;
+    }
+
+    public Double getNotificationRadius() {
+        return notificationRadius;
+    }
+
+    public void setNotificationRadius(Double notificationRadius) {
+        this.notificationRadius = notificationRadius;
+    }
+
+    public List<String> getNotificationKeywords() {
+        return notificationKeywords;
+    }
+
+    public void setNotificationKeywords(List<String> notificationKeywords) {
+        this.notificationKeywords = notificationKeywords;
+    }
+
+    public Boolean getCurrentLocationNotifications() {
+        return currentLocationNotifications;
+    }
+
+    public void setCurrentLocationNotifications(Boolean currentLocationNotifications) {
+        this.currentLocationNotifications = currentLocationNotifications;
+    }
+
+    public Boolean getHomeLocationNotifications() {
+        return homeLocationNotifications;
+    }
+
+    public void setHomeLocationNotifications(Boolean homeLocationNotifications) {
+        this.homeLocationNotifications = homeLocationNotifications;
     }
 }

@@ -54,6 +54,18 @@
                 android:src="@drawable/ic_mode_edit_black_24dp" />
 
             <ImageButton
+                android:id="@+id/cancel_transaction_button"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/exchange_icon"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:background="@color/white"
+                android:visibility="gone"
+                android:tint="@color/redPink"
+                android:src="@drawable/ic_cancel_black_24dp" />
+
+            <ImageButton
                 android:id="@+id/view_response_button"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"

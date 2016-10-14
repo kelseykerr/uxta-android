@@ -295,6 +295,12 @@ public class HistoryFragment extends Fragment {
         f.show(getFragmentManager(), "dialog");
     }
 
+    public void showCancelTransactionDialog(String transactionId) {
+        CancelTransactionDialogFragment f = CancelTransactionDialogFragment.newInstance(transactionId);
+        f.show(getFragmentManager(), "dialog");
+
+    }
+
     public void getHistory(final HistoryFragment thisFragment) {
         new AsyncTask<Void, Void, Void>() {
             @Override

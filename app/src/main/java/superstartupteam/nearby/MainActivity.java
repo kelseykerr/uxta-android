@@ -36,7 +36,7 @@ import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewOfferDialogFragment;
 import layout.RequestDialogFragment;
-import layout.UpdateAccountFragment;
+import layout.UpdateAccountDialogFragment;
 import layout.ViewOfferDialogFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         RequestDialogFragment.OnFragmentInteractionListener,
         HistoryFragment.OnFragmentInteractionListener,
         NewOfferDialogFragment.OnFragmentInteractionListener,
-        UpdateAccountFragment.OnFragmentInteractionListener,
+        UpdateAccountDialogFragment.OnFragmentInteractionListener,
         ExchangeCodeDialogFragment.OnFragmentInteractionListener,
         ExchangeOverrideDialogFragment.OnFragmentInteractionListener {
 
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 fragmentManager.beginTransaction()
                         .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
-                        .add(R.id.content_frame, UpdateAccountFragment.newInstance(), Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)
+                        .add(R.id.content_frame, UpdateAccountDialogFragment.newInstance(), Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)
                         .commit();
             }
 
@@ -382,7 +382,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 fragmentManager.beginTransaction()
                         .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_right)
-                        .add(R.id.content_frame, UpdateAccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                        .add(R.id.content_frame, UpdateAccountDialogFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
                         .commit();
             }
 

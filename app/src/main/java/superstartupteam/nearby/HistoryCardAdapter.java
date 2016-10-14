@@ -52,6 +52,12 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     @Override
     public void onBindChildViewHolder(final ResponseViewHolder responseViewHolder, int i, Object obj) {
         final Response r = (Response) obj;
+        String requestStatus = "";
+        for (History h: recentHistory) {
+            if (h.getRequest().getId().equals(r.getRequestId())) {
+                requestStatus = h.getRequest().getStatus();
+            }
+        }
         responseViewHolder.mOfferAmount.setText(r.getOfferPrice().toString());
         responseViewHolder.mResponderName.setText(r.getSeller().getFirstName());
         if (r.getPriceType().equals("per_hour")) {
@@ -60,7 +66,8 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             responseViewHolder.mPriceType.setText(" per day");
         }
 
-        if (r.getResponseStatus().toString().toLowerCase().equals("closed")) {
+        if (r.getResponseStatus().toString().toLowerCase().equals("closed")
+                || requestStatus.toLowerCase().equals("closed")) {
             responseViewHolder.mResponseDetailsButton.setVisibility(View.GONE);
         } else {
             responseViewHolder.mResponseDetailsButton.setVisibility(View.VISIBLE);
@@ -78,7 +85,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     public void onBindParentViewHolder(final HistoryCardViewHolder requestViewHolder, int i, Object obj) {
         final History h = (History) obj;
         Request r = h.getRequest();
-        if (h.getTransaction() != null) {
+        if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed")) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
            setUpRequestCard(requestViewHolder, r, h);
@@ -283,6 +290,12 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
             requestViewHolder.vStatus.setText("Awaiting initial exchange");
             Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
+            requestViewHolder.cancelTransactionButton.setVisibility(View.VISIBLE);
+            requestViewHolder.cancelTransactionButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    historyFragment.showCancelTransactionDialog(transaction.getId());
+                }
+            });
             if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
                 requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
                 requestViewHolder.vStatus.setText("Pending exchange override approval");
@@ -385,6 +398,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         private ImageButton vResponseDetailsButton;
         public RelativeLayout mCardBackground;
         public ImageButton mExchangeIcon;
+        public ImageButton cancelTransactionButton;
         private CardView historyCard;
 
 
@@ -404,6 +418,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             this.context = context;
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
             mExchangeIcon = (ImageButton) v.findViewById(R.id.exchange_icon);
+            cancelTransactionButton = (ImageButton) v.findViewById(R.id.cancel_transaction_button);
             historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
             historyCard.setMaxCardElevation(7);
 

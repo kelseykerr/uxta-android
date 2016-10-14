@@ -71,6 +71,10 @@ public class Transaction {
 
     private Boolean lostOrStolen;
 
+    private String canceler;
+
+    private String canceledReason;
+
     public String getId() {
         return id;
     }
@@ -213,6 +217,22 @@ public class Transaction {
 
     public void setFinalPrice(Double finalPrice) {
         this.finalPrice = finalPrice;
+    }
+
+    public String getCanceler() {
+        return canceler;
+    }
+
+    public void setCanceler(String canceler) {
+        this.canceler = canceler;
+    }
+
+    public String getCanceledReason() {
+        return canceledReason;
+    }
+
+    public void setCanceledReason(String canceledReason) {
+        this.canceledReason = canceledReason;
     }
 
     /**

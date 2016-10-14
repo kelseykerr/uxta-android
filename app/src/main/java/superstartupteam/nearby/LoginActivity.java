@@ -85,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
         user = PrefUtils.getCurrentUser(LoginActivity.this);
         if(user != null && user.getAccessToken() != null && user.getId() != null){
             Log.i("Current token: ", user.getAccessToken() + " ****************");
-
             Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(homeIntent);
             finish();
@@ -108,14 +107,6 @@ public class LoginActivity extends AppCompatActivity {
                                             " <- token");
                                     user = new User();
                                     user.setFacebookId(object.getString("id").toString());
-                                    String email = object.has("email") ?
-                                            object.getString("email").toString() : null;
-                                    user.setEmail(email);
-                                    user.setName(object.getString("name").toString());
-                                    String gender = object.has("gender") ?
-                                            object.getString("gender").toString() : null;
-                                    user.setGender(gender);
-                                    user.setUserId(loginResult.getAccessToken().getUserId());
                                     user.setAccessToken(loginResult.getAccessToken().getToken());
                                     PrefUtils.setCurrentUser(user, LoginActivity.this);
 
@@ -160,23 +151,12 @@ public class LoginActivity extends AppCompatActivity {
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
+                    Log.e("***user***", output);
                     try {
                         User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
-                        //TODO: populate other fields here so they can be used in the account section
-                        user.setId(userFromServer.getId());
-                        // Retrieve address information from user record
-                        if (userFromServer.getAddress() == null) {
-                            user.setAddress("No address");
-                        } else {
-                            user.setAddress(userFromServer.getAddress());
-                        }
-                        if (userFromServer.getAddressLine2() == null) {
-                            user.setAddressLine2("No city/state/zip");
-                        } else {
-                            user.setAddressLine2(userFromServer.getAddressLine2());
-                        }
-
-                        PrefUtils.setCurrentUser(user, LoginActivity.this);
+                        userFromServer.setFacebookId(user.getFacebookId());
+                        userFromServer.setAccessToken(user.getAccessToken());
+                        PrefUtils.setCurrentUser(userFromServer, LoginActivity.this);
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to read " +
                                 "user info from server: " + e.getMessage());
