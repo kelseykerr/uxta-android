@@ -256,6 +256,20 @@ public class MainActivity extends AppCompatActivity
                             .setCustomAnimations(firstAnim, secondAnim)
                             .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                             .commit();
+                } else if (menuItemId == R.id.bottomBarAccountItem) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    AccountFragment accountFragment = (AccountFragment) fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
+                    if (accountFragment != null) {
+                        fragmentTransaction.remove(accountFragment);
+                    }
+                    AccountFragment.snackbarMessage = snackbarMessage;
+                    snackbarMessage = null;
+                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
+                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
+                    fragmentTransaction
+                            .setCustomAnimations(firstAnim, secondAnim)
+                            .add(R.id.content_frame, AccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                            .commit();
                 }
             }
         });
@@ -433,7 +447,16 @@ public class MainActivity extends AppCompatActivity
         }
         snackbarMessage = message;
         mBottomBar.selectTabAtPosition(1, true);
+    }
 
+    public void goToAccount(String message) {
+        AccountFragment fragment = (AccountFragment) fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
+        if (fragment != null) {
+            fragment.parentScroll.scrollTo(0, 0);
+            AccountFragment.snackbarMessage = message;
+        }
+        snackbarMessage = message;
+        mBottomBar.selectTabAtPosition(2, true);
     }
 
 }

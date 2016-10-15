@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                                     user.setAccessToken(loginResult.getAccessToken().getToken());
                                     PrefUtils.setCurrentUser(user, LoginActivity.this);
 
-                                    getUserInfoFromServer();
+                                    SharedAsyncMethods.getUserInfoFromServer(user, LoginActivity.this);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void getUserInfoFromServer() {
+    /*public void getUserInfoFromServer() {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String output = AppUtils.getResponseContent(conn);
-                    Log.e("***user***", output);
+                    Log.i("***user***", output);
                     try {
                         User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
                         userFromServer.setFacebookId(user.getFacebookId());
@@ -167,7 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                 return null;
             }
         }.execute();
-    }
+    }*/
 
 
     @Override

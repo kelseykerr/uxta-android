@@ -2,6 +2,7 @@ package superstartupteam.nearby;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -11,12 +12,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
 import superstartupteam.nearby.model.BaseEntity;
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/21/16.
@@ -101,4 +104,5 @@ public class AppUtils {
         }
         return false;
     }
+
 }

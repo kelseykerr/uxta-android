@@ -96,6 +96,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private ScrollView listView;
     private RelativeLayout requestMapView;
     private Double currentRadius;
+    private CameraUpdate cu;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -170,6 +172,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         newFragment.show(getFragmentManager(), "dialog");
     }
 
+
+
     public void getRequests(final Double radius) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -243,7 +247,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
                 LatLngBounds bounds = builder.build();
                 int padding = 120; // offset from edges of the map in pixels
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.moveCamera(cu);
 
             }
@@ -267,6 +271,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(final GoogleMap map) {
         this.map = map;
+        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                if (cu != null) {
+                    //map.moveCamera(cu);
+                }
+            }
+        });
         map.getUiSettings().setZoomGesturesEnabled(true);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 

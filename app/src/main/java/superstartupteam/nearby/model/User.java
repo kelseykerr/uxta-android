@@ -1,14 +1,19 @@
 package superstartupteam.nearby.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 /**
  * Created by kerrk on 7/16/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends BaseEntity {
 
     private String userId;
 
+    @JsonIgnore
     private String facebookId;
 
     private String gender;
@@ -17,6 +22,7 @@ public class User extends BaseEntity {
 
     private String name;
 
+    @JsonIgnore
     private String accessToken;
 
     private String firstName;
@@ -53,6 +59,27 @@ public class User extends BaseEntity {
 
     public User() {
 
+    }
+
+    public void updateUserFromServer(User fromServer) {
+        this.firstName = fromServer.firstName;
+        this.lastName = fromServer.lastName;
+        this.userId = fromServer.userId;
+        this.email = fromServer.email;
+        this.name = fromServer.name;
+        this.phone = fromServer.phone;
+        this.address = fromServer.address;
+        this.addressLine2 = fromServer.addressLine2;
+        this.city = fromServer.city;
+        this.state = fromServer.state;
+        this.zip = fromServer.zip;
+        this.homeLongitude = fromServer.homeLongitude;
+        this.homeLatitude = fromServer.homeLatitude;
+        this.newRequestNotificationsEnabled = fromServer.newRequestNotificationsEnabled;
+        this.notificationRadius = fromServer.notificationRadius;
+        this.notificationKeywords = fromServer.notificationKeywords;
+        this.currentLocationNotifications = fromServer.currentLocationNotifications;
+        this.homeLocationNotifications = fromServer.homeLocationNotifications;
     }
 
     public String getUserId() {

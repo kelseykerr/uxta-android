@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,8 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
+import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 
@@ -46,10 +49,14 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private EditText city;
     private EditText state;
     private EditText zip;
+    private EditText email;
+    private EditText phone;
     private SwitchCompat notificationsNearHome;
     private SwitchCompat notificationsNearby;
     private Double currentRadius;
     private OnFragmentInteractionListener mListener;
+    private String errorMessage;
+    private View view;
 
     /**
      * Use this factory method to create a new instance of
@@ -103,6 +110,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         state.setText(user.getState());
         zip = (EditText) view.findViewById(R.id.zipcode);
         zip.setText(user.getZip());
+        email = (EditText) view.findViewById(R.id.email);
+        email.setText(user.getEmail());
+        phone = (EditText) view.findViewById(R.id.phone);
+        phone.setText(user.getPhone());
         notificationsNearHome = (SwitchCompat) view.findViewById(R.id.notifications_near_home);
         if (user.getHomeLocationNotifications() != null) {
             notificationsNearHome.setChecked(user.getHomeLocationNotifications());
@@ -160,9 +171,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setHomeLocationNotifications(notificationsNearHome.isChecked());
                 user.setNewRequestNotificationsEnabled(notificationsNearby.isChecked() || notificationsNearHome.isChecked());
                 user.setNotificationRadius(currentRadius);
+                user.setEmail(email.getText().toString());
+                user.setPhone(phone.getText().toString());
                 updateUser();
             }
         });
+        this.view = view;
         return view;
     }
 
@@ -235,7 +249,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     conn.setRequestMethod("PUT");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     conn.setRequestProperty("Content-Type", "application/json");
-
                     ObjectMapper mapper = new ObjectMapper();
                     String updateJson = mapper.writeValueAsString(user);
                     Log.i("updated account: ", updateJson);
@@ -250,8 +263,11 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
+                    SharedAsyncMethods.getUserInfoFromServer(user, context);
+                    return responseCode;
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not update account: " + e.getMessage());
+                    errorMessage = "Could not update account: " + e.getMessage();
+                    Log.e("ERROR ", errorMessage);
                 }
                 return 0;
             }
@@ -259,7 +275,17 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode != null && responseCode == 200) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+
+                    }
                     dismiss();
+                    ((MainActivity) getActivity()).goToAccount("successfully updated account info");
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, errorMessage, Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             }
 

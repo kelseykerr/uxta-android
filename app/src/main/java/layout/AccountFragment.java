@@ -10,9 +10,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +21,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
+import com.google.zxing.common.StringUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
+import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -40,7 +41,7 @@ import superstartupteam.nearby.model.User;
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountFragment extends Fragment implements View.OnFocusChangeListener {
+public class AccountFragment extends Fragment {
     private Context context;
     private Bitmap bitmap;
     private TextView btnLogout;
@@ -48,9 +49,7 @@ public class AccountFragment extends Fragment implements View.OnFocusChangeListe
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
-
-    private TextView addressStreet;
-    private TextView addressCityZip;
+    public static String snackbarMessage = null;
 
     private boolean updateAccountRequest;
 
@@ -83,12 +82,11 @@ public class AccountFragment extends Fragment implements View.OnFocusChangeListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        user = PrefUtils.getCurrentUser(context);
         View view = inflater.inflate(R.layout.fragment_account, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
 
         updateAccountRequest = false;
-
-        view.setOnFocusChangeListener(this);
 
         // fetching facebook's profile picture
         new AsyncTask<Void, Void, Void>() {
@@ -147,11 +145,34 @@ public class AccountFragment extends Fragment implements View.OnFocusChangeListe
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 
-        addressStreet = (TextView) view.findViewById(R.id.user_home_address_street);
+        TextView addressStreet = (TextView) view.findViewById(R.id.user_address_line_1);
         addressStreet.setText(user.getAddress());
 
-        addressCityZip = (TextView) view.findViewById(R.id.user_city_zip);
-        addressCityZip.setText(user.getAddressLine2());
+        TextView addressLine2 = (TextView) view.findViewById(R.id.user_address_line_2);
+        if (user.getAddressLine2() != null && user.getAddressLine2().length() > 0) {
+            addressLine2.setText(user.getAddressLine2());
+        } else {
+            addressLine2.setVisibility(View.GONE);
+        }
+        TextView cityStateZip = (TextView) view.findViewById(R.id.user_city_state_zip);
+        if (user.getCity() != null || user.getState() != null || user.getZip() != null) {
+            String csz = "";
+            if (user.getCity() != null) {
+                csz += user.getCity();
+                if (user.getState() != null) {
+                    csz += ", ";
+                }
+            }
+            if (user.getState() != null) {
+                csz += user.getState() + " ";
+            }
+            if (user.getZip() != null) {
+                csz += user.getZip();
+            }
+            cityStateZip.setText(csz);
+        } else {
+            cityStateZip.setVisibility(View.GONE);
+        }
 
         TextView userEmail = (TextView) view.findViewById(R.id.user_email);
         if (user.getEmail() != null) {
@@ -165,38 +186,27 @@ public class AccountFragment extends Fragment implements View.OnFocusChangeListe
         } else {
             userPhone.setVisibility(View.GONE);
         }
-        TextView notificationsNearHome = (TextView) view.findViewById(R.id.notifications_near_home);
-        if (user.getHomeLocationNotifications() != null && user.getHomeLocationNotifications()) {
-            String htmlString = "Receive notifications about requests near your home address: <b>enabled</b>";
-            notificationsNearHome.setText(Html.fromHtml(htmlString));
+        TextView notificationsText = (TextView) view.findViewById(R.id.notifications_text);
+        boolean homeNotifs = user.getHomeLocationNotifications() != null &&
+                user.getHomeLocationNotifications();
+        boolean nearNotifs = user.getCurrentLocationNotifications() != null &&
+                user.getCurrentLocationNotifications();
+        if (homeNotifs && nearNotifs) {
+            String htmlString = "you will receive notifications about requests within " +
+                    user.getNotificationRadius() + " of your home and your current location";
+            notificationsText.setText(htmlString);
+        } else if (!homeNotifs && !nearNotifs) {
+            String htmlString = "notifications about new requests are disabled";
+            notificationsText.setText(htmlString);
         } else {
-            String htmlString = "Receive notifications about requests near your home address: <b>disabled</b>";
-            notificationsNearHome.setText(Html.fromHtml(htmlString));
+            String htmlString = "you will receive notifications about requests within " +
+                    user.getNotificationRadius() + " of your " + (homeNotifs ? "home" :  "current location");
+            notificationsText.setText(htmlString);
         }
-        TextView notificationsNearby = (TextView) view.findViewById(R.id.notifications_near_me);
-        if (user.getCurrentLocationNotifications() != null && user.getCurrentLocationNotifications()) {
-            String htmlString = "Receive notifications about requests near my current location: <b>enabled</b>";
-            notificationsNearby.setText(Html.fromHtml(htmlString));
-        } else {
-            String htmlString = "Receive notifications about requests near my current location: <b>disabled</b>";
-            notificationsNearby.setText(Html.fromHtml(htmlString));
-        }
-        TextView notificationsRadius = (TextView) view.findViewById(R.id.notifications_radius);
-        if (user.getNewRequestNotificationsEnabled() != null && user.getNewRequestNotificationsEnabled()) {
-            String htmlString = "Notifications radius: <b>" + user.getNotificationRadius() + " miles</b>";
-            notificationsRadius.setText(Html.fromHtml(htmlString));
-        } else {
-            notificationsRadius.setVisibility(View.GONE);
-        }
-        TextView notificationsKeywords = (TextView) view.findViewById(R.id.notifications_keywords);
-        if (user.getNotificationKeywords() != null) {
-            String keywords = "";
-            for (String k:user.getNotificationKeywords()) {
-                keywords += (k + " ");
-            }
-            notificationsKeywords.setText("notification keywords: " + keywords);
-        } else {
-            notificationsKeywords.setVisibility(View.GONE);
+        if (snackbarMessage != null) {
+            Snackbar snackbar = Snackbar
+                    .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
         return view;
 
@@ -225,21 +235,6 @@ public class AccountFragment extends Fragment implements View.OnFocusChangeListe
 
     protected void onAttachToContext(Context context) {
         this.context = context;
-    }
-
-    public void onFocusChange(View v, boolean hasFocus) {
-
-        Boolean isTrue = hasFocus;
-        if(isTrue){
-            user = PrefUtils.getCurrentUser(context);
-            addressStreet = (TextView) v.findViewById(R.id.user_home_address_street);
-            addressStreet.setText(user.getAddress());
-
-            Log.i (Constants.ACCOUNT_FRAGMENT_TAG, "address=" + user.getAddress());
-
-            addressCityZip = (TextView) v.findViewById(R.id.user_city_zip);
-            addressCityZip.setText(user.getAddressLine2());
-        }
     }
 
     @Override
