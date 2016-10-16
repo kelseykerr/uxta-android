@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
-import com.google.zxing.common.StringUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,7 +28,6 @@ import java.net.URL;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
-import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -193,7 +190,7 @@ public class AccountFragment extends Fragment {
                 user.getCurrentLocationNotifications();
         if (homeNotifs && nearNotifs) {
             String htmlString = "you will receive notifications about requests within " +
-                    user.getNotificationRadius() + " of your home and your current location";
+                    user.getNotificationRadius() + " miles of your home and your current location";
             notificationsText.setText(htmlString);
         } else if (!homeNotifs && !nearNotifs) {
             String htmlString = "notifications about new requests are disabled";

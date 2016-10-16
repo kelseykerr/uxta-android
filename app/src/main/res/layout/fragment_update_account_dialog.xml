@@ -43,12 +43,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_gravity="left"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="20dp"
-                android:background="@color/white"
+                android:layout_gravity="start"
+                android:paddingBottom="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="25dp"
+                android:paddingTop="20dp"
                 android:tint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/x_svg"/>
 
             <android.support.design.widget.TextInputLayout
@@ -67,7 +68,7 @@
                     android:layout_marginStart="15dp"
                     android:hint="address"
                     android:inputType="text"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -88,7 +89,7 @@
                     android:layout_marginStart="15dp"
                     android:hint="address line 2"
                     android:inputType="text"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -109,7 +110,7 @@
                     android:layout_marginStart="15dp"
                     android:hint="city"
                     android:inputType="text"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -130,7 +131,7 @@
                     android:layout_marginStart="15dp"
                     android:hint="state"
                     android:inputType="text"
-                    android:maxLines="2"
+                    android:maxLength="2"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -150,8 +151,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:hint="zipcode"
-                    android:inputType="text"
-                    android:maxLines="2"
+                    android:inputType="number"
+                    android:maxLength="5"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -171,8 +172,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:hint="email"
-                    android:inputType="text"
-                    android:maxLines="2"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -192,8 +193,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:hint="phone number"
-                    android:inputType="text"
-                    android:maxLines="2"
+                    android:inputType="phone"
+                    android:maxLength="12"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
@@ -202,9 +203,10 @@
                 android:id="@+id/notifications_near_home"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:thumb="@drawable/switch_compat_thumb"
                 android:textOff="disabled"
+                android:trackTint="@color/colorPrimary"
                 android:text="Receive notifications about requests near your home address:"
-                android:background="@android:color/transparent"
                 android:textColor="@color/colorAccent"
                 android:textOn="enabled"
                 android:button="@null"
@@ -215,6 +217,7 @@
                 android:id="@+id/notifications_nearby"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:thumb="@drawable/switch_compat_thumb"
                 android:textOff="disabled"
                 android:text="Receive notifications about requests near your current location:"
                 android:background="@android:color/transparent"
@@ -253,7 +256,7 @@
                 android:layout_below="@+id/radius_spinner"
                 android:textColor="@color/white"
                 android:layout_marginBottom="20dp"
-                android:background="@color/colorPrimary"
+                android:background="@drawable/primary_btn"
                 android:text="save" />
 
         </RelativeLayout>

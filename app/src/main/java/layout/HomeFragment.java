@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -248,6 +250,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 LatLngBounds bounds = builder.build();
                 int padding = 120; // offset from edges of the map in pixels
                 cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                map.moveCamera(cu);
+
+                CircleOptions options = new CircleOptions();
+                options.center(currLocationMarker.getPosition());
+                //Radius in meters
+                options.radius(currentRadius * 1609.344);
+                options.strokeWidth(10);
+
+                int zoomLevel = 11;
+                if (options != null)
+                {
+                    double radius = options.getRadius();
+                    double scale = radius / 500;
+                    zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
+                }
+                cu = CameraUpdateFactory.zoomTo(zoomLevel);
                 map.moveCamera(cu);
 
             }

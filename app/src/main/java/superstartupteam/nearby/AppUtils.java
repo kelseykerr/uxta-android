@@ -75,8 +75,7 @@ public class AppUtils {
 
         long diffMinutes = diff / (60 * 1000) % 60;
         long diffHours = diff / (60 * 60 * 1000);
-        int diffDays = (int) diff / (1000 * 60 * 60 * 24);
-
+        long diffDays = diff / (1000 * 60 * 60 * 24);
         if (diffDays > 1) {
             return diffDays + " days ago";
         } else if (diffDays == 1) {

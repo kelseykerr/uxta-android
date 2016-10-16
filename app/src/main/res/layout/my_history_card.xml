@@ -26,8 +26,8 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
-                android:background="@color/white"
                 android:tint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
 
             <ImageButton
@@ -37,9 +37,9 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
-                android:background="@color/white"
                 android:tint="#FFD700"
                 android:visibility="gone"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_swap_horiz_black_24dp" />
 
             <ImageButton
@@ -49,8 +49,8 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
-                android:background="@color/white"
                 android:tint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_mode_edit_black_24dp" />
 
             <ImageButton
@@ -60,9 +60,9 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
-                android:background="@color/white"
                 android:visibility="gone"
                 android:tint="@color/redPink"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_cancel_black_24dp" />
 
             <ImageButton
@@ -72,8 +72,8 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
-                android:background="@color/white"
                 android:tint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_chevron_right_black_24dp"/>
 
             <TextView

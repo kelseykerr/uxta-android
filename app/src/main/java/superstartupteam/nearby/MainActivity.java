@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -16,8 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.TouchDelegate;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -132,26 +131,12 @@ public class MainActivity extends AppCompatActivity
         toolbar.setSubtitle("");
 
         newRequestButton = (ImageButton) findViewById(R.id.new_request_button);
-        newRequestButton.setOnClickListener(new View.OnClickListener() {
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
+        frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showDialog(v);
             }
         });
-        Rect clickableArea = new Rect();
-        newRequestButton.getHitRect(clickableArea);
-        // Extend the touch area of the ImageButton beyond its bounds
-        //TODO: this doesn't work
-        clickableArea.left += 400;
-        clickableArea.bottom += 400;
-        clickableArea.top += 400;
-        clickableArea.bottom += 400;
-        TouchDelegate touchDelegate = new TouchDelegate(clickableArea,
-                newRequestButton);
-        // Sets the TouchDelegate on the parent view, such that touches
-        // within the touch delegate bounds are routed to the child.
-        if (View.class.isInstance(newRequestButton.getParent())) {
-            ((View) newRequestButton.getParent()).setTouchDelegate(touchDelegate);
-        }
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_bar);
