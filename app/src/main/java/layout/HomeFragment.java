@@ -15,6 +15,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -53,7 +55,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
@@ -99,6 +103,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private RelativeLayout requestMapView;
     private Double currentRadius;
     private CameraUpdate cu;
+    private Map<Double, String> radiusMap = new HashMap<Double, String>();
 
 
     private OnFragmentInteractionListener mListener;
@@ -139,19 +144,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         spinner.setOnItemSelectedListener(this);
 
         // Spinner Drop down elements
-        List<Double> radiusList = new ArrayList<Double>();
-        radiusList.add(.1);
-        radiusList.add(.25);
-        radiusList.add(.5);
-        radiusList.add(1D);
-        radiusList.add(5D);
-        radiusList.add(10D);
+        List<String> radiusList = new ArrayList<>();
+        radiusMap.put(.1, ".1 mile radius");
+        radiusMap.put(.25, ".25 mile radius");
+        radiusMap.put(.5, ".5 mile radius");
+        radiusMap.put(1.0, "1 mile radius");
+        radiusMap.put(5.0, "5 mile radius");
+        radiusMap.put(10.0, "10 mile radius");
+        radiusList.add(radiusMap.get(.1));
+        radiusList.add(radiusMap.get(.25));
+        radiusList.add(radiusMap.get(.5));
+        radiusList.add(radiusMap.get(1.0));
+        radiusList.add(radiusMap.get(5.0));
+        radiusList.add(radiusMap.get(10.0));
 
         // Creating adapter for spinner
-        ArrayAdapter<Double> dataAdapter = new ArrayAdapter<Double>(context, android.R.layout.simple_spinner_item, radiusList);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, radiusList);
 
         // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
@@ -168,9 +179,30 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         return v;
     }
 
+    private void setMarkerClick() {
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                try {
+                    for (Request r:requests) {
+                        if (r.getLatitude().equals(marker.getPosition().latitude) &&
+                        r.getLongitude().equals(marker.getPosition().longitude) &&
+                                marker.getTitle().equals(r.getItemName())) {
+                            showDialog(r.getId());
+                            break;
+                        }
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e("marker click", " could not find request from marker index [" +
+                            marker.getSnippet() + "]");
+                }
+
+            }
+        });
+    }
+
     public void showDialog(String itemId) {
-        DialogFragment newFragment = NewOfferDialogFragment
-                .newInstance(itemId);
+        DialogFragment newFragment = NewOfferDialogFragment.newInstance(itemId);
         newFragment.show(getFragmentManager(), "dialog");
     }
 
@@ -235,13 +267,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 }
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(currLocationMarker.getPosition());
-
+                int i = 0;
+                setMarkerClick();
                 for (Request request : requests) {
                     LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
                     markerOptions.title(request.getItemName());
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
+                    float[] hsv = new float[3];
+                    Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+
+                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                     Marker marker = map.addMarker(markerOptions);
                     requestMarkers.add(marker);
                     builder.include(marker.getPosition());
@@ -275,10 +313,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // On selecting a radius from the spinner
-        Double radius = (Double) parent.getItemAtPosition(position);
-        currentRadius = radius;
-        // Get requests within that radius
-        getRequests(radius);
+        String radiusString = (String) parent.getItemAtPosition(position);
+        for (Map.Entry<Double, String> entry : radiusMap.entrySet()) {
+            Double key = entry.getKey();
+            String value = entry.getValue();
+            if (value.equals(radiusString)) {
+                currentRadius = key;
+                // Get requests within that radius
+                getRequests(key);
+                break;
+            }
+        }
 
     }
 
