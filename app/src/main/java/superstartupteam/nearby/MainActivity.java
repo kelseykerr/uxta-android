@@ -1,12 +1,15 @@
 package superstartupteam.nearby;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.Snackbar;
@@ -21,12 +24,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.braintreepayments.api.BraintreePaymentActivity;
+import com.braintreepayments.api.PaymentRequest;
+import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
@@ -110,6 +118,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        user = PrefUtils.getCurrentUser(MainActivity.this);
+        if (user == null || user.getAccessToken() == null) {
+            if(user != null && user.getAccessToken() != null){
+                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(loginIntent);
+                finish();
+            }
+        }
+        SharedAsyncMethods.getUserInfoFromServer(user, this);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_landing);
         mLayout = findViewById(R.id.landing_layout);
@@ -147,14 +164,7 @@ public class MainActivity extends AppCompatActivity
         //TODO: if request_notification, the radius should be set to the user's settings
         setmBottomBarListener();
 
-        user = PrefUtils.getCurrentUser(MainActivity.this);
-        if (user == null || user.getAccessToken() == null) {
-            if(user != null && user.getAccessToken() != null){
-                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
-                finish();
-            }
-        }
+        getBraintreeClientToken(this);
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
@@ -334,7 +344,7 @@ public class MainActivity extends AppCompatActivity
 
     public void onFragmentInteraction(Uri url, String nextFragment) {
 
-        Log.i ("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
+        Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
         if (nextFragment == Constants.UPDATE_ACCOUNT_FRAGMENT_TAG){
 
@@ -442,6 +452,55 @@ public class MainActivity extends AppCompatActivity
         }
         snackbarMessage = message;
         mBottomBar.selectTabAtPosition(2, true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 404) {
+            if (resultCode == Activity.RESULT_OK) {
+                PaymentMethodNonce paymentMethodNonce = data.getParcelableExtra(
+                        BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE
+                );
+                String nonce = paymentMethodNonce.getNonce();
+                user.setPaymentMethodNonce(nonce);
+                SharedAsyncMethods.updateUser(user, this);
+                String deviceData = data.getStringExtra(BraintreePaymentActivity.EXTRA_DEVICE_DATA);
+                Log.i("***", deviceData + "***device data");
+            }
+        }
+    }
+
+    public void getBraintreeClientToken(final Context ctx) {
+        final User user = PrefUtils.getCurrentUser(ctx);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/token");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    String token = AppUtils.getResponseContent(conn);
+                    Log.i("braintree token", "***" + token);
+                    user.setBraintreeClientToken(token);
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not get braintree token from server: " + e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (user.getPaymentMethodNonce() == null) {
+                    /*PaymentRequest paymentRequest = new PaymentRequest()
+                            .clientToken(user.getBraintreeClientToken());
+                    paymentRequest.collectDeviceData(true);
+                    startActivityForResult(paymentRequest.getIntent(ctx), 404);*/
+                }
+            }
+        }.execute();
     }
 
 }

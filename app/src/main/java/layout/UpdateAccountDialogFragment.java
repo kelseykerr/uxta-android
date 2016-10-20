@@ -22,9 +22,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.common.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -93,6 +96,9 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_update_account_dialog, container, false);
+        final RelativeLayout screen1 = (RelativeLayout) view.findViewById(R.id.account_1);
+        final RelativeLayout screen2 = (RelativeLayout) view.findViewById(R.id.account_2);
+        final RelativeLayout screen3 = (RelativeLayout) view.findViewById(R.id.account_3);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_edit_profile);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -157,22 +163,48 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
+        Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
+        Button nextBtn2 = (Button) view.findViewById(R.id.next_button_2);
+
+        nextBtn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                screen1.setVisibility(View.GONE);
+                screen2.setVisibility(View.VISIBLE);
+            }
+        });
+
+        nextBtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                screen2.setVisibility(View.GONE);
+                screen3.setVisibility(View.VISIBLE);
+            }
+        });
+
         Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.setAddress(addressLine1.getText().toString());
-                user.setAddressLine2(addressLine2.getText().toString());
-                user.setCity(city.getText().toString());
-                user.setState(state.getText().toString());
-                user.setZip(zip.getText().toString());
+                String address1 = addressLine1.getText().toString();
+                user.setAddress(AppUtils.validateString(address1) ? address1 : null);
+                String address2 = addressLine2.getText().toString();
+                user.setAddressLine2(AppUtils.validateString(address2) ? address2 : null);
+                String sCity = city.getText().toString();
+                user.setCity(AppUtils.validateString(sCity) ? sCity : null);
+                String sState = state.getText().toString();
+                user.setState(AppUtils.validateString(sState) ? sState : null);
+                String sZip = zip.getText().toString();
+                user.setZip(AppUtils.validateString(sZip) ? sZip : null);
                 user.setCurrentLocationNotifications(notificationsNearby.isChecked());
                 user.setHomeLocationNotifications(notificationsNearHome.isChecked());
                 user.setNewRequestNotificationsEnabled(notificationsNearby.isChecked() || notificationsNearHome.isChecked());
                 user.setNotificationRadius(currentRadius);
-                user.setEmail(email.getText().toString());
-                user.setPhone(phone.getText().toString());
+                String sEmail = email.getText().toString();
+                user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
+                String sPhone = phone.getText().toString();
+                user.setPhone(AppUtils.validateString(sPhone) ? sPhone : null);
                 updateUser();
             }
         });

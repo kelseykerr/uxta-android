@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,8 +138,8 @@ public class AccountFragment extends Fragment {
 
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
-        TextView myAwesomeTextView = (TextView) view.findViewById(R.id.user_profile_name);
-        myAwesomeTextView.setText(user.getFullName());
+        TextView userName = (TextView) view.findViewById(R.id.user_profile_name);
+        userName.setText(user.getFullName());
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 

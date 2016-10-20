@@ -104,4 +104,8 @@ public class AppUtils {
         return false;
     }
 
+    public static boolean validateString(String s) {
+        return s != null && s.length() > 0;
+    }
+
 }

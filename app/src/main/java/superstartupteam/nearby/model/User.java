@@ -16,10 +16,12 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String facebookId;
 
+    @JsonIgnore
     private String gender;
 
     private String email;
 
+    @JsonIgnore
     private String name;
 
     @JsonIgnore
@@ -56,6 +58,25 @@ public class User extends BaseEntity {
     private Boolean currentLocationNotifications;
 
     private Boolean homeLocationNotifications;
+
+    private String paymentMethodNonce;
+
+    private String merchantId;
+
+    private String merchantStatus;
+
+    private String customerId;
+
+    private String dateOfBirth;
+
+    private String bankAccountNumber;
+
+    private String bankRoutingNumber;
+
+    private String fundingDestination;
+
+    @JsonIgnore
+    private String braintreeClientToken;
 
     public User() {
 
@@ -256,5 +277,77 @@ public class User extends BaseEntity {
 
     public void setHomeLocationNotifications(Boolean homeLocationNotifications) {
         this.homeLocationNotifications = homeLocationNotifications;
+    }
+
+    public String getBraintreeClientToken() {
+        return braintreeClientToken;
+    }
+
+    public void setBraintreeClientToken(String braintreeClientToken) {
+        this.braintreeClientToken = braintreeClientToken;
+    }
+
+    public String getPaymentMethodNonce() {
+        return paymentMethodNonce;
+    }
+
+    public void setPaymentMethodNonce(String paymentMethodNonce) {
+        this.paymentMethodNonce = paymentMethodNonce;
+    }
+
+    public String getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
+    }
+
+    public String getMerchantStatus() {
+        return merchantStatus;
+    }
+
+    public void setMerchantStatus(String merchantStatus) {
+        this.merchantStatus = merchantStatus;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
+
+    public String getBankRoutingNumber() {
+        return bankRoutingNumber;
+    }
+
+    public void setBankRoutingNumber(String bankRoutingNumber) {
+        this.bankRoutingNumber = bankRoutingNumber;
+    }
+
+    public String getFundingDestination() {
+        return fundingDestination;
+    }
+
+    public void setFundingDestination(String fundingDestination) {
+        this.fundingDestination = fundingDestination;
     }
 }

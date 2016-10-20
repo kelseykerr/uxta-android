@@ -8,21 +8,22 @@
     android:layout_height="match_parent"
     tools:context="layout.UpdateAccountDialogFragment">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:focusable="true"
         android:id="@+id/update_account_parent_scrollview"
         android:focusableInTouchMode="true"
         android:layout_marginBottom="20dp"
         android:descendantFocusability="beforeDescendants"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent">-->
 
         <RelativeLayout
             android:orientation="vertical"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:id="@+id/RelativeLayout1"
+            android:id="@+id/account_1"
             xmlns:android="http://schemas.android.com/apk/res/android">
+
 
             <TextView
                 android:id="@+id/edit_profile_text"
@@ -53,11 +54,50 @@
                 android:src="@drawable/x_svg"/>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/address_line1_layout"
-                android:layout_marginTop="10dp"
+                android:id="@+id/first_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/cancel_edit_profile"
+                android:layout_below="@id/edit_profile_text"
+                app:errorEnabled="true"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/first_name"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="first name"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/last_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/first_name_layout"
+                app:errorEnabled="true"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/last_name"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="last name"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/address_line1_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/last_name_layout"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
@@ -115,11 +155,48 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
+
+            <Button
+                android:id="@+id/next_button_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/city_layout"
+                android:textColor="@color/white"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/primary_btn"
+                android:text="next ->" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:id="@+id/account_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <TextView
+                android:id="@+id/edit_profile_text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="Edit Profile"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/state_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/city_layout"
+                android:layout_below="@id/edit_profile_text2"
                 app:errorEnabled="true"
                 android:layout_marginTop="-10dp"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
@@ -199,6 +276,121 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/bank_acct_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/phone_layout"
+                app:errorEnabled="true"
+                android:layout_marginTop="-10dp"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/bank_acct"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="bank account number"
+                    android:inputType="number"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/routing_number_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bank_acct_layout"
+                app:errorEnabled="true"
+                android:layout_marginTop="-10dp"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/routing_number"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="routing number"
+                    android:inputType="number"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/next_button_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/routing_number_layout"
+                android:textColor="@color/white"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/primary_btn"
+                android:text="next ->" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:id="@+id/account_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <TextView
+                android:id="@+id/edit_profile_text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="Edit Profile"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/credit_card_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edit_profile_text3"
+                app:errorEnabled="true"
+                android:layout_marginTop="-10dp"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/credit_card"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="credit card number"
+                    android:inputType="number"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/exp_date_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/credit_card_layout"
+                app:errorEnabled="true"
+                android:layout_marginTop="-10dp"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/exp_date"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="expiration date"
+                    android:inputType="text"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/notifications_near_home"
                 android:layout_width="match_parent"
@@ -210,7 +402,7 @@
                 android:textColor="@color/colorAccent"
                 android:textOn="enabled"
                 android:button="@null"
-                android:layout_below="@id/phone_layout"
+                android:layout_below="@id/exp_date_layout"
                 android:padding="10dp"/>
 
             <android.support.v7.widget.SwitchCompat
@@ -246,13 +438,11 @@
                 android:layout_height="wrap_content"
                 android:prompt="@string/radius_spinner_title"/>
 
-
             <Button
                 android:id="@+id/save_profile_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:layout_marginTop="20dp"
-                android:layout_alignParentBottom="true"
                 android:layout_below="@+id/radius_spinner"
                 android:textColor="@color/white"
                 android:layout_marginBottom="20dp"
@@ -260,6 +450,5 @@
                 android:text="save" />
 
         </RelativeLayout>
-    </ScrollView>
 
 </FrameLayout>

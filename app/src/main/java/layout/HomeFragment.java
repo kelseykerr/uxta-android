@@ -161,9 +161,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, radiusList);
 
-        // Drop down layout style - list view with radio button
-        //dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
