@@ -75,6 +75,8 @@ public class User extends BaseEntity {
 
     private String fundingDestination;
 
+    private Boolean tosAccepted;
+
     @JsonIgnore
     private String braintreeClientToken;
 
@@ -101,6 +103,7 @@ public class User extends BaseEntity {
         this.notificationKeywords = fromServer.notificationKeywords;
         this.currentLocationNotifications = fromServer.currentLocationNotifications;
         this.homeLocationNotifications = fromServer.homeLocationNotifications;
+        this.tosAccepted = fromServer.tosAccepted;
     }
 
     public String getUserId() {
@@ -350,4 +353,13 @@ public class User extends BaseEntity {
     public void setFundingDestination(String fundingDestination) {
         this.fundingDestination = fundingDestination;
     }
+
+    public Boolean getTosAccepted() {   
+        return tosAccepted;
+    }
+
+    public void setTosAccepted(Boolean tosAccepted) {
+        this.tosAccepted = tosAccepted;
+    }
 }
+
