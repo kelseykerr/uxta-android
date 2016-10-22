@@ -354,7 +354,7 @@ public class User extends BaseEntity {
         this.fundingDestination = fundingDestination;
     }
 
-    public Boolean getTosAccepted() {   
+    public Boolean getTosAccepted() {
         return tosAccepted;
     }
 

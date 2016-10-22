@@ -110,14 +110,14 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_offer_dialog, container, false);
-        offerTypes.add("flat");
+        /*offerTypes.add("flat");
         offerTypes.add("per hour");
         offerTypes.add("per day");
         ArrayAdapter<String> offerTypeAdapter;
         offerTypeSpinner = (Spinner) view.findViewById(R.id.offer_type);
         offerTypeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, offerTypes);
         offerTypeSpinner.setAdapter(offerTypeAdapter);
-        offerTypeSpinner.setOnItemSelectedListener(this);
+        offerTypeSpinner.setOnItemSelectedListener(this);*/
 
         submitOfferBtn = (Button) view.findViewById(R.id.submit_offer_button);
         submitOfferBtn.setOnClickListener(new View.OnClickListener() {
@@ -296,13 +296,13 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         }
         double offer = Double.parseDouble(offerPrice.getText().toString());
         response.setOfferPrice(offer);
-        String offerType = offerTypeSpinner.getSelectedItem().toString();
+        /*String offerType = offerTypeSpinner.getSelectedItem().toString();
         if (offerType.equals("per day")) {
             offerType= "per_day";
         } else if (offerType.equals("per hour")) {
             offerType = "per_hour";
-        }
-        response.setPriceType(offerType);
+        }*/
+        response.setPriceType("flat");
         return response;
     }
 
