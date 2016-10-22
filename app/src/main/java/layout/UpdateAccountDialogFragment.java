@@ -57,6 +57,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private SwitchCompat notificationsNearHome;
     private SwitchCompat notificationsNearby;
     private Double currentRadius;
+    private EditText bank_acct;
+    private EditText routing_number;
+    private EditText credit_card;
+    private EditText exp_date;
     private OnFragmentInteractionListener mListener;
     private String errorMessage;
     private View view;
@@ -120,6 +124,16 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         email.setText(user.getEmail());
         phone = (EditText) view.findViewById(R.id.phone);
         phone.setText(user.getPhone());
+        bank_acct = (EditText) view.findViewById(R.id.bank_acct);
+        bank_acct.setText(user.getBankAccountNumber());
+        routing_number = (EditText) view.findViewById(R.id.routing_number);
+        routing_number.setText(user.getBankRoutingNumber());
+/*
+        credit_card = (EditText) view.findViewById(R.id.credit_card);
+        credit_card.setText(user.getCreditCardNumber());
+        exp_date = (EditText) view.findViewById(R.id.exp_date);
+        exp_date.setText(user.getExpirationDate());
+*/
         notificationsNearHome = (SwitchCompat) view.findViewById(R.id.notifications_near_home);
         if (user.getHomeLocationNotifications() != null) {
             notificationsNearHome.setChecked(user.getHomeLocationNotifications());
@@ -205,6 +219,17 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
                 user.setPhone(AppUtils.validateString(sPhone) ? sPhone : null);
+
+                String sBank = bank_acct.getText().toString();
+                user.setBankAccountNumber(sBank);
+                String sRouting = routing_number.getText().toString();
+                user.setBankRoutingNumber(sRouting);
+/*
+                String sCard = credit_card.getText().toString();
+                user.setCreditCardNumber(sCard);
+                String sExpDate = exp_date.getText().toString();
+                user.setExpirationDate(sExpDate);
+*/
                 updateUser();
             }
         });
