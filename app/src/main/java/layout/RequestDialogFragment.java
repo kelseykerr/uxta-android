@@ -113,21 +113,24 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         itemName = (EditText) view.findViewById(R.id.request_name);
         description = (EditText) view.findViewById(R.id.request_description);
 
-        categorySpinner = (Spinner) view.findViewById(R.id.request_category);
+        //Let's not do categories for the MVP...we can add this back in later
+        /*categorySpinner = (Spinner) view.findViewById(R.id.request_category);
         ArrayAdapter<String> categoryAdapter;
         //TODO: this is crazy...why can't I use the list above. must fix.
         List<String> c = new ArrayList<>();
         c.add(Constants.SELECT_CATEGORY_STRING);
         c.add("tools");
         categoryAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, c);
-        categorySpinner.setAdapter(categoryAdapter);
+        categorySpinner.setAdapter(categoryAdapter);*/
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
         ArrayAdapter<String> rentBuyAdapter;
         List<String> rentBuyList = new ArrayList<>();
         rentBuyList.add("rent");
         rentBuyList.add("buy");
-        rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, rentBuyList);
+        rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, rentBuyList);
+        rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
+        rentalSpinner.setSelection(1);
 
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +171,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             }
             // TODO: update this as we add categories
             if (request.getCategory() != null) {
-                categorySpinner.setSelection(1);
+                //categorySpinner.setSelection(1);
             }
             description.setText(request.getDescription());
         }
@@ -225,14 +228,14 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
 
     private void updateRequestObject() {
         request.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
-        if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
+        /*if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {
                 if (c.getName().equals(cat)) {
                     request.setCategory(c);
                 }
             }
-        }
+        }*/
         request.setItemName(itemName.getText().toString());
         request.setDescription(description.getText().toString());
     }

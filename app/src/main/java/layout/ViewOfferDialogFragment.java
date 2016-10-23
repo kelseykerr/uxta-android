@@ -139,14 +139,14 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         }
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
         offerPrice.setText(response.getOfferPrice().toString());
-        offerType = (Spinner) view.findViewById(R.id.offer_type);
-        if (response.getPriceType().toLowerCase().equals("flat")) {
+        //offerType = (Spinner) view.findViewById(R.id.offer_type);
+        /*if (response.getPriceType().toLowerCase().equals("flat")) {
             offerType.setSelection(0);
         } else if (response.getPriceType().toLowerCase().equals("per_hour")) {
             offerType.setSelection(1);
         } else {
             offerType.setSelection(2);
-        }
+        }*/
         backButton = (ImageButton) view.findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
