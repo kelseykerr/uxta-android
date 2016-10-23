@@ -48,6 +48,7 @@ public class AccountFragment extends Fragment {
     private ImageView profileImage;
     public ScrollView parentScroll;
     public static String snackbarMessage = null;
+    public static UpdateAccountDialogFragment updateAccountDialog;
 
     private boolean updateAccountRequest;
 
@@ -74,6 +75,12 @@ public class AccountFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
         super.onCreate(savedInstanceState);
+    }
+
+    public static void dismissUpdateAccountDialog() {
+        if (updateAccountDialog != null) {
+            updateAccountDialog.dismiss();
+        }
     }
 
     @Override
@@ -131,8 +138,8 @@ public class AccountFragment extends Fragment {
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UpdateAccountDialogFragment newFragment = UpdateAccountDialogFragment.newInstance();
-                newFragment.show(getFragmentManager(), "dialog");
+                updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                updateAccountDialog.show(getFragmentManager(), "dialog");
             }
         });
 

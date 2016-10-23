@@ -78,6 +78,12 @@ public class User extends BaseEntity {
     private Boolean tosAccepted;
 
     @JsonIgnore
+    private String creditCardNumber;
+
+    @JsonIgnore
+    private String ccExpirationDate;
+
+    @JsonIgnore
     private String braintreeClientToken;
 
     public User() {
@@ -360,6 +366,22 @@ public class User extends BaseEntity {
 
     public void setTosAccepted(Boolean tosAccepted) {
         this.tosAccepted = tosAccepted;
+    }
+
+    public String getCreditCardNumber() {
+        return creditCardNumber;
+    }
+
+    public void setCreditCardNumber(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
+    }
+
+    public String getCcExpirationDate() {
+        return ccExpirationDate;
+    }
+
+    public void setCcExpirationDate(String ccExpirationDate) {
+        this.ccExpirationDate = ccExpirationDate;
     }
 }
 

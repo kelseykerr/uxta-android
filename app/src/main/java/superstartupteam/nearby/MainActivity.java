@@ -27,9 +27,7 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.braintreepayments.api.BraintreeFragment;
 import com.braintreepayments.api.BraintreePaymentActivity;
 import com.braintreepayments.api.Card;
-import com.braintreepayments.api.PaymentRequest;
 import com.braintreepayments.api.exceptions.InvalidArgumentException;
-import com.braintreepayments.api.interfaces.BraintreeCancelListener;
 import com.braintreepayments.api.interfaces.BraintreeListener;
 import com.braintreepayments.api.interfaces.PaymentMethodNonceCreatedListener;
 import com.braintreepayments.api.models.CardBuilder;
@@ -178,45 +176,6 @@ public class MainActivity extends AppCompatActivity
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
-
-        // Create braintree fragment
-        try {
-            String mAuthorization = user.getBraintreeClientToken();
-            mBraintreeFragment = BraintreeFragment.newInstance(this, mAuthorization);
-            mBraintreeFragment.addListener(new PaymentMethodNonceCreatedListener() {
-                @Override
-                public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
-                    user.setPaymentMethodNonce(paymentMethodNonce.getNonce());
-
-/*  KELSEY Check this out
-                    final User user = PrefUtils.getCurrentUser(ctx);
-
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            try {
-                                URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/createCustomer");
-                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                                conn.setReadTimeout(10000);
-                                conn.setConnectTimeout(30000);
-                                conn.setRequestMethod("GET");
-                                conn.setRequestProperty(Constants.AUTH_HEADER, user.getPaymentMethodNonce());
-                                String createCustomerStatus = AppUtils.getResponseContent(conn);
-                                Log.i("INFO", "braintree create customer status:" + createCustomerStatus);
-//                                user.setBraintreeClientToken(token);
-                            } catch (IOException e) {
-                                Log.e("ERROR ", "Creating braintree customer: " + e.getMessage());
-                            }
-                            return null;
-                        }
-                    };
-*/
-                }
-            });
-        } catch (InvalidArgumentException e) {
-            // There was an issue with your authorization string.
-        }
-
         checkNotificationOnOpen();
     }
 
@@ -389,7 +348,7 @@ public class MainActivity extends AppCompatActivity
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest ) {
+    public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest) {
 
         Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
@@ -528,6 +487,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void getBraintreeClientToken(final Context ctx) {
+        final MainActivity act = this;
         final User user = PrefUtils.getCurrentUser(ctx);
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -550,11 +510,19 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             protected void onPostExecute(Void result) {
-                if (user.getPaymentMethodNonce() == null) {
-                    /*PaymentRequest paymentRequest = new PaymentRequest()
-                            .clientToken(user.getBraintreeClientToken());
-                    paymentRequest.collectDeviceData(true);
-                    startActivityForResult(paymentRequest.getIntent(ctx), 404);*/
+                // Create braintree fragment
+                try {
+                    String mAuthorization = user.getBraintreeClientToken();
+                    mBraintreeFragment = BraintreeFragment.newInstance(act, mAuthorization);
+                    mBraintreeFragment.addListener(new PaymentMethodNonceCreatedListener() {
+                        @Override
+                        public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
+                            user.setPaymentMethodNonce(paymentMethodNonce.getNonce());
+                            SharedAsyncMethods.updateUser(user, act, act, mLayout);
+                        }
+                    });
+                } catch (InvalidArgumentException e) {
+                    Log.e("**", "error creating braintree fragment: " + e.getMessage());
                 }
             }
         }.execute();

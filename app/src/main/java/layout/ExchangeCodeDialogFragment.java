@@ -221,8 +221,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
+        void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
 
