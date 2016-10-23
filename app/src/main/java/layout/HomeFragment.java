@@ -297,7 +297,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 if (options != null)
                 {
                     double radius = options.getRadius();
-/*for Ken's testing */                    radius = 300 * 1609.344;
+                    //radius = 300 * 1609.344; /*for Ken's testing */
                     double scale = radius / 500;
                     zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
                 }
