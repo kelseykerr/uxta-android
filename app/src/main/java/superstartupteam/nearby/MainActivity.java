@@ -354,11 +354,16 @@ public class MainActivity extends AppCompatActivity
 
         // We should now have payment information => get nonce from braintree so that we can create a customer
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
-            CardBuilder cardBuilder = new CardBuilder()
-                    .cardNumber("4111111111111111")
-                    .expirationDate("09/2018");
 
-            Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
+            if (user.getCreditCardNumber() != null && user.getCcExpirationDate() != null) {
+                CardBuilder cardBuilder = new CardBuilder()
+                        .cardNumber("4111111111111111")
+                        .expirationDate("09/2018");
+
+                Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
+            } else {
+                SharedAsyncMethods.updateUser(user, this, this, mLayout);
+            }
         }
 /*
         if (nextFragment.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)){
@@ -481,7 +486,6 @@ public class MainActivity extends AppCompatActivity
                 user.setPaymentMethodNonce(nonce);
                 SharedAsyncMethods.updateUser(user, this);
                 String deviceData = data.getStringExtra(BraintreePaymentActivity.EXTRA_DEVICE_DATA);
-                Log.i("***", deviceData + "***device data");
             }
         }
     }
@@ -500,7 +504,6 @@ public class MainActivity extends AppCompatActivity
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     String token = AppUtils.getResponseContent(conn);
-                    Log.i("braintree token", "***" + token);
                     user.setBraintreeClientToken(token);
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not get braintree token from server: " + e.getMessage());
