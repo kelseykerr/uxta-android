@@ -253,7 +253,7 @@ public class AccountFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri url, String nextFragment);
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
 }

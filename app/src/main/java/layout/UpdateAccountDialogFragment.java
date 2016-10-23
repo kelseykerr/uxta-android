@@ -231,6 +231,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setExpirationDate(sExpDate);
 */
                 updateUser();
+
+                String nextFragment = " ";
+                Uri url = null;
+                mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER);
             }
         });
         this.view = view;
@@ -254,6 +258,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     public void onAttach(Context context) {
         this.context = context;
         super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -289,7 +299,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri url, String nextFragment);
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
     private void updateUser() {

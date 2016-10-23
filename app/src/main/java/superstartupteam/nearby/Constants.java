@@ -22,4 +22,7 @@ public class Constants {
 
     public static final String CODE_FRAGMENT_TAG = "code";
 
+    // Fragment Post-processing requests
+    public static final int FPPR_REGISTER_BRAINTREE_CUSTOMER = 101;
+
 }

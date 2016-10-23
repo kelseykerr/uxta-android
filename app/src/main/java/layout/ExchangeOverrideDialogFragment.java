@@ -132,7 +132,7 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri, String nextFragment);
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
 

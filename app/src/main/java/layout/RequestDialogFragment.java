@@ -220,7 +220,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri, String nextFragment);
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
     private void updateRequestObject() {

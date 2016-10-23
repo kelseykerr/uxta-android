@@ -24,8 +24,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.braintreepayments.api.BraintreeFragment;
 import com.braintreepayments.api.BraintreePaymentActivity;
+import com.braintreepayments.api.Card;
 import com.braintreepayments.api.PaymentRequest;
+import com.braintreepayments.api.exceptions.InvalidArgumentException;
+import com.braintreepayments.api.interfaces.BraintreeCancelListener;
+import com.braintreepayments.api.interfaces.BraintreeListener;
+import com.braintreepayments.api.interfaces.PaymentMethodNonceCreatedListener;
+import com.braintreepayments.api.models.CardBuilder;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -61,7 +68,8 @@ public class MainActivity extends AppCompatActivity
         NewOfferDialogFragment.OnFragmentInteractionListener,
         UpdateAccountDialogFragment.OnFragmentInteractionListener,
         ExchangeCodeDialogFragment.OnFragmentInteractionListener,
-        ExchangeOverrideDialogFragment.OnFragmentInteractionListener {
+        ExchangeOverrideDialogFragment.OnFragmentInteractionListener,
+        BraintreeListener {
 
     private User user;
     private Toolbar toolbar;
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity
     private Response response;
     private Request request;
     private boolean readNotification = false;
+    private BraintreeFragment mBraintreeFragment;
 
     /**
      * Root of the layout of this Activity.
@@ -169,6 +178,44 @@ public class MainActivity extends AppCompatActivity
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
+
+        // Create braintree fragment
+        try {
+            String mAuthorization = user.getBraintreeClientToken();
+            mBraintreeFragment = BraintreeFragment.newInstance(this, mAuthorization);
+            mBraintreeFragment.addListener(new PaymentMethodNonceCreatedListener() {
+                @Override
+                public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
+                    user.setPaymentMethodNonce(paymentMethodNonce.getNonce());
+
+/*  KELSEY Check this out
+                    final User user = PrefUtils.getCurrentUser(ctx);
+
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/createCustomer");
+                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                conn.setReadTimeout(10000);
+                                conn.setConnectTimeout(30000);
+                                conn.setRequestMethod("GET");
+                                conn.setRequestProperty(Constants.AUTH_HEADER, user.getPaymentMethodNonce());
+                                String createCustomerStatus = AppUtils.getResponseContent(conn);
+                                Log.i("INFO", "braintree create customer status:" + createCustomerStatus);
+//                                user.setBraintreeClientToken(token);
+                            } catch (IOException e) {
+                                Log.e("ERROR ", "Creating braintree customer: " + e.getMessage());
+                            }
+                            return null;
+                        }
+                    };
+*/
+                }
+            });
+        } catch (InvalidArgumentException e) {
+            // There was an issue with your authorization string.
+        }
 
         checkNotificationOnOpen();
     }
@@ -342,11 +389,20 @@ public class MainActivity extends AppCompatActivity
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    public void onFragmentInteraction(Uri url, String nextFragment) {
+    public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest ) {
 
         Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
-        if (nextFragment == Constants.UPDATE_ACCOUNT_FRAGMENT_TAG){
+        // We should now have payment information => get nonce from braintree so that we can create a customer
+        if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
+            CardBuilder cardBuilder = new CardBuilder()
+                    .cardNumber("4111111111111111")
+                    .expirationDate("09/2018");
+
+            Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
+        }
+/*
+        if (nextFragment.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)){
 
             listMapText.setVisibility(View.INVISIBLE);
 
@@ -371,7 +427,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
-        if (nextFragment == Constants.ACCOUNT_FRAGMENT_TAG){
+        if (nextFragment.equals(Constants.ACCOUNT_FRAGMENT_TAG)){
 
             listMapText.setVisibility(View.INVISIBLE);
 
@@ -396,6 +452,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
+*/
     }
 
     /**
@@ -502,5 +559,6 @@ public class MainActivity extends AppCompatActivity
             }
         }.execute();
     }
+
 
 }

@@ -484,7 +484,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri, String nextFragment);
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
     public void toggleView(String v) {
