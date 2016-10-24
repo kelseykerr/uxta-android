@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     private Request request;
     private boolean readNotification = false;
     private BraintreeFragment mBraintreeFragment;
+    public static User updatedUser;
 
     /**
      * Root of the layout of this Activity.
@@ -354,15 +355,13 @@ public class MainActivity extends AppCompatActivity
 
         // We should now have payment information => get nonce from braintree so that we can create a customer
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
-
-            if (user.getCreditCardNumber() != null && user.getCcExpirationDate() != null) {
+            if (updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
                 CardBuilder cardBuilder = new CardBuilder()
                         .cardNumber("4111111111111111")
                         .expirationDate("09/2018");
-
                 Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
             } else {
-                SharedAsyncMethods.updateUser(user, this, this, mLayout);
+                SharedAsyncMethods.updateUser(updatedUser, this, this, mLayout);
             }
         }
 /*
@@ -520,8 +519,8 @@ public class MainActivity extends AppCompatActivity
                     mBraintreeFragment.addListener(new PaymentMethodNonceCreatedListener() {
                         @Override
                         public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
-                            user.setPaymentMethodNonce(paymentMethodNonce.getNonce());
-                            SharedAsyncMethods.updateUser(user, act, act, mLayout);
+                            updatedUser.setPaymentMethodNonce(paymentMethodNonce.getNonce());
+                            SharedAsyncMethods.updateUser(updatedUser, act, act, mLayout);
                         }
                     });
                 } catch (InvalidArgumentException e) {

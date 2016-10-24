@@ -12,7 +12,6 @@
         android:id="@+id/account_1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="20dp"
         android:descendantFocusability="beforeDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true">
@@ -159,6 +158,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/city_layout"
                 android:layout_marginBottom="20dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/primary_btn"
                 android:text="next ->"
@@ -172,7 +172,6 @@
         android:id="@+id/account_2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="20dp"
         android:descendantFocusability="beforeDescendants"
         android:focusable="true"
         android:visibility="gone"
@@ -253,11 +252,39 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/payment_destination_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_below="@id/zipcode_layout"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="false"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="how do you want to get paid?"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hint="how do you want to get paid?"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                app:ms_thickness=".5dp" />
+
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/email_layout"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/zipcode_layout"
+                android:layout_below="@id/payment_destination_spinner"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
@@ -276,9 +303,10 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/phone_layout"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/email_layout"
+                android:layout_below="@id/payment_destination_spinner"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
@@ -299,9 +327,10 @@
                 android:id="@+id/bank_acct_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/phone_layout"
+                android:layout_below="@id/payment_destination_spinner"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                android:visibility="gone"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
@@ -319,6 +348,7 @@
                 android:id="@+id/routing_number_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_below="@id/bank_acct_layout"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
@@ -339,9 +369,8 @@
                 android:id="@+id/next_button_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/routing_number_layout"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_below="@id/payment_destination_spinner"
+                android:layout_marginTop="150dp"
                 android:background="@drawable/primary_btn"
                 android:text="next ->"
                 android:textColor="@color/white" />
@@ -483,7 +512,7 @@
             <Button
                 android:id="@+id/save_profile_button"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="match_parent"
                 android:layout_below="@+id/radius_spinner"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"

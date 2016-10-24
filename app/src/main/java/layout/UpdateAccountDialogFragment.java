@@ -9,9 +9,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,8 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +38,7 @@ import java.util.Locale;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.User;
@@ -62,6 +67,14 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private View view;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/yy", Locale.US);
     private String mLastInput;
+    private Spinner paymentDestinationSpinner;
+    private static final String VENMO_EMAIL_STRING = "venmo - link by email";
+    private static final String VENMO_PHONE_STRING = "venmo - link by mobile phone";
+    private static final String BANK_STRING = "deposit directly to bank";
+    private TextInputLayout emailLayout;
+    private TextInputLayout phoneLayout;
+    private TextInputLayout accntNumberLayout;
+    private TextInputLayout routingNumberLayout;
 
 
     /**
@@ -125,10 +138,14 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         zip.setText(user.getZip());
         email = (EditText) view.findViewById(R.id.email);
         email.setText(user.getEmail());
+        emailLayout = (TextInputLayout) view.findViewById(R.id.email_layout);
         phone = (EditText) view.findViewById(R.id.phone);
         phone.setText(user.getPhone());
+        phoneLayout = (TextInputLayout) view.findViewById(R.id.phone_layout);
         bank_acct = (EditText) view.findViewById(R.id.bank_acct);
         bank_acct.setText(user.getBankAccountNumber());
+        accntNumberLayout = (TextInputLayout) view.findViewById(R.id.bank_acct_layout);
+        routingNumberLayout = (TextInputLayout) view.findViewById(R.id.routing_number_layout);
         routing_number = (EditText) view.findViewById(R.id.routing_number);
         routing_number.setText(user.getBankRoutingNumber());
 
@@ -151,31 +168,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             notificationsNearby.setChecked(false);
         }
-
-
-        Spinner radiusSpinner = (Spinner) view.findViewById(R.id.radius_spinner);
-        List<Double> radiusList = getRadiusList();
-        ArrayAdapter<Double> dataAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, radiusList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        radiusSpinner.setAdapter(dataAdapter);
-        int spinnerPosition = dataAdapter.getPosition(user.getNotificationRadius());
-        if (spinnerPosition >= 0) {
-            radiusSpinner.setSelection(spinnerPosition);
-        } else {
-            radiusSpinner.setSelection(0);
-        }
-
-        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
-                Double radius = (Double) parentView.getItemAtPosition(position);
-                currentRadius = radius;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
-        });
+        configureRadiusSpinner(view);
+        configureDestinationSpinner(view);
 
         Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
         Button nextBtn2 = (Button) view.findViewById(R.id.next_button_2);
@@ -249,14 +243,23 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setBankAccountNumber(sBank);
                 String sRouting = routing_number.getText().toString();
                 user.setBankRoutingNumber(sRouting);
-/*
+                String destination = paymentDestinationSpinner.getSelectedItem().toString();
+                switch (destination) {
+                    case VENMO_EMAIL_STRING:
+                        user.setFundingDestination("email");
+                        break;
+                    case VENMO_PHONE_STRING:
+                        user.setFundingDestination("mobile_phone");
+                        break;
+                    case BANK_STRING:
+                        user.setFundingDestination("bank");
+                        break;
+                }
                 String sCard = credit_card.getText().toString();
                 user.setCreditCardNumber(sCard);
                 String sExpDate = exp_date.getText().toString();
-                user.setExpirationDate(sExpDate);
-*/
-                //updateUser();
-
+                user.setCcExpirationDate(sExpDate);
+                MainActivity.updatedUser = user;
                 String nextFragment = " ";
                 Uri url = null;
                 mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER);
@@ -296,6 +299,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             onAttachToContext(activity);
         }
+        mListener = (OnFragmentInteractionListener) activity;
+
     }
 
     protected void onAttachToContext(Context context) {
@@ -383,5 +388,89 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         radiusList.add(5D);
         radiusList.add(10D);
         return radiusList;
+    }
+
+    private void configureRadiusSpinner(View v) {
+        Spinner radiusSpinner = (Spinner) v.findViewById(R.id.radius_spinner);
+        List<Double> radiusList = getRadiusList();
+        ArrayAdapter<Double> dataAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, radiusList);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        radiusSpinner.setAdapter(dataAdapter);
+        int spinnerPosition = dataAdapter.getPosition(user.getNotificationRadius());
+        if (spinnerPosition >= 0) {
+            radiusSpinner.setSelection(spinnerPosition);
+        } else {
+            radiusSpinner.setSelection(0);
+        }
+
+        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
+                Double radius = (Double) parentView.getItemAtPosition(position);
+                currentRadius = radius;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
+    }
+
+    private void configureDestinationSpinner(View v) {
+        paymentDestinationSpinner = (Spinner) v.findViewById(R.id.payment_destination_spinner);
+        List<String> destinations = new ArrayList<>();
+        destinations.add(VENMO_EMAIL_STRING);
+        destinations.add(VENMO_PHONE_STRING);
+        destinations.add(BANK_STRING);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item, destinations);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+        paymentDestinationSpinner.setAdapter(adapter);
+        if (user.getFundingDestination() != null) {
+            switch (user.getFundingDestination()) {
+                case "email":
+                    emailLayout.setVisibility(View.VISIBLE);
+                    paymentDestinationSpinner.setSelection(1);
+                    break;
+                case "mobile_phone":
+                    phoneLayout.setVisibility(View.VISIBLE);
+                    paymentDestinationSpinner.setSelection(2);
+                    break;
+                case "bank":
+                    routingNumberLayout.setVisibility(View.VISIBLE);
+                    accntNumberLayout.setVisibility(View.VISIBLE);
+                    paymentDestinationSpinner.setSelection(3);
+                    break;
+            }
+        }
+        paymentDestinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
+                String destination = (String) parentView.getItemAtPosition(position);
+                switch (destination) {
+                    case VENMO_EMAIL_STRING:
+                        emailLayout.setVisibility(View.VISIBLE);
+                        phoneLayout.setVisibility(View.GONE);
+                        routingNumberLayout.setVisibility(View.GONE);
+                        accntNumberLayout.setVisibility(View.GONE);
+                        break;
+                    case VENMO_PHONE_STRING:
+                        phoneLayout.setVisibility(View.VISIBLE);
+                        emailLayout.setVisibility(View.GONE);
+                        routingNumberLayout.setVisibility(View.GONE);
+                        accntNumberLayout.setVisibility(View.GONE);
+                        break;
+                    case BANK_STRING:
+                        routingNumberLayout.setVisibility(View.VISIBLE);
+                        accntNumberLayout.setVisibility(View.VISIBLE);
+                        phoneLayout.setVisibility(View.GONE);
+                        emailLayout.setVisibility(View.GONE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
     }
 }
