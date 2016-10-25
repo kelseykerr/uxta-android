@@ -73,7 +73,7 @@ public class User extends BaseEntity {
 
     private String bankRoutingNumber;
 
-    private String fundingDestination;
+    private String fundDestination;
 
     private Boolean tosAccepted;
 
@@ -352,12 +352,12 @@ public class User extends BaseEntity {
         this.bankRoutingNumber = bankRoutingNumber;
     }
 
-    public String getFundingDestination() {
-        return fundingDestination;
+    public String getFundDestination() {
+        return fundDestination;
     }
 
-    public void setFundingDestination(String fundingDestination) {
-        this.fundingDestination = fundingDestination;
+    public void setFundDestination(String fundDestination) {
+        this.fundDestination = fundDestination;
     }
 
     public Boolean getTosAccepted() {

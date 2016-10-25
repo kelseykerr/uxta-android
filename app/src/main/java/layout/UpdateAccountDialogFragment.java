@@ -13,7 +13,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +20,12 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +72,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private TextInputLayout phoneLayout;
     private TextInputLayout accntNumberLayout;
     private TextInputLayout routingNumberLayout;
+    private EditText dob;
 
 
     /**
@@ -115,6 +113,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         final ScrollView screen1 = (ScrollView) view.findViewById(R.id.account_1);
         final ScrollView screen2 = (ScrollView) view.findViewById(R.id.account_2);
         final ScrollView screen3 = (ScrollView) view.findViewById(R.id.account_3);
+        final ScrollView screen4 = (ScrollView) view.findViewById(R.id.account_4);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_edit_profile);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -149,6 +148,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         routing_number = (EditText) view.findViewById(R.id.routing_number);
         routing_number.setText(user.getBankRoutingNumber());
 
+        dob = (EditText) view.findViewById(R.id.dob);
+        dob.setText(user.getDateOfBirth());
         credit_card = (EditText) view.findViewById(R.id.credit_card);
         credit_card.setText(user.getCreditCardNumber());
         exp_date = (EditText) view.findViewById(R.id.exp_date);
@@ -207,7 +208,27 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         });
 
         Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
-        setSaveBtnClick(saveBtn);
+        if (!user.getTosAccepted()) {
+            saveBtn.setText("continue");
+            saveBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    screen3.setVisibility(View.GONE);
+                    screen4.setVisibility(View.VISIBLE);
+                }
+            });
+            CheckBox acceptTos = (CheckBox) view.findViewById(R.id.acceptTos);
+            acceptTos.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 user.setTosAccepted(((CheckBox) v).isChecked());
+                                             }
+                                         });
+            Button acceptAndSave = (Button) view.findViewById(R.id.accept_and_save);
+            setSaveBtnClick(acceptAndSave);
+        } else {
+            setSaveBtnClick(saveBtn);
+        }
 
         this.view = view;
         return view;
@@ -246,15 +267,17 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 String destination = paymentDestinationSpinner.getSelectedItem().toString();
                 switch (destination) {
                     case VENMO_EMAIL_STRING:
-                        user.setFundingDestination("email");
+                        user.setFundDestination("email");
                         break;
                     case VENMO_PHONE_STRING:
-                        user.setFundingDestination("mobile_phone");
+                        user.setFundDestination("mobile_phone");
                         break;
                     case BANK_STRING:
-                        user.setFundingDestination("bank");
+                        user.setFundDestination("bank");
                         break;
                 }
+                String dobString = dob.getText().toString();
+                user.setDateOfBirth(dobString);
                 String sCard = credit_card.getText().toString();
                 user.setCreditCardNumber(sCard);
                 String sExpDate = exp_date.getText().toString();
@@ -425,8 +448,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item, destinations);
         adapter.setDropDownViewResource(R.layout.spinner_item);
         paymentDestinationSpinner.setAdapter(adapter);
-        if (user.getFundingDestination() != null) {
-            switch (user.getFundingDestination()) {
+        if (user.getFundDestination() != null) {
+            switch (user.getFundDestination()) {
                 case "email":
                     emailLayout.setVisibility(View.VISIBLE);
                     paymentDestinationSpinner.setSelection(1);

@@ -294,8 +294,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 options.strokeWidth(10);
 
                 int zoomLevel = 11;
-                if (options != null)
-                {
+                if (options != null) {
                     double radius = options.getRadius();
                     //radius = 300 * 1609.344; /*for Ken's testing */
                     double scale = radius / 500;

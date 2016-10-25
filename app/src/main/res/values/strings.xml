@@ -27,6 +27,7 @@
         <item>per day</item>
     </string-array>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="braintree_tos">Nearby uses Braintree, a division of PayPal, Inc. (Braintree) for payment processing services. By using the Braintree payment processing services you agree to the Braintree Payment Services Agreement available at https://www.braintreepayments.com/legal/gateway-agreement, and the applicable bank agreement available at https://www.braintreepayments.com/legal/cea-wells.</string>
 
 
 </resources>

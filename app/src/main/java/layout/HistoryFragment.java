@@ -81,13 +81,15 @@ public class HistoryFragment extends Fragment {
             View.OnClickListener mOnClickListener;
             Response response = null;
             Request request = null;
-            String responseJson = intent.getStringExtra("response");
-            String requestJson = intent.getStringExtra("request");
-            try {
-                response = new ObjectMapper().readValue(responseJson, Response.class);
-                request = new ObjectMapper().readValue(requestJson, Request.class);
-            } catch (IOException e) {
-                Log.e("JSON ERROR", "**" + e.getMessage());
+            if (!type.equals("merchant_account_status")) {
+                String responseJson = intent.getStringExtra("response");
+                String requestJson = intent.getStringExtra("request");
+                try {
+                    response = new ObjectMapper().readValue(responseJson, Response.class);
+                    request = new ObjectMapper().readValue(requestJson, Request.class);
+                } catch (IOException e) {
+                    Log.e("JSON ERROR", "**" + e.getMessage());
+                }
             }
 
             switch (type) {

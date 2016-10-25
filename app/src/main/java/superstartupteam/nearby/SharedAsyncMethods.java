@@ -143,9 +143,7 @@ public class SharedAsyncMethods {
                     mainActivity.goToAccount("successfully updated account info");
                 } else {
                     AccountFragment.dismissUpdateAccountDialog();
-                    Snackbar snackbar = Snackbar
-                            .make(view, errorMessage, Snackbar.LENGTH_LONG);
-                    snackbar.show();
+                    mainActivity.goToAccount(errorMessage);
                 }
             }
 
