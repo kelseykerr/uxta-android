@@ -68,6 +68,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
 
     public static RequestDialogFragment newInstance() {
         RequestDialogFragment fragment = new RequestDialogFragment();
+        request = null;
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -246,14 +247,14 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         newRequest.setDescription(description.getText().toString());
         newRequest.setType(Request.Type.item);
         newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
-        if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
+        /*if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {
                 if (c.getName().equals(cat)) {
                     newRequest.setCategory(c);
                 }
             }
-        }
+        }*/
         newRequest.setPostDate(new Date());
         newRequest.setLatitude(PrefUtils.latLng.latitude);
         newRequest.setLongitude(PrefUtils.latLng.longitude);

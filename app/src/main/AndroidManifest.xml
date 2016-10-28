@@ -59,11 +59,14 @@
         <activity android:name=".ScannerActivity"></activity>
 
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-        <receiver android:name=".ConnectivityReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
+        <receiver
+            android:name=".ConnectivityReceiver"
+            android:process=":remote" >
         </receiver>
+
+        <service
+            android:name=".service.RequestNotificationService"
+            android:exported="false" />
     </application>
 
 </manifest>

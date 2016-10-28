@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -73,6 +74,11 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private TextInputLayout accntNumberLayout;
     private TextInputLayout routingNumberLayout;
     private EditText dob;
+    private ScrollView screen1;
+    private ScrollView screen2;
+    private ScrollView screen3;
+    private ScrollView screen4;
+    private RelativeLayout updatingScreen;
 
 
     /**
@@ -110,10 +116,11 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_update_account_dialog, container, false);
-        final ScrollView screen1 = (ScrollView) view.findViewById(R.id.account_1);
-        final ScrollView screen2 = (ScrollView) view.findViewById(R.id.account_2);
-        final ScrollView screen3 = (ScrollView) view.findViewById(R.id.account_3);
-        final ScrollView screen4 = (ScrollView) view.findViewById(R.id.account_4);
+        screen1 = (ScrollView) view.findViewById(R.id.account_1);
+        screen2 = (ScrollView) view.findViewById(R.id.account_2);
+        screen3 = (ScrollView) view.findViewById(R.id.account_3);
+        screen4 = (ScrollView) view.findViewById(R.id.account_4);
+        updatingScreen = (RelativeLayout) view.findViewById(R.id.updating_account_screen);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_edit_profile);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -238,6 +245,9 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                screen3.setVisibility(View.GONE);
+                screen4.setVisibility(View.GONE);
+                updatingScreen.setVisibility(View.VISIBLE);
                 String first = firstName.getText().toString();
                 user.setFirstName(first);
                 String last = lastName.getText().toString();
@@ -451,7 +461,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         if (user.getFundDestination() != null) {
             switch (user.getFundDestination()) {
                 case "email":
-                    emailLayout.setVisibility(View.VISIBLE);
                     paymentDestinationSpinner.setSelection(1);
                     break;
                 case "mobile_phone":
@@ -472,14 +481,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 String destination = (String) parentView.getItemAtPosition(position);
                 switch (destination) {
                     case VENMO_EMAIL_STRING:
-                        emailLayout.setVisibility(View.VISIBLE);
                         phoneLayout.setVisibility(View.GONE);
                         routingNumberLayout.setVisibility(View.GONE);
                         accntNumberLayout.setVisibility(View.GONE);
                         break;
                     case VENMO_PHONE_STRING:
                         phoneLayout.setVisibility(View.VISIBLE);
-                        emailLayout.setVisibility(View.GONE);
                         routingNumberLayout.setVisibility(View.GONE);
                         accntNumberLayout.setVisibility(View.GONE);
                         break;
@@ -487,7 +494,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                         routingNumberLayout.setVisibility(View.VISIBLE);
                         accntNumberLayout.setVisibility(View.VISIBLE);
                         phoneLayout.setVisibility(View.GONE);
-                        emailLayout.setVisibility(View.GONE);
                         break;
                 }
             }

@@ -42,6 +42,7 @@ import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.Transaction;
 import superstartupteam.nearby.model.User;
+import superstartupteam.nearby.service.NearbyMessagingService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,7 +82,11 @@ public class HistoryFragment extends Fragment {
             View.OnClickListener mOnClickListener;
             Response response = null;
             Request request = null;
-            if (!type.equals("merchant_account_status")) {
+            boolean hasRequestResponseParams = type !=  null &&
+                    (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));
+            if (hasRequestResponseParams) {
                 String responseJson = intent.getStringExtra("response");
                 String requestJson = intent.getStringExtra("request");
                 try {

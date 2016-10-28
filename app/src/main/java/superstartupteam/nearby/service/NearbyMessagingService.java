@@ -27,6 +27,12 @@ public class NearbyMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "NearbyMessagingService";
 
+    //has request/response data: response_update, offer_closed, offer_accepted
+    public enum NotificationType {
+        response_update, merchant_account_status, exchange_confirmed, cancelled_transaction,
+        request_notification, offer_closed, offer_accepted
+    }
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // [START_EXCLUDE]
@@ -77,6 +83,14 @@ public class NearbyMessagingService extends FirebaseMessagingService {
             intent.putExtra("type", type);
             switch (type) {
                 case "response_update":
+                    intent.putExtra("request", payload.get("request"));
+                    intent.putExtra("response", payload.get("response"));
+                    break;
+                case "offer_closed":
+                    intent.putExtra("request", payload.get("request"));
+                    intent.putExtra("response", payload.get("response"));
+                    break;
+                case "offer_accepted":
                     intent.putExtra("request", payload.get("request"));
                     intent.putExtra("response", payload.get("response"));
                     break;

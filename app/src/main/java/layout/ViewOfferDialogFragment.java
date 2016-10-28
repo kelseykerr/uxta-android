@@ -283,13 +283,13 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private void updateResponseObject() {
         double offer = Double.parseDouble(offerPrice.getText().toString());
         response.setOfferPrice(offer);
-        String type = offerType.getSelectedItem().toString();
+        /*String type = offerType.getSelectedItem().toString();
         if (type.equals("per day")) {
             type= "per_day";
         } else if (type.equals("per hour")) {
             type = "per_hour";
         }
-        response.setPriceType(type);
+        response.setPriceType(type);*/
         response.setExchangeLocation(pickupLocation.getText().toString());
         if (!pickupTime.getText().toString().equals("Pickup Time")) {
             Date eDate = new Date(pickupTime.getText().toString());

@@ -66,6 +66,7 @@ import superstartupteam.nearby.R;
 import superstartupteam.nearby.RequestAdapter;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
+import superstartupteam.nearby.service.RequestNotificationService;
 
 
 /**
@@ -418,6 +419,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
+        RequestNotificationService.latLng = latLng;
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         currLocationMarker = map.addMarker(markerOptions);
