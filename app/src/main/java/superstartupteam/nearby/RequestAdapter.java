@@ -39,7 +39,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
-        String htmlString = r.getUser().getFirstName() + " requested a <b>" +
+
+        String htmlString = r.getUser().getFirstName() + " would like to " +
+                (r.getRental() ? " borrow a " : " buy a ") + "<b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
