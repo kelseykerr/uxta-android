@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_menu"
+    android:layout_alignParentEnd="true"
+    android:layout_centerVertical="true">
+    <item android:id="@+id/cancel_transaction_button"
+        android:tint="@color/redPink"
+        android:enabled="false"
+        android:icon="@drawable/ic_cancel_black_24dp"
+        android:title="cancel transaction"/>
+    <item android:id="@+id/edit_button"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:title="edit" />
+    <item android:id="@+id/exchange_icon"
+        android:icon="@drawable/ic_swap_horiz_black_24dp"
+        android:tint="#FFD700"
+        android:title="exchange"
+        android:enabled="false"/>
+    <item android:id="@+id/confirm_charge"
+        android:icon="@drawable/ic_assignment_late_black_24dp"
+        android:tint="@color/redPink"
+        android:enabled="false"
+        android:title="confirm charge"/>
+</menu>

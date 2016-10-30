@@ -19,18 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/parent_list_item_expand_arrow"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:tint="@color/colorAccent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
-
-            <ImageButton
+            <!--<ImageButton
                 android:id="@+id/exchange_icon"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
@@ -40,9 +29,9 @@
                 android:tint="#FFD700"
                 android:visibility="gone"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_swap_horiz_black_24dp" />
+                android:src="@drawable/ic_swap_horiz_black_24dp" /> -->
 
-            <ImageButton
+            <!--<ImageButton
                 android:id="@+id/edit_button"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/parent_list_item_expand_arrow"
@@ -51,10 +40,9 @@
                 android:padding="10dp"
                 android:tint="@color/colorAccent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_mode_edit_black_24dp" />
+                android:src="@drawable/ic_mode_edit_black_24dp" /> -->
 
-            <ImageButton
-                android:id="@+id/cancel_transaction_button"
+            <!--<ImageButton
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/exchange_icon"
                 android:layout_height="wrap_content"
@@ -63,18 +51,28 @@
                 android:visibility="gone"
                 android:tint="@color/redPink"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_cancel_black_24dp" />
+                android:src="@drawable/ic_cancel_black_24dp" /> -->
+
+            <ImageView
+                android:id="@+id/card_menu"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_more_vert_black_24dp"
+                android:onClick="showPopup" />
 
             <ImageButton
-                android:id="@+id/view_response_button"
+                android:id="@+id/parent_list_item_expand_arrow"
                 android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
                 android:layout_centerVertical="true"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:padding="10dp"
                 android:tint="@color/colorAccent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron_right_black_24dp"/>
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
 
             <TextView
                 android:id="@+id/item_name"
