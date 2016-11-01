@@ -150,7 +150,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         } else {
             closeRequestBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    request.setExpireDate(new Date());
+                    request.setExpireDate(new Date(new Date().getTime() - 60000));
                     updateRequest();
                 }
             });
