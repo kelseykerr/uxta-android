@@ -138,6 +138,31 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         listView.setVisibility(View.GONE);
         requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
 
+        Spinner locationSpinner = (Spinner) v.findViewById(R.id.location_spinner);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
+                getResources().getStringArray(R.array.locationItems));
+        locationSpinner.setAdapter(locationAdapter);
+        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
+            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    if (selectedItem.equals("current location")) {
+                        getRequests(currentRadius, true);
+                    } else {
+                        getRequests(currentRadius, false);
+                    }
+                } // to close the onItemSelected
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            locationSpinner.setVisibility(View.VISIBLE);
+        } else {
+            locationSpinner.setVisibility(View.GONE);
+        }
+
+
         // Spinner element
         Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
 
@@ -173,7 +198,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
-        getRequests(currentRadius);
+        getRequests(currentRadius, false);
         return v;
     }
 
@@ -206,7 +231,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
 
 
-    public void getRequests(final Double radius) {
+    public void getRequests(final Double radius, final boolean homeAddress) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -216,7 +241,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 try {
                     Double r = radius != null ? radius : currentRadius;
                     URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + r +
-                            "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
+                            "&latitude=" + (homeAddress ? user.getHomeLatitude() : latLng.latitude)
+                            + "&longitude=" + (homeAddress ? user.getHomeLongitude() : latLng.longitude) +
                             "&includeMine=false&expired=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
@@ -318,7 +344,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             if (value.equals(radiusString)) {
                 currentRadius = key;
                 // Get requests within that radius
-                getRequests(key);
+                getRequests(key, false);
                 break;
             }
         }
@@ -376,7 +402,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
-            getRequests(.1);
+            getRequests(.1, false);
             if (recList != null) {
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
@@ -435,7 +461,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        getRequests(.1);
+        getRequests(.1, false);
         requestAdapter.swap(requests);
         //ft.show(mapFragment).commit();
 

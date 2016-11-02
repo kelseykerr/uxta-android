@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity
                     listMapText.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
-                        homeFragment.getRequests(null);
+                        homeFragment.getRequests(null, false);
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
                                 .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
