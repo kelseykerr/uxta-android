@@ -432,7 +432,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     historyFragment.showCancelTransactionDialog(transaction.getId());
                     return true;
                 case R.id.edit_button:
-                    historyFragment.showRequestDialog(history);
+                    if (isSeller) {
+                        historyFragment.showResponseDialog(history.getResponses().get(0));
+                    } else {
+                        historyFragment.showRequestDialog(history);
+                    }
                     return true;
                 case R.id.exchange_icon:
                     if (isSeller) {

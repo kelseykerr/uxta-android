@@ -77,6 +77,8 @@ public class User extends BaseEntity {
 
     private Boolean tosAccepted;
 
+    private String merchantStatusMessage;
+
     @JsonIgnore
     private String creditCardNumber;
 
@@ -382,6 +384,14 @@ public class User extends BaseEntity {
 
     public void setCcExpirationDate(String ccExpirationDate) {
         this.ccExpirationDate = ccExpirationDate;
+    }
+
+    public String getMerchantStatusMessage() {
+        return merchantStatusMessage;
+    }
+
+    public void setMerchantStatusMessage(String merchantStatusMessage) {
+        this.merchantStatusMessage = merchantStatusMessage;
     }
 }
 

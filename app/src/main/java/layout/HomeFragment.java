@@ -298,6 +298,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
                     markerOptions.title(request.getItemName());
+                    if (request.getDescription() != null && request.getDescription().length() > 0) {
+                        markerOptions.snippet(request.getDescription());
+                    }
 
                     float[] hsv = new float[3];
                     Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
