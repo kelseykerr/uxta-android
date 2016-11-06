@@ -88,8 +88,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (resp == null || resp.getSeller() == null) {
                 return;
             }
-            BigDecimal price = BigDecimal.valueOf(resp.getOfferPrice());
-            price = price.setScale(AppUtils.USD.getDefaultFractionDigits(), AppUtils.DEFAULT_ROUNDING);
+            BigDecimal price = AppUtils.formatCurrency(resp.getOfferPrice());
             String htmlString = "<font color='#767474'>" + resp.getSeller().getFirstName() +
                     " made an offer for $" + price +
                     "<br/>" + resp.getResponseStatus().toString() + "</font>";
@@ -362,7 +361,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             }
         } else if (r.getStatus().equals("TRANSACTION_PENDING")) {
-            String calculatedPrice = "<b>calculated price:</b> " + transaction.getCalculatedPrice();
+            BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getCalculatedPrice());
+            String calculatedPrice = "<b>calculated price:</b> " + formattedValue;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
             requestViewHolder.vDescription.setVisibility(View.GONE);
             if (isBuyer) {
@@ -381,8 +381,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
         } else {
             requestViewHolder.showExchangeIcon = false;
-            BigDecimal formattedValue = BigDecimal.valueOf(transaction.getFinalPrice());
-            formattedValue = formattedValue.setScale(AppUtils.USD.getDefaultFractionDigits(), AppUtils.DEFAULT_ROUNDING);
+            BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getFinalPrice());
             if (isBuyer) {
                 String price = "<b>Payment:</b> -$" + formattedValue;
                 requestViewHolder.vDescription.setText(Html.fromHtml(price));

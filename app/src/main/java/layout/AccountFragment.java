@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,6 +46,8 @@ public class AccountFragment extends Fragment {
     private Bitmap bitmap;
     private TextView btnLogout;
     private TextView editProfile;
+    private TextView noCustomerText;
+    private TextView noMerchantText;
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
@@ -212,6 +216,29 @@ public class AccountFragment extends Fragment {
             Snackbar snackbar = Snackbar
                     .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
             snackbar.show();
+        }
+        noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
+        noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
+        boolean displayCustomerStatus = user.getCustomerStatus() != null &&
+                !user.getCustomerStatus().toLowerCase().equals("valid");
+        if (user.getCustomerId() == null || displayCustomerStatus) {
+            noCustomerText.setVisibility(View.VISIBLE);
+            if (displayCustomerStatus) {
+                noCustomerText.setText(user.getCustomerStatus());
+            }
+        } else {
+            noCustomerText.setVisibility(View.GONE);
+        }
+        boolean displayMerchantStatus = user.getMerchantStatus() != null &&
+                !user.getMerchantStatus().toLowerCase().equals("pending") &&
+                !user.getMerchantStatus().toLowerCase().equals("active");
+        if (user.getMerchantId() == null || displayMerchantStatus) {
+            noMerchantText.setVisibility(View.VISIBLE);
+            if (user.getMerchantStatusMessage() != null) {
+                noMerchantText.setText(user.getMerchantStatusMessage());
+            }
+        } else {
+            noMerchantText.setVisibility(View.GONE);
         }
         return view;
 

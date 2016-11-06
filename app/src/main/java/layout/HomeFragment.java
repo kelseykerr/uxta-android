@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -20,14 +19,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -51,7 +46,6 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -230,18 +224,55 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                try {
-                    for (Request r:requests) {
-                        if (r.getLatitude().equals(marker.getPosition().latitude) &&
-                        r.getLongitude().equals(marker.getPosition().longitude) &&
-                                marker.getTitle().equals(r.getItemName())) {
-                            showDialog(r.getId());
-                            break;
+                boolean goodMerchantStatus = user.getMerchantStatus() != null &&
+                        user.getMerchantStatus().toString().toLowerCase().equals("active");
+                if (user.getMerchantId() != null && goodMerchantStatus) {
+                    try {
+                        for (Request r:requests) {
+                            if (r.getLatitude().equals(marker.getPosition().latitude) &&
+                                    r.getLongitude().equals(marker.getPosition().longitude) &&
+                                    marker.getTitle().equals(r.getItemName())) {
+                                showDialog(r.getId());
+                                break;
+                            }
+                        }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        Log.e("marker click", " could not find request from marker index [" +
+                                marker.getSnippet() + "]");
+                    }
+                } else {
+                    String title;
+                    boolean showAction = false;
+                    if (user.getMerchantStatus() != null &&
+                            user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
+                        title = "Your merchant account is pending, please try again later";
+                    } else {
+                        showAction = true;
+                        if (user.getMerchantStatusMessage() != null) {
+                            title = user.getMerchantStatusMessage();
+                        } else {
+                            title = "Please link your bank account or venmo account to your profile";
                         }
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    Log.e("marker click", " could not find request from marker index [" +
-                            marker.getSnippet() + "]");
+                    Snackbar snack = Snackbar.make(view.getRootView(), title,
+                            Snackbar.LENGTH_LONG);
+                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snack.getView().getRootView().getLayoutParams();
+                    params.setMargins(params.leftMargin,
+                            params.topMargin,
+                            params.rightMargin,
+                            params.bottomMargin + 150);
+                    if (showAction) {
+                        snack.setAction("update account", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                                AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                            }
+                        });
+                    }
+                    snack.getView().getRootView().setLayoutParams(params);
+                    snack.show();
                 }
 
             }
@@ -617,5 +648,27 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             snackbar.show();
         }
     };
+
+    public void displayNoNewRequestSnackbar() {
+        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
+                Snackbar.LENGTH_LONG)
+                .setAction("update account", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                        AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                    }
+                });
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snack.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+
+        snack.getView().getRootView().setLayoutParams(params);
+        snack.show();
+    }
 
 }

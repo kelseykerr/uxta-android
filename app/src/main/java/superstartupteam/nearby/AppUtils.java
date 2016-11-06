@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -111,6 +112,11 @@ public class AppUtils {
 
     public static boolean validateString(String s) {
         return s != null && s.length() > 0;
+    }
+
+    public static BigDecimal formatCurrency(Double value) {
+        BigDecimal formattedValue = BigDecimal.valueOf(value);
+        return formattedValue.setScale(AppUtils.USD.getDefaultFractionDigits(), AppUtils.DEFAULT_ROUNDING);
     }
 
 }

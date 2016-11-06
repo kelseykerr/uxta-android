@@ -7,7 +7,6 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -57,7 +56,6 @@ import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 import superstartupteam.nearby.service.NearbyInstanceIdService;
-import superstartupteam.nearby.service.NearbyMessagingService;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -163,7 +161,14 @@ public class MainActivity extends AppCompatActivity
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
         frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showDialog(v);
+                boolean goodCustomerStatus = user.getCustomerStatus() != null &&
+                        user.getCustomerStatus().equals("valid");
+                if (user.getCustomerId() != null && goodCustomerStatus) {
+                    showNewRequestDialog(v);
+                } else {
+                    HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                    homeFragment.displayNoNewRequestSnackbar();
+                }
             }
         });
 
@@ -186,7 +191,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void showDialog(View view) {
+    public void showNewRequestDialog(View view) {
         DialogFragment newFragment = RequestDialogFragment
                 .newInstance();
         newFragment.show(getFragmentManager(), "dialog");
@@ -366,6 +371,7 @@ public class MainActivity extends AppCompatActivity
         // We should now have payment information => get nonce from braintree so that we can create a customer
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
             if (updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
+                //TODO: in prod, user the real cc number & expiration date
                 CardBuilder cardBuilder = new CardBuilder()
                         .cardNumber("4111111111111111")
                         .expirationDate("09/2018");
