@@ -1,6 +1,7 @@
 package layout;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +23,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -73,12 +78,13 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private TextInputLayout phoneLayout;
     private TextInputLayout accntNumberLayout;
     private TextInputLayout routingNumberLayout;
-    private EditText dob;
+    private TextView dob;
     private ScrollView screen1;
     private ScrollView screen2;
     private ScrollView screen3;
     private ScrollView screen4;
     private RelativeLayout updatingScreen;
+    private String mDobString;
 
 
     /**
@@ -155,8 +161,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         routing_number = (EditText) view.findViewById(R.id.routing_number);
         routing_number.setText(user.getBankRoutingNumber());
 
-        dob = (EditText) view.findViewById(R.id.dob);
+        dob = (TextView) view.findViewById(R.id.dob);
         dob.setText(user.getDateOfBirth());
+        Log.i ("UpdateACcount", "dob from user data = "+user.getDateOfBirth());
+
         credit_card = (EditText) view.findViewById(R.id.credit_card);
         credit_card.setText(user.getCreditCardNumber());
         exp_date = (EditText) view.findViewById(R.id.exp_date);
@@ -214,6 +222,17 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
+        final Button dobPickerButton = (Button) view.findViewById(R.id.dob_picker_button);
+        dobPickerButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                showDobPickerDialog();
+            }
+        });
+
+
+
         Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
         if (!user.getTosAccepted()) {
             saveBtn.setText("continue");
@@ -245,6 +264,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 screen3.setVisibility(View.GONE);
                 screen4.setVisibility(View.GONE);
                 updatingScreen.setVisibility(View.VISIBLE);
@@ -286,18 +306,49 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                         user.setFundDestination("bank");
                         break;
                 }
-                String dobString = dob.getText().toString();
-                user.setDateOfBirth(dobString);
+
+//                String dobString = dob.getText().toString();
+
+                Log.i ("UpdateSave:", "DOB String = " + mDobString);
+                user.setDateOfBirth(mDobString);
+
                 String sCard = credit_card.getText().toString();
                 user.setCreditCardNumber(sCard);
                 String sExpDate = exp_date.getText().toString();
                 user.setCcExpirationDate(sExpDate);
                 MainActivity.updatedUser = user;
+
+                PrefUtils.setCurrentUser(MainActivity.updatedUser, context);
+
                 String nextFragment = " ";
                 Uri url = null;
                 mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER);
             }
         });
+    }
+
+    public class dobPickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year         = c.get (Calendar.YEAR);
+            int month        = c.get (Calendar.MONTH);
+            int day          = c.get (Calendar.DAY_OF_MONTH);
+
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet (DatePicker view, int year, int month, int day) {
+            month += 1;
+            mDobString = String.format("%1$04d-%2$02d-%3$02d", year, month, day);
+            user.setDateOfBirth(mDobString);
+            Log.i ("OnDateSet", "DOB String = " + mDobString);
+        }
+    }
+
+    private void showDobPickerDialog (){
+        DialogFragment dobFragment = new dobPickerFragment();
+        dobFragment.show(getFragmentManager(), "datePicker");
     }
 
 

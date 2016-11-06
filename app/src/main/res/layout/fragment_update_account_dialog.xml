@@ -420,7 +420,7 @@
                 android:paddingTop="20dp"
                 android:src="@drawable/ic_keyboard_backspace_black_24dp"
                 android:tint="@color/colorAccent" />
-
+<!--
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/dob_layout"
                 android:layout_width="match_parent"
@@ -429,24 +429,54 @@
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+-->
+            <TextView
+                android:id="@+id/dob_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edit_profile_text3"
+                android:layout_marginTop="-10dp"
+                android:layout_marginStart="15dp"
+                android:textSize="10sp"
+                android:text="@string/dobLabel"/>
 
-                <EditText
-                    android:id="@+id/dob"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:hint="date of birth"
-                    android:inputType="text"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
+            <TextView
+                android:id="@+id/dob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dob_label"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/colorAccent"
+                android:theme="@style/EditTextTheme" />
 
-            <android.support.design.widget.TextInputLayout
+            <Button
+                android:id="@+id/dob_picker_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/changeButtonLabel"
+                android:textSize="12sp"
+                android:layout_below="@id/edit_profile_text3"
+                android:layout_marginTop="-10dp"
+                android:layout_marginStart="150dp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/dob_picker_button"
+                android:layout_marginBottom="80dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="50dp"
+                android:background="@android:color/darker_gray"/>
+
+        <android.support.design.widget.TextInputLayout
                 android:id="@+id/credit_card_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/dob_layout"
-                android:layout_marginTop="-10dp"
+                android:layout_below="@id/dob_picker_button"
+                android:layout_marginTop="10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
