@@ -77,6 +77,12 @@ public class User extends BaseEntity {
 
     private Boolean tosAccepted;
 
+    private String merchantStatusMessage;
+
+    public Boolean paymentSetup;
+
+    public String customerStatus;
+
     @JsonIgnore
     private String creditCardNumber;
 
@@ -110,6 +116,8 @@ public class User extends BaseEntity {
         this.currentLocationNotifications = fromServer.currentLocationNotifications;
         this.homeLocationNotifications = fromServer.homeLocationNotifications;
         this.tosAccepted = fromServer.tosAccepted;
+        this.paymentSetup = fromServer.paymentSetup;
+        this.customerStatus = fromServer.customerStatus;
     }
 
     public String getUserId() {
@@ -382,6 +390,30 @@ public class User extends BaseEntity {
 
     public void setCcExpirationDate(String ccExpirationDate) {
         this.ccExpirationDate = ccExpirationDate;
+    }
+
+    public String getMerchantStatusMessage() {
+        return merchantStatusMessage;
+    }
+
+    public void setMerchantStatusMessage(String merchantStatusMessage) {
+        this.merchantStatusMessage = merchantStatusMessage;
+    }
+
+    public Boolean getPaymentSetup() {
+        return paymentSetup;
+    }
+
+    public void setPaymentSetup(Boolean paymentSetup) {
+        this.paymentSetup = paymentSetup;
+    }
+
+    public String getCustomerStatus() {
+        return customerStatus;
+    }
+
+    public void setCustomerStatus(String customerStatus) {
+        this.customerStatus = customerStatus;
     }
 }
 

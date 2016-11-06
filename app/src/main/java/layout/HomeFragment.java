@@ -5,32 +5,34 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -44,7 +46,6 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -65,7 +66,9 @@ import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.RequestAdapter;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
+import superstartupteam.nearby.service.NearbyMessagingService;
 import superstartupteam.nearby.service.RequestNotificationService;
 
 
@@ -105,6 +108,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private Double currentRadius;
     private CameraUpdate cu;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
+    private View view;
+    private LocalBroadcastManager mLocalBroadcastManager;
 
 
     private OnFragmentInteractionListener mListener;
@@ -124,10 +129,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        registerBroadcastReceiver();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        unregisterBroadcastReceiver();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        view = v;
         mapFragment = (MapFragment) this.getChildFragmentManager()
                 .findFragmentById(R.id.map);
         fm = this.getChildFragmentManager();
@@ -137,6 +155,31 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         listView = (ScrollView) v.findViewById(R.id.list_view);
         listView.setVisibility(View.GONE);
         requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
+
+        Spinner locationSpinner = (Spinner) v.findViewById(R.id.location_spinner);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
+                getResources().getStringArray(R.array.locationItems));
+        locationSpinner.setAdapter(locationAdapter);
+        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
+            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    if (selectedItem.equals("current location")) {
+                        getRequests(currentRadius, true);
+                    } else {
+                        getRequests(currentRadius, false);
+                    }
+                } // to close the onItemSelected
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            locationSpinner.setVisibility(View.VISIBLE);
+        } else {
+            locationSpinner.setVisibility(View.GONE);
+        }
+
 
         // Spinner element
         Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
@@ -173,7 +216,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
-        getRequests(currentRadius);
+        getRequests(currentRadius, false);
         return v;
     }
 
@@ -181,18 +224,55 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                try {
-                    for (Request r:requests) {
-                        if (r.getLatitude().equals(marker.getPosition().latitude) &&
-                        r.getLongitude().equals(marker.getPosition().longitude) &&
-                                marker.getTitle().equals(r.getItemName())) {
-                            showDialog(r.getId());
-                            break;
+                boolean goodMerchantStatus = user.getMerchantStatus() != null &&
+                        user.getMerchantStatus().toString().toLowerCase().equals("active");
+                if (user.getMerchantId() != null && goodMerchantStatus) {
+                    try {
+                        for (Request r:requests) {
+                            if (r.getLatitude().equals(marker.getPosition().latitude) &&
+                                    r.getLongitude().equals(marker.getPosition().longitude) &&
+                                    marker.getTitle().equals(r.getItemName())) {
+                                showDialog(r.getId());
+                                break;
+                            }
+                        }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        Log.e("marker click", " could not find request from marker index [" +
+                                marker.getSnippet() + "]");
+                    }
+                } else {
+                    String title;
+                    boolean showAction = false;
+                    if (user.getMerchantStatus() != null &&
+                            user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
+                        title = "Your merchant account is pending, please try again later";
+                    } else {
+                        showAction = true;
+                        if (user.getMerchantStatusMessage() != null) {
+                            title = user.getMerchantStatusMessage();
+                        } else {
+                            title = "Please link your bank account or venmo account to your profile";
                         }
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    Log.e("marker click", " could not find request from marker index [" +
-                            marker.getSnippet() + "]");
+                    Snackbar snack = Snackbar.make(view.getRootView(), title,
+                            Snackbar.LENGTH_LONG);
+                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snack.getView().getRootView().getLayoutParams();
+                    params.setMargins(params.leftMargin,
+                            params.topMargin,
+                            params.rightMargin,
+                            params.bottomMargin + 150);
+                    if (showAction) {
+                        snack.setAction("update account", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                                AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                            }
+                        });
+                    }
+                    snack.getView().getRootView().setLayoutParams(params);
+                    snack.show();
                 }
 
             }
@@ -206,7 +286,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
 
 
-    public void getRequests(final Double radius) {
+    public void getRequests(final Double radius, final boolean homeAddress) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -216,7 +296,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 try {
                     Double r = radius != null ? radius : currentRadius;
                     URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + r +
-                            "&latitude=" + latLng.latitude + "&longitude=" + latLng.longitude +
+                            "&latitude=" + (homeAddress ? user.getHomeLatitude() : latLng.latitude)
+                            + "&longitude=" + (homeAddress ? user.getHomeLongitude() : latLng.longitude) +
                             "&includeMine=false&expired=false");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
@@ -272,6 +353,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
                     markerOptions.title(request.getItemName());
+                    if (request.getDescription() != null && request.getDescription().length() > 0) {
+                        markerOptions.snippet(request.getDescription());
+                    }
 
                     float[] hsv = new float[3];
                     Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
@@ -318,7 +402,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             if (value.equals(radiusString)) {
                 currentRadius = key;
                 // Get requests within that radius
-                getRequests(key);
+                getRequests(key, false);
                 break;
             }
         }
@@ -376,7 +460,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
-            getRequests(.1);
+            getRequests(.1, false);
             if (recList != null) {
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
@@ -435,7 +519,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        getRequests(.1);
+        getRequests(.1, false);
         requestAdapter.swap(requests);
         //ft.show(mapFragment).commit();
 
@@ -497,4 +581,94 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             listView.setVisibility(View.GONE);
         }
     }
+
+    private void registerBroadcastReceiver() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("NOTIFICATION_MESSAGE");
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("message");
+            Snackbar snackbar = Snackbar.make(view.getRootView(), message, Snackbar.LENGTH_LONG);
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                    snackbar.getView().getRootView().getLayoutParams();
+
+            params.setMargins(params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    params.bottomMargin + 150);
+            String type = intent.getStringExtra("type");
+            View.OnClickListener mOnClickListener;
+            Response response = null;
+            Request request = null;
+            boolean hasRequestResponseParams = type !=  null &&
+                    (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));
+            if (hasRequestResponseParams) {
+                String responseJson = intent.getStringExtra("response");
+                String requestJson = intent.getStringExtra("request");
+                try {
+                    response = new ObjectMapper().readValue(responseJson, Response.class);
+                    request = new ObjectMapper().readValue(requestJson, Request.class);
+                } catch (IOException e) {
+                    Log.e("JSON ERROR", "**" + e.getMessage());
+                }
+            }
+
+            if (type != null) {
+                switch (type) {
+                    case "response_update":
+                        if (response.getId() != null) {
+                            DialogFragment newFragment = null;
+                            newFragment = ViewOfferDialogFragment.newInstance(response, request);
+                            final DialogFragment frag = newFragment;
+                            mOnClickListener = new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    frag.show(getFragmentManager(), "dialog");
+                                }
+                            };
+                            snackbar.setAction("view", mOnClickListener);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            snackbar.getView().getRootView().setLayoutParams(params);
+            snackbar.show();
+        }
+    };
+
+    public void displayNoNewRequestSnackbar() {
+        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
+                Snackbar.LENGTH_LONG)
+                .setAction("update account", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                        AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                    }
+                });
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snack.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+
+        snack.getView().getRootView().setLayoutParams(params);
+        snack.show();
+    }
+
 }

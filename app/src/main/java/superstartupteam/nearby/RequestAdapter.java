@@ -1,29 +1,30 @@
 package superstartupteam.nearby;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
-import android.support.v4.app.DialogFragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
+import layout.AccountFragment;
 import layout.HomeFragment;
-import layout.NewOfferDialogFragment;
+import layout.UpdateAccountDialogFragment;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.User;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private List<Request> requests;
-
+    private User user;
+    private View view;
     private HomeFragment homeFragment;
 
     public RequestAdapter(List<Request> requests, HomeFragment homeFragment) {
@@ -37,7 +38,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     }
 
     @Override
-    public void onBindViewHolder(RequestViewHolder requestViewHolder, int i) {
+    public void onBindViewHolder(final RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
 
         String htmlString = r.getUser().getFirstName() + " would like to " +
@@ -60,9 +61,41 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         requestViewHolder.vMakeOfferButton.setTag(i);
         requestViewHolder.vMakeOfferButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                int position=(Integer)v.getTag();
-                Request r = requests.get(position);
-                homeFragment.showDialog(r.getId());
+                boolean goodMerchantStatus = user.getMerchantStatus() != null &&
+                        user.getMerchantStatus().toString().toLowerCase().equals("active");
+                if (user.getMerchantId() != null && goodMerchantStatus) {
+                    int position=(Integer)v.getTag();
+                    Request r = requests.get(position);
+                    homeFragment.showDialog(r.getId());
+                } else {
+                    String title;
+                    boolean showAction = false;
+                    if (user.getMerchantStatus() != null &&
+                            user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
+                        title = "Your merchant account is pending, please try again later";
+                    } else {
+                        showAction = true;
+                        if (user.getMerchantStatusMessage() != null) {
+                            title = user.getMerchantStatusMessage();
+                        } else {
+                            title = "Please link your bank account or venmo account to your profile";
+                        }
+                    }
+                    Snackbar snack = Snackbar.make(view.getRootView(), title,
+                            Snackbar.LENGTH_LONG);
+                    if (showAction) {
+                        snack.setAction("update account", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                                FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
+                                AccountFragment.updateAccountDialog.show(fm, "dialog");
+                            }
+                        });
+                    }
+                    snack.show();
+                }
+
             }
         });
     }
@@ -74,7 +107,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.request_card, viewGroup, false);
+        this.view = itemView;
         Context context = viewGroup.getContext();
+        this.user = PrefUtils.getCurrentUser(context);
         return new RequestViewHolder(context, itemView);
     }
 

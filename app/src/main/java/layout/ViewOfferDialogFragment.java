@@ -33,12 +33,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -138,7 +140,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             setDateTimeFunctionality(returnTime, false);
         }
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
-        offerPrice.setText(response.getOfferPrice().toString());
+        BigDecimal formattedValue = AppUtils.formatCurrency(response.getOfferPrice());
+        offerPrice.setText(formattedValue.toString());
         //offerType = (Spinner) view.findViewById(R.id.offer_type);
         /*if (response.getPriceType().toLowerCase().equals("flat")) {
             offerType.setSelection(0);
@@ -156,12 +159,14 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         updateRequestBtn = (Button) view.findViewById(R.id.accept_offer_button);
         updateRequestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                updateRequestBtn.setEnabled(false);
                 updateResponse();
             }
         });
         rejectRequestBtn = (Button) view.findViewById(R.id.reject_offer_button);
         rejectRequestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                rejectRequestBtn.setEnabled(false);
                 declineResponse();
             }
         });
@@ -217,6 +222,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
             @Override
             protected void onPostExecute(Integer responseCode) {
+                rejectRequestBtn.setEnabled(true);
                 if (responseCode == 200) {
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully declined offer");
@@ -246,10 +252,11 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                         response.setSellerStatus(Response.SellerStatus.ACCEPTED);
                     }
                     ObjectMapper mapper = new ObjectMapper();
-                    Response r = response;
-                    r.setSeller(null);
-                    String responseJson = mapper.writeValueAsString(r);
+                    User seller = response.getSeller();
+                    response.setSeller(null);
+                    String responseJson = mapper.writeValueAsString(response);
                     Log.i("updated response: ", responseJson);
+                    response.setSeller(seller);
                     byte[] outputInBytes = responseJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
@@ -268,6 +275,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
             @Override
             protected void onPostExecute(Integer responseCode) {
+                updateRequestBtn.setEnabled(true);
                 if (responseCode == 200) {
                     ((MainActivity) getActivity()).goToHistory("successfully updated offer");
                     dismiss();

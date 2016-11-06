@@ -11,8 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +28,9 @@ import superstartupteam.nearby.model.User;
  * Created by kerrk on 8/21/16.
  */
 public class AppUtils {
+
+    public static final Currency USD = Currency.getInstance("USD");
+    public static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
 
      public static <T extends BaseEntity> T jsonStringToPojo(Class<T> c, String jsonString) throws IOException{
          ObjectMapper mapper = new ObjectMapper();
@@ -106,6 +112,11 @@ public class AppUtils {
 
     public static boolean validateString(String s) {
         return s != null && s.length() > 0;
+    }
+
+    public static BigDecimal formatCurrency(Double value) {
+        BigDecimal formattedValue = BigDecimal.valueOf(value);
+        return formattedValue.setScale(AppUtils.USD.getDefaultFractionDigits(), AppUtils.DEFAULT_ROUNDING);
     }
 
 }

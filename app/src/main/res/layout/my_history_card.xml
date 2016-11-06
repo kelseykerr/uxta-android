@@ -5,9 +5,9 @@
     android:id="@+id/my_history_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clickable="true"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true"
-    android:clickable="true"
     card_view:cardElevation="5dp">
 
     <FrameLayout
@@ -19,18 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/parent_list_item_expand_arrow"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:tint="@color/colorAccent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
-
-            <ImageButton
+            <!--<ImageButton
                 android:id="@+id/exchange_icon"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
@@ -40,9 +29,9 @@
                 android:tint="#FFD700"
                 android:visibility="gone"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_swap_horiz_black_24dp" />
+                android:src="@drawable/ic_swap_horiz_black_24dp" /> -->
 
-            <ImageButton
+            <!--<ImageButton
                 android:id="@+id/edit_button"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/parent_list_item_expand_arrow"
@@ -51,10 +40,9 @@
                 android:padding="10dp"
                 android:tint="@color/colorAccent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_mode_edit_black_24dp" />
+                android:src="@drawable/ic_mode_edit_black_24dp" /> -->
 
-            <ImageButton
-                android:id="@+id/cancel_transaction_button"
+            <!--<ImageButton
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/exchange_icon"
                 android:layout_height="wrap_content"
@@ -63,18 +51,27 @@
                 android:visibility="gone"
                 android:tint="@color/redPink"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_cancel_black_24dp" />
+                android:src="@drawable/ic_cancel_black_24dp" /> -->
+
+            <ImageView
+                android:id="@+id/card_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:onClick="showPopup"
+                android:src="@drawable/ic_more_vert_black_24dp" />
 
             <ImageButton
-                android:id="@+id/view_response_button"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_height="wrap_content"
+                android:id="@+id/parent_list_item_expand_arrow"
                 android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:tint="@color/colorAccent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron_right_black_24dp"/>
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                android:tint="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/item_name"
@@ -84,25 +81,26 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="6dp"
                 android:text=""
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/category_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/item_name"
-                android:layout_marginStart="15dp"
                 android:layout_marginEnd="88dp"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="6dp"
                 android:text=""
                 android:textSize="14sp" />
+
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/category_name"
-                android:layout_marginStart="15dp"
                 android:layout_marginEnd="88dp"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="6dp"
                 android:text=""
                 android:textSize="14sp" />
@@ -112,9 +110,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/description"
+                android:layout_marginEnd="88dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="6dp"
-                android:layout_marginEnd="88dp"
                 android:gravity="center_vertical"
                 android:text=""
                 android:textSize="14sp" />
@@ -127,9 +125,32 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="6dp"
                 android:gravity="center_vertical"
-                android:textStyle="italic"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:id="@+id/response_separator"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/history_card_status">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border_bottom" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/response_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/response_separator"
+                android:scrollbars="vertical"
+                android:visibility="gone">
+
+            </ListView>
 
         </RelativeLayout>
 

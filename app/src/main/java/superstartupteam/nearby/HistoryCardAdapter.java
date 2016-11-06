@@ -3,13 +3,25 @@ package superstartupteam.nearby;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,6 +30,7 @@ import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,60 +44,26 @@ import superstartupteam.nearby.model.User;
 /**
  * Created by kerrk on 8/28/16.
  */
-public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAdapter.HistoryCardViewHolder, HistoryCardAdapter.ResponseViewHolder> {
+public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.HistoryCardViewHolder> {
     private List<History> recentHistory;
     private User user;
     private LayoutInflater mInflater;
     private HistoryFragment historyFragment;
     private Context context;
 
-    public HistoryCardAdapter(Context context, List<ParentObject> parentItemList, HistoryFragment fragment) {
-        super(context, parentItemList);
-        List<History> objs = new ArrayList<>();
-        for (ParentObject p : parentItemList) {
-            objs.add((History) p);
-        }
-        this.recentHistory = objs;
-        historyFragment = fragment;
-        mInflater = LayoutInflater.from(context);
+    public HistoryCardAdapter(List<History> history, HistoryFragment fragment) {
+        this.recentHistory = history;
+        this.historyFragment = fragment;
     }
 
     @Override
-    public void onBindChildViewHolder(final ResponseViewHolder responseViewHolder, int i, Object obj) {
-        final Response r = (Response) obj;
-        String requestStatus = "";
-        for (History h: recentHistory) {
-            if (h.getRequest().getId().equals(r.getRequestId())) {
-                requestStatus = h.getRequest().getStatus();
-            }
-        }
-        responseViewHolder.mOfferAmount.setText(r.getOfferPrice().toString());
-        responseViewHolder.mResponderName.setText(r.getSeller().getFirstName());
-        if (r.getPriceType().equals("per_hour")) {
-            responseViewHolder.mPriceType.setText(" per hour");
-        } else if (r.getPriceType().equals("per_day")) {
-            responseViewHolder.mPriceType.setText(" per day");
-        }
-
-        if (r.getResponseStatus().toString().toLowerCase().equals("closed")
-                || requestStatus.toLowerCase().equals("closed")) {
-            responseViewHolder.mResponseDetailsButton.setVisibility(View.GONE);
-        } else {
-            responseViewHolder.mResponseDetailsButton.setVisibility(View.VISIBLE);
-        }
-        responseViewHolder.mResponseStatus.setText(r.getResponseStatus().toString());
-        setResponseStatusColor(responseViewHolder.mResponseStatus, r.getResponseStatus().toString());
-        responseViewHolder.mResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                historyFragment.showResponseDialog(r);
-            }
-        });
+    public int getItemCount() {
+        return recentHistory.size();
     }
 
-    @Override
-    public void onBindParentViewHolder(final HistoryCardViewHolder requestViewHolder, int i, Object obj) {
-        final History h = (History) obj;
-        Request r = h.getRequest();
+    public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
+        final History h = recentHistory.get(i);
+        final Request r = h.getRequest();
         if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed")) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
@@ -92,22 +71,112 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         } else { //this is an offer the user made
             setUpOfferCard(requestViewHolder, r, h);
         }
+        if (!requestViewHolder.showConfirmChargeIcon && !requestViewHolder.showEditIcon &&
+                !requestViewHolder.showCancelTransactionIcon && !requestViewHolder.showExchangeIcon) {
+            requestViewHolder.menuBtn.setVisibility(View.GONE);
+        } else {
+            requestViewHolder.menuBtn.setVisibility(View.VISIBLE);
+        }
+        requestViewHolder.menuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopupMenu(requestViewHolder.menuBtn, h, requestViewHolder);
+            }
+        });
+        List<String> values = new ArrayList();
+        for (Response resp:h.getResponses()) {
+            if (resp == null || resp.getSeller() == null) {
+                return;
+            }
+            BigDecimal price = AppUtils.formatCurrency(resp.getOfferPrice());
+            String htmlString = "<font color='#767474'>" + resp.getSeller().getFirstName() +
+                    " made an offer for $" + price +
+                    "<br/>" + resp.getResponseStatus().toString() + "</font>";
+            values.add(htmlString);
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, values) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View row;
+                if (convertView == null) {
+                    row = LayoutInflater.from(parent.getContext())
+                            .inflate(android.R.layout.simple_list_item_1, null);
+                } else {
+                    row = convertView;
+                }
+                TextView tv = (TextView) row.findViewById(android.R.id.text1);
+                tv.setPadding(55, 15, 0, 15);
+                tv.setLineSpacing(1, 1.3f);
+                tv.setText(Html.fromHtml(getItem(position)));
+
+                return row;
+            }
+        };
+        requestViewHolder.responseList.setAdapter(adapter);
+        requestViewHolder.responseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                Response response = h.getResponses().get(position);
+
+                if (!response.getResponseStatus().toString().toLowerCase().equals("closed")
+                        && !r.getStatus().toLowerCase().equals("closed")) {
+                    historyFragment.showResponseDialog(response);
+                }
+
+            }
+        });
+        requestViewHolder.vParentDropDownArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
+                if (requestViewHolder.dropdownExpanded) {
+                    requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);
+                    requestViewHolder.vParentDropDownArrow.animate().rotation(180).start();
+                    requestViewHolder.responseList.setVisibility(View.VISIBLE);
+                    justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
+                } else {
+                    requestViewHolder.responseSeparator.setVisibility(View.GONE);
+                    requestViewHolder.vParentDropDownArrow.animate().rotation(0).start();
+                    requestViewHolder.responseList.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    public static void justifyListViewHeightBasedOnChildren(ListView listView) {
+
+        ListAdapter adapter = listView.getAdapter();
+
+        if (adapter == null) {
+            return;
+        }
+        ViewGroup vg = listView;
+        int totalHeight = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, vg);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams par = listView.getLayoutParams();
+        par.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(par);
+        listView.requestLayout();
     }
 
     @Override
-    public HistoryCardViewHolder onCreateParentViewHolder(ViewGroup viewGroup) {
+    public HistoryCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         user = PrefUtils.getCurrentUser(viewGroup.getContext());
         Context context = viewGroup.getContext();
         this.context = context;
-        View view = mInflater.inflate(R.layout.my_history_card, viewGroup, false);
+        View view = LayoutInflater.
+                from(viewGroup.getContext()).
+                inflate(R.layout.my_history_card, viewGroup, false);
+
         return new HistoryCardViewHolder(context, view);
     }
 
-    @Override
-    public ResponseViewHolder onCreateChildViewHolder(ViewGroup viewGroup) {
-        View view = mInflater.inflate(R.layout.request_responses, viewGroup, false);
-        return new ResponseViewHolder(view);
-    }
 
     public void swap(List<History> newHistory) {
         recentHistory.clear();
@@ -146,10 +215,10 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     }
 
     private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
-        requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+        requestViewHolder.showExchangeIcon = false;
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
-        requestViewHolder.vEditButton.setVisibility(View.GONE);
+        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
+        requestViewHolder.showEditIcon = false;
         final Response resp = h.getResponses().get(0);
         String buyerName = r.getUser().getFirstName() != null ?
                 r.getUser().getFirstName() : r.getUser().getFullName();
@@ -166,21 +235,16 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
         requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
         if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
-            requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+            requestViewHolder.showEditIcon = false;
         } else {
-            requestViewHolder.vResponseDetailsButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    historyFragment.showResponseDialog(resp);
-                }
-            });
+            requestViewHolder.showEditIcon = true;
         }
     }
 
     private void setUpRequestCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
-        requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.request_card_background));
-        requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
+        requestViewHolder.showExchangeIcon = false;
         String htmlString = "requested a <b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -204,23 +268,12 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
              * closed requests
              */
         if (!r.getStatus().equals("OPEN")) {
-            requestViewHolder.vEditButton.setVisibility(View.GONE);
+            requestViewHolder.showEditIcon = false;
         } else {
-            requestViewHolder.vEditButton.setVisibility(View.VISIBLE);
-            requestViewHolder.vEditButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    historyFragment.showRequestDialog(h);
-                }
-            });
+            requestViewHolder.showEditIcon = true;
         }
         if (h.getResponses() == null || h.getResponses().size() < 1) {
             requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
-            if (r.getStatus().equals("OPEN")) {
-                RelativeLayout.LayoutParams lp =
-                        (RelativeLayout.LayoutParams) requestViewHolder.vEditButton.getLayoutParams();
-                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
-                requestViewHolder.vEditButton.setLayoutParams(lp);
-            }
         } else {
             requestViewHolder.vParentDropDownArrow.setVisibility(View.VISIBLE);
         }
@@ -229,9 +282,8 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
     private void setUpTransactionCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         boolean isBuyer = user.getId().equals(r.getUser().getId());
         final boolean isSeller = !isBuyer;
-        requestViewHolder.mCardBackground.setBackground(mContext.getResources().getDrawable(R.drawable.card_border_left));
-        requestViewHolder.vEditButton.setVisibility(View.GONE);
-        requestViewHolder.vResponseDetailsButton.setVisibility(View.GONE);
+        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
+        requestViewHolder.showEditIcon = false;
         requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
@@ -265,39 +317,17 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                     " to " + r.getUser().getFirstName();
         }
         requestViewHolder.vItemName.setText(topDescription);
-        requestViewHolder.mExchangeIcon.setVisibility(View.VISIBLE);
-        requestViewHolder.mExchangeIcon.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (isSeller) {
-                    if (!transaction.getExchanged()) {
-                        historyFragment.showExchangeCodeDialog(h.getTransaction(), false);
-                    } else {
-                        historyFragment.showScanner(h.getTransaction().getId(), false);
-                    }
-                } else {
-                    if (!transaction.getExchanged()) {
-                        historyFragment.showScanner(h.getTransaction().getId(), true);
-                    } else {
-                        historyFragment.showExchangeCodeDialog(h.getTransaction(), true);
-                    }
-                }
-            }
-        });
         if (!transaction.getExchanged()) {
+            requestViewHolder.showExchangeIcon = true;
             String exchangeTime = "<b>exchange time:</b> " + resp.getExchangeTime();
             requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
             requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
             requestViewHolder.vStatus.setText("Awaiting initial exchange");
             Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
-            requestViewHolder.cancelTransactionButton.setVisibility(View.VISIBLE);
-            requestViewHolder.cancelTransactionButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    historyFragment.showCancelTransactionDialog(transaction.getId());
-                }
-            });
+            requestViewHolder.showCancelTransactionIcon = true;
             if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
-                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+                requestViewHolder.showExchangeIcon = false;
                 requestViewHolder.vStatus.setText("Pending exchange override approval");
                 if (isBuyer) {
                     String description = resp.getSeller().getFirstName() +
@@ -309,6 +339,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                 }
             }
         } else if (!transaction.getReturned() && r.getRental()) {
+            requestViewHolder.showExchangeIcon = true;
             String returnTime = "<b>return time:</b> " + resp.getReturnTime();
             requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
@@ -316,7 +347,7 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             requestViewHolder.vStatus.setText("Awaiting return");
             Transaction.ExchangeOverride returnOverride = transaction.getReturnOverride();
             if (returnOverride != null && !returnOverride.sellerAccepted && !returnOverride.declined) {
-                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+                requestViewHolder.showExchangeIcon = false;
                 requestViewHolder.vStatus.setText("Pending return override approval");
                 if (isSeller) {
                     String description = r.getUser().getFirstName() +
@@ -330,39 +361,107 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
                 }
             }
         } else if (r.getStatus().equals("TRANSACTION_PENDING")) {
-            String calculatedPrice = "<b>calculated price:</b> " + transaction.getCalculatedPrice();
+            BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getCalculatedPrice());
+            String calculatedPrice = "<b>calculated price:</b> " + formattedValue;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
             requestViewHolder.vDescription.setVisibility(View.GONE);
             if (isBuyer) {
                 requestViewHolder.vStatus.setText("Processing Payment");
-                requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
+                requestViewHolder.showExchangeIcon = false;
             } else {
+                requestViewHolder.showExchangeIcon = false;
                 final String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
                         r.getItemName() + " to " + r.getUser().getFirstName();
                 historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
                         description, transaction.getId());
                 requestViewHolder.vStatus.setText("CONFIRM CHARGE!");
                 requestViewHolder.vStatus.setTextColor(Color.parseColor("#E52B50"));
-                requestViewHolder.mExchangeIcon.setImageResource(R.drawable.ic_assignment_late_black_24dp);
-                requestViewHolder.mExchangeIcon.setColorFilter(Color.parseColor("#E52B50"));
-                requestViewHolder.mExchangeIcon.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
-                                description, transaction.getId());
-                    }
-                });
+                requestViewHolder.showEditIcon = false;
+                requestViewHolder.showConfirmChargeIcon = true;
             }
         } else {
+            requestViewHolder.showExchangeIcon = false;
+            BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getFinalPrice());
             if (isBuyer) {
-                String price = "<b>Payment:</b> -$" + transaction.getFinalPrice();
+                String price = "<b>Payment:</b> -$" + formattedValue;
                 requestViewHolder.vDescription.setText(Html.fromHtml(price));
             } else {
-                String price = "<b>Payment:</b> $" + transaction.getFinalPrice();
+                String price = "<b>Payment:</b> $" + formattedValue;
                 requestViewHolder.vDescription.setText(Html.fromHtml(price));
             }
             requestViewHolder.vCategoryName.setVisibility(View.GONE);
-            requestViewHolder.mExchangeIcon.setVisibility(View.GONE);
             requestViewHolder.vStatus.setText(r.getStatus());
+        }
+    }
+
+    private void showPopupMenu(View view, History h, HistoryCardViewHolder rvh) {
+        // inflate menu
+        PopupMenu popup = new PopupMenu(context, view);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.history_card_menu, popup.getMenu());
+        Menu popupMenu = popup.getMenu();
+        if (!rvh.showExchangeIcon) {
+            popupMenu.removeItem(R.id.exchange_icon);
+        }
+        if (!rvh.showCancelTransactionIcon) {
+            popupMenu.removeItem(R.id.cancel_transaction_button);
+        }
+        if (!rvh.showEditIcon) {
+            popupMenu.removeItem(R.id.edit_button);
+        }
+        if (!rvh.showConfirmChargeIcon) {
+            popupMenu.removeItem(R.id.confirm_charge);
+        }
+        popup.setOnMenuItemClickListener(new MenuClickListener(h));
+        popup.show();
+    }
+
+    class MenuClickListener implements PopupMenu.OnMenuItemClickListener {
+        private History history;
+        private Transaction transaction;
+        public MenuClickListener(History h) {
+            history = h;
+            transaction = h.getTransaction();
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            boolean isSeller = !user.getId().equals(history.getRequest().getUser().getId());
+            switch (menuItem.getItemId()) {
+                case R.id.cancel_transaction_button:
+                    historyFragment.showCancelTransactionDialog(transaction.getId());
+                    return true;
+                case R.id.edit_button:
+                    if (isSeller) {
+                        historyFragment.showResponseDialog(history.getResponses().get(0));
+                    } else {
+                        historyFragment.showRequestDialog(history);
+                    }
+                    return true;
+                case R.id.exchange_icon:
+                    if (isSeller) {
+                        if (!transaction.getExchanged()) {
+                            historyFragment.showExchangeCodeDialog(history.getTransaction(), false);
+                        } else {
+                            historyFragment.showScanner(history.getTransaction().getId(), false);
+                        }
+                    } else {
+                        if (!transaction.getExchanged()) {
+                            historyFragment.showScanner(history.getTransaction().getId(), true);
+                        } else {
+                            historyFragment.showExchangeCodeDialog(history.getTransaction(), true);
+                        }
+                    }
+                    return true;
+                case R.id.confirm_charge:
+                    Request r = history.getRequest();
+                    String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
+                            r.getItemName() + " to " + r.getUser().getFirstName();
+                    historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
+                            description, transaction.getId());
+                default:
+            }
+            return false;
         }
     }
 
@@ -387,22 +486,24 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
 
 
     public static class HistoryCardViewHolder extends ParentViewHolder {
-        protected TextView vItemName;
-        protected TextView vCategoryName;
-        protected TextView vPostedDate;
-        protected TextView vDescription;
-        protected Context context;
+        private TextView vItemName;
+        private TextView vCategoryName;
+        private TextView vPostedDate;
+        private TextView vDescription;
+        private Context context;
         private ImageButton vParentDropDownArrow;
-        private ImageButton vEditButton;
         private TextView vStatus;
-        private ImageButton vResponseDetailsButton;
-        public RelativeLayout mCardBackground;
-        public ImageButton mExchangeIcon;
-        public ImageButton cancelTransactionButton;
+        private RelativeLayout mCardBackground;
         private CardView historyCard;
-
-
-        protected FrameLayout cardView;
+        private ImageView menuBtn;
+        private boolean showExchangeIcon = false;
+        private boolean showCancelTransactionIcon = false;
+        private boolean showEditIcon = true;
+        private boolean showConfirmChargeIcon = false;
+        private boolean dropdownExpanded = false;
+        private ListView responseList;
+        private FrameLayout cardView;
+        private LinearLayout responseSeparator;
 
         public HistoryCardViewHolder(Context context, View v) {
             super(v);
@@ -413,15 +514,13 @@ public class HistoryCardAdapter extends ExpandableRecyclerAdapter<HistoryCardAda
             cardView = (FrameLayout) itemView.findViewById(R.id.my_history_card_view);
             vParentDropDownArrow = (ImageButton) itemView.findViewById(R.id.parent_list_item_expand_arrow);
             vStatus = (TextView) v.findViewById(R.id.history_card_status);
-            vEditButton = (ImageButton) v.findViewById(R.id.edit_button);
-            vResponseDetailsButton = (ImageButton) itemView.findViewById(R.id.view_response_button);
             this.context = context;
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
-            mExchangeIcon = (ImageButton) v.findViewById(R.id.exchange_icon);
-            cancelTransactionButton = (ImageButton) v.findViewById(R.id.cancel_transaction_button);
             historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
             historyCard.setMaxCardElevation(7);
-
+            menuBtn = (ImageView) v.findViewById(R.id.card_menu);
+            responseList = (ListView) v.findViewById(R.id.response_list);
+            responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
         }
     }
 }

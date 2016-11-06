@@ -3,27 +3,22 @@ package layout;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -42,7 +37,6 @@ import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.Transaction;
 import superstartupteam.nearby.model.User;
-import superstartupteam.nearby.service.NearbyMessagingService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,83 +58,6 @@ public class HistoryFragment extends Fragment {
     public static String snackbarMessage = null;
 
     private OnFragmentInteractionListener mListener;
-    private LocalBroadcastManager mLocalBroadcastManager;
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("message");
-            Snackbar snackbar = Snackbar.make(view.getRootView(), message,
-                    Snackbar.LENGTH_LONG);
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                    snackbar.getView().getRootView().getLayoutParams();
-
-            params.setMargins(params.leftMargin,
-                    params.topMargin,
-                    params.rightMargin,
-                    params.bottomMargin + 150);
-            String type = intent.getStringExtra("type");
-            View.OnClickListener mOnClickListener;
-            Response response = null;
-            Request request = null;
-            boolean hasRequestResponseParams = type !=  null &&
-                    (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
-                            || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
-                            || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));
-            if (hasRequestResponseParams) {
-                String responseJson = intent.getStringExtra("response");
-                String requestJson = intent.getStringExtra("request");
-                try {
-                    response = new ObjectMapper().readValue(responseJson, Response.class);
-                    request = new ObjectMapper().readValue(requestJson, Request.class);
-                } catch (IOException e) {
-                    Log.e("JSON ERROR", "**" + e.getMessage());
-                }
-            }
-
-            switch (type) {
-                case "response_update":
-                    DialogFragment newFragment = null;
-                    newFragment = ViewOfferDialogFragment.newInstance(response, request);
-                    final DialogFragment frag = newFragment;
-                    mOnClickListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            frag.show(getFragmentManager(), "dialog");
-                        }
-                    };
-                    snackbar.setAction("view", mOnClickListener);
-                    break;
-                default:
-                    break;
-            }
-            snackbar.getView().getRootView().setLayoutParams(params);
-            snackbar.show();
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        registerBroadcastReceiver();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        unregisterBroadcastReceiver();
-    }
-
-    private void registerBroadcastReceiver() {
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("NOTIFICATION_MESSAGE");
-        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
-    }
-
-    private void unregisterBroadcastReceiver() {
-        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
-    }
-
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -171,10 +88,11 @@ public class HistoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-        historyCardAdapter = new HistoryCardAdapter(context, parentObjs, this);
-        historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
-        historyCardAdapter.setParentClickableViewAnimationDuration(0);
-        historyCardAdapter.setParentAndIconExpandOnClick(false);
+        historyCardAdapter = new HistoryCardAdapter(recentHistory, this);
+        //historyCardAdapter = new HistoryCardAdapter(context, parentObjs, this);
+        //historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
+        //historyCardAdapter.setParentClickableViewAnimationDuration(0);
+        //historyCardAdapter.setParentAndIconExpandOnClick(false);
         requestHistoryList.setAdapter(historyCardAdapter);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -346,10 +264,11 @@ public class HistoryFragment extends Fragment {
                     parentObjs.add(h);
                 }
                 requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-                historyCardAdapter = new HistoryCardAdapter(context, parentObjs, thisFragment);
-                historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
-                historyCardAdapter.setParentClickableViewAnimationDuration(0);
-                historyCardAdapter.setParentAndIconExpandOnClick(false);
+                //historyCardAdapter = new HistoryCardAdapter(context, parentObjs, thisFragment);
+                historyCardAdapter = new HistoryCardAdapter(recentHistory, thisFragment);
+                //historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
+                //historyCardAdapter.setParentClickableViewAnimationDuration(0);
+                //historyCardAdapter.setParentAndIconExpandOnClick(false);
                 requestHistoryList.setAdapter(historyCardAdapter);
                 LinearLayoutManager llm = new LinearLayoutManager(context);
                 llm.setOrientation(LinearLayoutManager.VERTICAL);

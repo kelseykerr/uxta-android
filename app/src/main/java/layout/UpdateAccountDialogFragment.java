@@ -290,11 +290,18 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
                 user.setPhone(AppUtils.validateString(sPhone) ? sPhone : null);
-                String sBank = bank_acct.getText().toString();
+                // TODO: in prod uncomment below. In sandbox use test routing/acct numbers
+                /*String sBank = bank_acct.getText().toString();
                 user.setBankAccountNumber(sBank);
                 String sRouting = routing_number.getText().toString();
-                user.setBankRoutingNumber(sRouting);
-                String destination = paymentDestinationSpinner.getSelectedItem().toString();
+                user.setBankRoutingNumber(sRouting);*/
+                user.setBankAccountNumber("1123581321");
+                user.setBankRoutingNumber("071101307");
+                /**
+                 * TODO: when switching to production, uncomment the below snippet.
+                 * TODO: In sandbox we want to use the test cc so destination will always be bank
+                 * */
+                /*String destination = paymentDestinationSpinner.getSelectedItem().toString();
                 switch (destination) {
                     case VENMO_EMAIL_STRING:
                         user.setFundDestination("email");
@@ -305,17 +312,21 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     case BANK_STRING:
                         user.setFundDestination("bank");
                         break;
-                }
 
-//                String dobString = dob.getText().toString();
+                }*/
+                user.setFundDestination("bank");
 
                 Log.i ("UpdateSave:", "DOB String = " + mDobString);
                 user.setDateOfBirth(mDobString);
 
-                String sCard = credit_card.getText().toString();
+                // TODO: in prod uncomment below. In sandbox use test cc number & expiration
+                /*String sCard = credit_card.getText().toString();
+
                 user.setCreditCardNumber(sCard);
                 String sExpDate = exp_date.getText().toString();
-                user.setCcExpirationDate(sExpDate);
+                user.setCcExpirationDate(sExpDate);*/
+                user.setCreditCardNumber("4111111111111111");
+                user.setCcExpirationDate("05/19");
                 MainActivity.updatedUser = user;
 
                 PrefUtils.setCurrentUser(MainActivity.updatedUser, context);

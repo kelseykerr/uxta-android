@@ -161,7 +161,14 @@ public class MainActivity extends AppCompatActivity
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
         frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showDialog(v);
+                boolean goodCustomerStatus = user.getCustomerStatus() != null &&
+                        user.getCustomerStatus().equals("valid");
+                if (user.getCustomerId() != null && goodCustomerStatus) {
+                    showNewRequestDialog(v);
+                } else {
+                    HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                    homeFragment.displayNoNewRequestSnackbar();
+                }
             }
         });
 
@@ -184,7 +191,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void showDialog(View view) {
+    public void showNewRequestDialog(View view) {
         DialogFragment newFragment = RequestDialogFragment
                 .newInstance();
         newFragment.show(getFragmentManager(), "dialog");
@@ -203,7 +210,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
@@ -212,7 +218,7 @@ public class MainActivity extends AppCompatActivity
                     listMapText.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
-                        homeFragment.getRequests(null);
+                        homeFragment.getRequests(null, false);
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
                                 .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
@@ -258,7 +264,7 @@ public class MainActivity extends AppCompatActivity
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction
-                            .setCustomAnimations(firstAnim, secondAnim)
+                            //.setCustomAnimations(firstAnim, secondAnim)
                             .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                             .commit();
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
@@ -269,11 +275,17 @@ public class MainActivity extends AppCompatActivity
                     }
                     AccountFragment.snackbarMessage = snackbarMessage;
                     snackbarMessage = null;
-                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
-                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction
-                            .setCustomAnimations(firstAnim, secondAnim)
                             .add(R.id.content_frame, AccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                            .commit();
+                } else if (menuItemId == R.id.bottomBarHomeItem) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                    if (homeFragment != null) {
+                        fragmentTransaction.remove(homeFragment);
+                    }
+                    fragmentTransaction
+                            .add(R.id.content_frame, HomeFragment.newInstance(), Constants.HOME_FRAGMENT_TAG)
                             .commit();
                 }
             }
@@ -359,6 +371,7 @@ public class MainActivity extends AppCompatActivity
         // We should now have payment information => get nonce from braintree so that we can create a customer
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
             if (updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
+                //TODO: in prod, user the real cc number & expiration date
                 CardBuilder cardBuilder = new CardBuilder()
                         .cardNumber("4111111111111111")
                         .expirationDate("09/2018");

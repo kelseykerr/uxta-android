@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="@color/colorPrimary"
     android:layout_height="match_parent"
     android:padding="16dp">
 
@@ -9,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="140dp"
-        android:drawableStart="@drawable/nearby_logo_blue"
+        android:drawableStart="@drawable/rsz_nearby_logo_white_large"
         android:drawablePadding="0dp"
         android:contextClickable="true" />
 
@@ -17,6 +18,12 @@
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="180dp"
+        />
 
 </RelativeLayout>
