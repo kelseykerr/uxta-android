@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -56,6 +57,7 @@ import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 import superstartupteam.nearby.service.NearbyInstanceIdService;
+import superstartupteam.nearby.service.NearbyMessagingService;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -203,7 +205,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
@@ -258,7 +259,7 @@ public class MainActivity extends AppCompatActivity
                     int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction
-                            .setCustomAnimations(firstAnim, secondAnim)
+                            //.setCustomAnimations(firstAnim, secondAnim)
                             .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
                             .commit();
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
@@ -269,11 +270,17 @@ public class MainActivity extends AppCompatActivity
                     }
                     AccountFragment.snackbarMessage = snackbarMessage;
                     snackbarMessage = null;
-                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
-                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     fragmentTransaction
-                            .setCustomAnimations(firstAnim, secondAnim)
                             .add(R.id.content_frame, AccountFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
+                            .commit();
+                } else if (menuItemId == R.id.bottomBarHomeItem) {
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                    if (homeFragment != null) {
+                        fragmentTransaction.remove(homeFragment);
+                    }
+                    fragmentTransaction
+                            .add(R.id.content_frame, HomeFragment.newInstance(), Constants.HOME_FRAGMENT_TAG)
                             .commit();
                 }
             }

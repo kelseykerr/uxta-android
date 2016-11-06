@@ -119,8 +119,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
                 Response response = h.getResponses().get(position);
+
                 if (!response.getResponseStatus().toString().toLowerCase().equals("closed")
-                        && r.getStatus().toLowerCase().equals("closed")) {
+                        && !r.getStatus().toLowerCase().equals("closed")) {
                     historyFragment.showResponseDialog(response);
                 }
 
