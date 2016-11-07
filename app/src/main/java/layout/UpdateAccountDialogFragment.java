@@ -41,6 +41,7 @@ import java.util.Locale;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.DobPickerFragment;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
@@ -84,7 +85,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private ScrollView screen3;
     private ScrollView screen4;
     private RelativeLayout updatingScreen;
-    private String mDobString;
 
 
     /**
@@ -222,9 +222,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
-        final Button dobPickerButton = (Button) view.findViewById(R.id.dob_picker_button);
-        dobPickerButton.setOnClickListener(new View.OnClickListener() {
-
+        dob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDobPickerDialog();
@@ -315,9 +313,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
                 }*/
                 user.setFundDestination("bank");
-
-                Log.i ("UpdateSave:", "DOB String = " + mDobString);
-                user.setDateOfBirth(mDobString);
+                user.setDateOfBirth(dob.getText().toString());
 
                 // TODO: in prod uncomment below. In sandbox use test cc number & expiration
                 /*String sCard = credit_card.getText().toString();
@@ -338,28 +334,38 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         });
     }
 
-    public class dobPickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+        // when dialog box is closed, below method will be called.
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int year         = c.get (Calendar.YEAR);
-            int month        = c.get (Calendar.MONTH);
-            int day          = c.get (Calendar.DAY_OF_MONTH);
-
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet (DatePicker view, int year, int month, int day) {
+        public void onDateSet(DatePicker view, int year, int month, int day) {
             month += 1;
-            mDobString = String.format("%1$04d-%2$02d-%3$02d", year, month, day);
-            user.setDateOfBirth(mDobString);
-            Log.i ("OnDateSet", "DOB String = " + mDobString);
+            dob.setText(String.format("%1$04d-%2$02d-%3$02d", year, month, day));
+            Log.i("OnDateSet", "DOB String = " + dob.getText().toString());
         }
-    }
+    };
 
-    private void showDobPickerDialog (){
-        DialogFragment dobFragment = new dobPickerFragment();
-        dobFragment.show(getFragmentManager(), "datePicker");
+    private void showDobPickerDialog () {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (user.getDateOfBirth() != null) {
+            String [] dobArray = user.getDateOfBirth().split("-");
+            if (dobArray[0] != null) {
+                year = Integer.parseInt(dobArray[0]);
+            }
+            if (dobArray[1] != null) {
+                month = Integer.parseInt(dobArray[1]) -1;
+            }
+            if (dobArray[2] != null) {
+                day = Integer.parseInt(dobArray[2]);
+            }
+        }
+
+        DobPickerFragment dobPicker = new DobPickerFragment(context, android.R.style.Theme_Holo_Light_Dialog, datePickerListener, year, month, day);
+        DatePickerDialog dialog = dobPicker.getPicker();
+        dialog.show();
     }
 
 
