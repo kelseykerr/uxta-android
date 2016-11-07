@@ -79,7 +79,7 @@ public class User extends BaseEntity {
 
     private String merchantStatusMessage;
 
-    public Boolean paymentSetup;
+    public Boolean isPaymentSetup;
 
     public String customerStatus;
 
@@ -116,7 +116,7 @@ public class User extends BaseEntity {
         this.currentLocationNotifications = fromServer.currentLocationNotifications;
         this.homeLocationNotifications = fromServer.homeLocationNotifications;
         this.tosAccepted = fromServer.tosAccepted;
-        this.paymentSetup = fromServer.paymentSetup;
+        this.isPaymentSetup = fromServer.isPaymentSetup;
         this.customerStatus = fromServer.customerStatus;
     }
 
@@ -400,12 +400,12 @@ public class User extends BaseEntity {
         this.merchantStatusMessage = merchantStatusMessage;
     }
 
-    public Boolean getPaymentSetup() {
-        return paymentSetup;
+    public Boolean getIsPaymentSetup() {
+        return isPaymentSetup;
     }
 
-    public void setPaymentSetup(Boolean paymentSetup) {
-        this.paymentSetup = paymentSetup;
+    public void setIsPaymentSetup(Boolean isPaymentSetup) {
+        this.isPaymentSetup = isPaymentSetup;
     }
 
     public String getCustomerStatus() {

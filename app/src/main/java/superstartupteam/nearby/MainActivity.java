@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
         frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                user = PrefUtils.getCurrentUser(MainActivity.this);
                 boolean goodCustomerStatus = user.getCustomerStatus() != null &&
                         user.getCustomerStatus().equals("valid");
                 if (user.getCustomerId() != null && goodCustomerStatus) {
