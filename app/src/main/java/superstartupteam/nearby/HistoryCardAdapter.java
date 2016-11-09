@@ -96,56 +96,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     "<br/>" + resp.getResponseStatus().toString() + "</font>";
             values.add(htmlString);
         }
-        /*ArrayAdapter<RequestResponseCardAdapter> adapter = new ArrayAdapter<RequestResponseCardAdapter>(context, android.R.layout.simple_list_item_1, values) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View row;
-                if (convertView == null) {
-                    row = LayoutInflater.from(parent.getContext())
-                            .inflate(android.R.layout.simple_list_item_1, null);
-                } else {
-                    row = convertView;
-                }
-                TextView tv = (TextView) row.findViewById(android.R.id.text1);
-                tv.setPadding(55, 15, 0, 15);
-                tv.setLineSpacing(1, 1.3f);
-                tv.setText(Html.fromHtml(getItem(position)));
-
-                return row;
-            }
-        };*/
         RequestResponseCardAdapter adapter = new RequestResponseCardAdapter(context, 0,
                 h.getResponses(), r, historyFragment);
         requestViewHolder.responseList.setAdapter(adapter);
-        /*requestViewHolder.responseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                Response response = h.getResponses().get(position);
-
-                if (!response.getResponseStatus().toString().toLowerCase().equals("closed")
-                        && !r.getStatus().toLowerCase().equals("closed")) {
-                    historyFragment.showResponseDialog(response);
-                }
-
-            }
-        });*/
-        requestViewHolder.vParentDropDownArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
-                if (requestViewHolder.dropdownExpanded) {
-                    requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);
-                    requestViewHolder.vParentDropDownArrow.animate().rotation(180).start();
-                    requestViewHolder.responseList.setVisibility(View.VISIBLE);
-                    justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
-                } else {
-                    requestViewHolder.responseSeparator.setVisibility(View.GONE);
-                    requestViewHolder.vParentDropDownArrow.animate().rotation(0).start();
-                    requestViewHolder.responseList.setVisibility(View.GONE);
-                }
-            }
-        });
     }
 
 
@@ -208,7 +161,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         status = status.toLowerCase();
         switch (status) {
             case "open":
-                requestStatus.setTextColor(Color.GREEN);
+                requestStatus.setTextColor(Color.parseColor("#26D39C"));
                 break;
             case "closed":
                 requestStatus.setTextColor(Color.parseColor("#E52B50"));
@@ -241,7 +194,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
-        requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
         if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
             requestViewHolder.showEditIcon = false;
         } else {
@@ -249,7 +201,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
     }
 
-    private void setUpRequestCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+    private void setUpRequestCard(final HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showExchangeIcon = false;
@@ -265,7 +217,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vCategoryName.setVisibility(View.GONE);
         }
 
-        if (r.getDescription() != null) {
+        if (r.getDescription() != null && !r.getDescription().isEmpty()) {
             requestViewHolder.vDescription.setText(r.getDescription());
         } else {
             requestViewHolder.vDescription.setVisibility(View.GONE);
@@ -281,10 +233,22 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.showEditIcon = true;
         }
-        if (h.getResponses() == null || h.getResponses().size() < 1) {
-            requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
-        } else {
-            requestViewHolder.vParentDropDownArrow.setVisibility(View.VISIBLE);
+        if (h.getResponses() != null && h.getResponses().size() > 0 &&
+                !r.getStatus().toString().equalsIgnoreCase("closed")) {
+            requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
+                    if (requestViewHolder.dropdownExpanded) {
+                        requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);
+                        requestViewHolder.responseList.setVisibility(View.VISIBLE);
+                        justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
+                    } else {
+                        requestViewHolder.responseSeparator.setVisibility(View.GONE);
+                        requestViewHolder.responseList.setVisibility(View.GONE);
+                    }
+                }
+            });
         }
     }
 
@@ -293,7 +257,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         final boolean isSeller = !isBuyer;
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
         requestViewHolder.showEditIcon = false;
-        requestViewHolder.vParentDropDownArrow.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
         requestViewHolder.vDescription.setVisibility(View.VISIBLE);
@@ -507,7 +470,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                         phone = resp.getSeller().getPhone().replace("-", "");
                     }
                     smsIntent.putExtra("address", phone);
-                    smsIntent.putExtra("sms_body","Body of Message");
+                    smsIntent.putExtra("sms_body","");
                     context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
                 default:
             }
@@ -522,7 +485,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private TextView vPostedDate;
         private TextView vDescription;
         private Context context;
-        private ImageButton vParentDropDownArrow;
         private TextView vStatus;
         private RelativeLayout mCardBackground;
         private CardView historyCard;
@@ -544,7 +506,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             vPostedDate = (TextView) v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
             cardView = (FrameLayout) itemView.findViewById(R.id.my_history_card_view);
-            vParentDropDownArrow = (ImageButton) itemView.findViewById(R.id.parent_list_item_expand_arrow);
             vStatus = (TextView) v.findViewById(R.id.history_card_status);
             this.context = context;
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);

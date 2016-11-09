@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
@@ -55,9 +56,10 @@ public class RequestResponseCardAdapter extends ArrayAdapter<Response> {
         }
         BigDecimal price = AppUtils.formatCurrency(response.getOfferPrice());
         String htmlString = "<font color='#767474'>" + response.getSeller().getFirstName() +
-                " made an offer for $" + price +
-                "<br/>" + response.getResponseStatus().toString() + "</font>";
+                " made an offer for $" + price + "</font>";
         offerText.setText(Html.fromHtml(htmlString));
+        TextView responseStatus = (TextView) v.findViewById(R.id.response_status);
+        responseStatus.setText(response.getResponseStatus().toString());
         ImageButton msgUser = (ImageButton) v.findViewById(R.id.message_user_button);
         final String phone = response.getSeller().getPhone();
         if (phone == null || phone.isEmpty() || response.getResponseStatus().toString().equalsIgnoreCase("closed")) {
@@ -70,23 +72,20 @@ public class RequestResponseCardAdapter extends ArrayAdapter<Response> {
                     Intent smsIntent = new Intent(Intent.ACTION_VIEW);
                     smsIntent.setType("vnd.android-dir/mms-sms");
                     smsIntent.putExtra("address", phone);
-                    smsIntent.putExtra("sms_body", "Body of Message");
+                    smsIntent.putExtra("sms_body","");
                     context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
                 }
             });
         }
-        ImageButton viewOffer = (ImageButton) v.findViewById(R.id.view_response_button);
+        RelativeLayout layout = (RelativeLayout) v.findViewById(R.id.response_card);
         if (!response.getResponseStatus().toString().toLowerCase().equals("closed")
                 && !request.getStatus().toLowerCase().equals("closed")) {
-            viewOffer.setVisibility(View.VISIBLE);
-            viewOffer.setOnClickListener(new View.OnClickListener() {
+            layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     historyFragment.showResponseDialog(response);
                 }
             });
-        } else {
-            viewOffer.setVisibility(View.GONE);
         }
         return v;
 
