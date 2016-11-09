@@ -1,6 +1,7 @@
 package superstartupteam.nearby;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
@@ -72,7 +73,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             setUpOfferCard(requestViewHolder, r, h);
         }
         if (!requestViewHolder.showConfirmChargeIcon && !requestViewHolder.showEditIcon &&
-                !requestViewHolder.showCancelTransactionIcon && !requestViewHolder.showExchangeIcon) {
+                !requestViewHolder.showCancelTransactionIcon && !requestViewHolder.showExchangeIcon
+                && !requestViewHolder.showMessageUserIcon) {
             requestViewHolder.menuBtn.setVisibility(View.GONE);
         } else {
             requestViewHolder.menuBtn.setVisibility(View.VISIBLE);
@@ -94,7 +96,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     "<br/>" + resp.getResponseStatus().toString() + "</font>";
             values.add(htmlString);
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, values) {
+        /*ArrayAdapter<RequestResponseCardAdapter> adapter = new ArrayAdapter<RequestResponseCardAdapter>(context, android.R.layout.simple_list_item_1, values) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View row;
@@ -111,9 +113,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
                 return row;
             }
-        };
+        };*/
+        RequestResponseCardAdapter adapter = new RequestResponseCardAdapter(context, 0,
+                h.getResponses(), r, historyFragment);
         requestViewHolder.responseList.setAdapter(adapter);
-        requestViewHolder.responseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*requestViewHolder.responseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
@@ -125,7 +129,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
 
             }
-        });
+        });*/
         requestViewHolder.vParentDropDownArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -143,6 +147,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
         });
     }
+
 
     public static void justifyListViewHeightBasedOnChildren(ListView listView) {
 
@@ -216,6 +221,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         requestViewHolder.showExchangeIcon = false;
+        if (r.getUser().getPhone() != null) {
+            requestViewHolder.showMessageUserIcon = true;
+        }
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showEditIcon = false;
@@ -245,6 +253,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showExchangeIcon = false;
+        requestViewHolder.showMessageUserIcon = false;
         String htmlString = "requested a <b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -319,6 +328,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vItemName.setText(topDescription);
         if (!transaction.getExchanged()) {
             requestViewHolder.showExchangeIcon = true;
+            if (isSeller && r.getUser().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
+            if (isBuyer && resp.getSeller().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
             String exchangeTime = "<b>exchange time:</b> " + resp.getExchangeTime();
             requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
@@ -340,6 +355,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
         } else if (!transaction.getReturned() && r.getRental()) {
             requestViewHolder.showExchangeIcon = true;
+            if (isSeller && r.getUser().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
+            if (isBuyer && resp.getSeller().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
             String returnTime = "<b>return time:</b> " + resp.getReturnTime();
             requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
@@ -361,6 +382,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             }
         } else if (r.getStatus().equals("TRANSACTION_PENDING")) {
+            if (isSeller && r.getUser().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
+            if (isBuyer && resp.getSeller().getPhone() != null) {
+                requestViewHolder.showMessageUserIcon = true;
+            }
             BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getCalculatedPrice());
             String calculatedPrice = "<b>calculated price:</b> " + formattedValue;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
@@ -412,6 +439,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         if (!rvh.showConfirmChargeIcon) {
             popupMenu.removeItem(R.id.confirm_charge);
         }
+        if (!rvh.showMessageUserIcon) {
+            popupMenu.removeItem(R.id.message_user);
+        }
         popup.setOnMenuItemClickListener(new MenuClickListener(h));
         popup.show();
     }
@@ -459,28 +489,29 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                             r.getItemName() + " to " + r.getUser().getFirstName();
                     historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
                             description, transaction.getId());
+                case R.id.message_user:
+                    Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                    smsIntent.setType("vnd.android-dir/mms-sms");
+                    String phone;
+                    if (isSeller) {
+                        phone = history.getRequest().getUser().getPhone().replace("-", "");
+                    } else {
+                        Response resp = null;
+                        final Transaction transaction = history.getTransaction();
+                        for (Response res : history.getResponses()) {
+                            if (res.getId().equals(transaction.getResponseId())) {
+                                resp = res;
+                                break;
+                            }
+                        }
+                        phone = resp.getSeller().getPhone().replace("-", "");
+                    }
+                    smsIntent.putExtra("address", phone);
+                    smsIntent.putExtra("sms_body","Body of Message");
+                    context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
                 default:
             }
             return false;
-        }
-    }
-
-    public static class ResponseViewHolder extends ChildViewHolder {
-
-        public TextView mResponderName;
-        public TextView mItemName;
-        public TextView mOfferAmount;
-        public TextView mPriceType;
-        public TextView mResponseStatus;
-        private ImageButton mResponseDetailsButton;
-
-        public ResponseViewHolder(View itemView) {
-            super(itemView);
-            mResponderName = (TextView) itemView.findViewById(R.id.responder_name);
-            mItemName = (TextView) itemView.findViewById(R.id.item_name);
-            mOfferAmount = (TextView) itemView.findViewById(R.id.offer_amount);
-            mResponseStatus = (TextView) itemView.findViewById(R.id.response_status);
-            mResponseDetailsButton = (ImageButton) itemView.findViewById(R.id.view_response_button);
         }
     }
 
@@ -501,6 +532,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private boolean showEditIcon = true;
         private boolean showConfirmChargeIcon = false;
         private boolean dropdownExpanded = false;
+        private boolean showMessageUserIcon = false;
         private ListView responseList;
         private FrameLayout cardView;
         private LinearLayout responseSeparator;

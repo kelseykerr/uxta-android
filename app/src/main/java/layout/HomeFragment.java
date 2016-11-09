@@ -525,7 +525,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
-        if (homeLocation) {
+        if (homeLocation != null && homeLocation) {
             return;
         }
 
