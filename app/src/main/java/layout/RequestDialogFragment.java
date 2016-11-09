@@ -304,8 +304,8 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
-                    dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully updated request");
+                    dismiss();
                 }
             }
         }.execute();

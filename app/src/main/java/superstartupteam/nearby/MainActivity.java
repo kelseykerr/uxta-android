@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
         frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                user = PrefUtils.getCurrentUser(MainActivity.this);
                 boolean goodCustomerStatus = user.getCustomerStatus() != null &&
                         user.getCustomerStatus().equals("valid");
                 if (user.getCustomerId() != null && goodCustomerStatus) {
@@ -245,28 +246,32 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    int secondAnim = selectHistoryFragment(menuItemId);
+                    reselectHistory(menuItemId);
+                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
                 }
                 currentMenuItem = menuItemId;
             }
 
+            public void reselectHistory(int menuItemId) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+                if (historyFragment != null) {
+                    fragmentTransaction.remove(historyFragment);
+                }
+                HistoryFragment.snackbarMessage = snackbarMessage;
+                snackbarMessage = null;
+                int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
+                fragmentTransaction
+                        //.setCustomAnimations(firstAnim, secondAnim)
+                        .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
+                        .commit();
+            }
+
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHistoryItem) {
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
-                    if (historyFragment != null) {
-                        fragmentTransaction.remove(historyFragment);
-                    }
-                    HistoryFragment.snackbarMessage = snackbarMessage;
-                    snackbarMessage = null;
-                    int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
-                    int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
-                    fragmentTransaction
-                            //.setCustomAnimations(firstAnim, secondAnim)
-                            .add(R.id.content_frame, HistoryFragment.newInstance(), Constants.HISTORY_FRAGMENT_TAG)
-                            .commit();
+                    reselectHistory(menuItemId);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     AccountFragment accountFragment = (AccountFragment) fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
@@ -334,12 +339,14 @@ public class MainActivity extends AppCompatActivity
         HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
         if (historyFragment != null) {
             historyFragment.getHistory(historyFragment);
+            historyFragment.snackbarMessage = snackbarMessage;
             fragmentManager.beginTransaction()
                     .setCustomAnimations(firstAnim, secondAnim)
                     .show(historyFragment)
                     .commit();
         } else {
             historyFragment = HistoryFragment.newInstance();
+            historyFragment.snackbarMessage = snackbarMessage;
             fragmentManager.beginTransaction()
                     .setCustomAnimations(firstAnim, secondAnim)
                     .add(R.id.content_frame, historyFragment, Constants.HISTORY_FRAGMENT_TAG)
@@ -380,58 +387,6 @@ public class MainActivity extends AppCompatActivity
                 SharedAsyncMethods.updateUser(updatedUser, this, this, mLayout);
             }
         }
-/*
-        if (nextFragment.equals(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)){
-
-            listMapText.setVisibility(View.INVISIBLE);
-
-            // Hide Account Fragment
-            if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(0, R.animator.exit_to_right)
-                        .hide(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
-                        .commit();
-            }
-
-            if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
-                        .show(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
-                        .commit();
-            } else {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
-                        .add(R.id.content_frame, UpdateAccountDialogFragment.newInstance(), Constants.UPDATE_ACCOUNT_FRAGMENT_TAG)
-                        .commit();
-            }
-
-        }
-        if (nextFragment.equals(Constants.ACCOUNT_FRAGMENT_TAG)){
-
-            listMapText.setVisibility(View.INVISIBLE);
-
-            // Hide Update Account Fragment
-            if (fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG) != null) {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(0, R.animator.exit_to_left)
-                        .hide(fragmentManager.findFragmentByTag(Constants.UPDATE_ACCOUNT_FRAGMENT_TAG))
-                        .commit();
-            }
-
-            if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_right)
-                        .show(fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG))
-                        .commit();
-            } else {
-                fragmentManager.beginTransaction()
-                        .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_right)
-                        .add(R.id.content_frame, UpdateAccountDialogFragment.newInstance(), Constants.ACCOUNT_FRAGMENT_TAG)
-                        .commit();
-            }
-
-        }
-*/
     }
 
     /**
@@ -473,8 +428,7 @@ public class MainActivity extends AppCompatActivity
     public void goToHistory(String message) {
         HistoryFragment fragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
         if (fragment != null) {
-            fragment.parentScroll.scrollTo(0, 0);
-            HistoryFragment.snackbarMessage = message;
+            fragment.snackbarMessage = message;
         }
         snackbarMessage = message;
         mBottomBar.selectTabAtPosition(1, true);

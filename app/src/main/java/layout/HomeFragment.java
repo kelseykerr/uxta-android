@@ -110,6 +110,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
     private View view;
     private LocalBroadcastManager mLocalBroadcastManager;
+    private Boolean homeLocation;
+    private Location currentLocation;
 
 
     private OnFragmentInteractionListener mListener;
@@ -165,9 +167,31 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String selectedItem = parent.getItemAtPosition(position).toString();
                     if (selectedItem.equals("current location")) {
-                        getRequests(currentRadius, true);
-                    } else {
+                        homeLocation = false;
+                        if (latLng != null) {
+                            updateMapFocus(new LatLng(currentLocation.getLatitude(),
+                                    currentLocation.getLongitude()));
+                        }
                         getRequests(currentRadius, false);
+                    } else {
+                        homeLocation = true;
+                        if (currLocationMarker != null) {
+                            currLocationMarker.remove();
+                        }
+                        latLng = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLng);
+                        markerOptions.title("Home Location");
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                        currLocationMarker = map.addMarker(markerOptions);
+
+                        //zoom to current position:
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(latLng).zoom(15).build();
+
+                        map.animateCamera(CameraUpdateFactory
+                                .newCameraPosition(cameraPosition));
+                        getRequests(currentRadius, true);
                     }
                 } // to close the onItemSelected
                 public void onNothingSelected(AdapterView<?> parent) {
@@ -333,12 +357,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 requestMarkers.clear();
                 if (requests.size() < 1) {
                     noResults.setVisibility(View.VISIBLE);
-                    if (latLng != null) {
+                    if (latLng != null && !homeLocation) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(latLng).zoom(15).build();
                         map.animateCamera(CameraUpdateFactory
                                 .newCameraPosition(cameraPosition));
                         PrefUtils.setLatLng(latLng);
+                    } else if (homeLocation != null && homeLocation && user.getHomeLongitude() != null
+                            && user.getHomeLatitude() != null) {
+                        LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(home).zoom(15).build();
+                        map.animateCamera(CameraUpdateFactory
+                                .newCameraPosition(cameraPosition));
                     }
                     return;
                 } else {
@@ -493,13 +524,30 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
+        currentLocation = location;
+        if (homeLocation) {
+            return;
+        }
 
         //place marker at current position
         //mGoogleMap.clear();
+        updateMapFocus(new LatLng(location.getLatitude(), location.getLongitude()));
+
+        //If you only need one location, unregister the listener
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        fm = this.getChildFragmentManager();
+        ft = fm.beginTransaction();
+        getRequests(.1, false);
+        requestAdapter.swap(requests);
+        //ft.show(mapFragment).commit();
+
+    }
+
+    private void updateMapFocus(LatLng ll) {
         if (currLocationMarker != null) {
             currLocationMarker.remove();
         }
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        latLng = new LatLng(ll.latitude, ll.longitude);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
@@ -514,15 +562,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         map.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
-
-        //If you only need one location, unregister the listener
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        fm = this.getChildFragmentManager();
-        ft = fm.beginTransaction();
-        getRequests(.1, false);
-        requestAdapter.swap(requests);
-        //ft.show(mapFragment).commit();
-
     }
 
     @Override

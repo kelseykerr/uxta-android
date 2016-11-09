@@ -15,6 +15,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ import java.util.Locale;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.DobPickerFragment;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
@@ -84,7 +86,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private ScrollView screen3;
     private ScrollView screen4;
     private RelativeLayout updatingScreen;
-    private String mDobString;
+    private CheckBox acceptTos;
 
 
     /**
@@ -163,6 +165,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
         dob = (TextView) view.findViewById(R.id.dob);
         dob.setText(user.getDateOfBirth());
+        Log.i("UpdateAccount", "dob from user data = " + user.getDateOfBirth());
 
         credit_card = (EditText) view.findViewById(R.id.credit_card);
         credit_card.setText(user.getCreditCardNumber());
@@ -186,21 +189,30 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         configureRadiusSpinner(view);
         configureDestinationSpinner(view);
 
-        Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
-        Button nextBtn2 = (Button) view.findViewById(R.id.next_button_2);
+        final Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
+        final Button nextBtn2 = (Button) view.findViewById(R.id.next_button_2);
 
         nextBtn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen1.setVisibility(View.GONE);
-                screen2.setVisibility(View.VISIBLE);
+                nextBtn1.setEnabled(false);
+                if (validateScreenOne()) {
+                    screen1.setVisibility(View.GONE);
+                    screen2.setVisibility(View.VISIBLE);
+                }
+                nextBtn1.setEnabled(true);
+
             }
         });
         nextBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen2.setVisibility(View.GONE);
-                screen3.setVisibility(View.VISIBLE);
+                nextBtn2.setEnabled(false);
+                if (validateScreenTwo()) {
+                    screen2.setVisibility(View.GONE);
+                    screen3.setVisibility(View.VISIBLE);
+                }
+                nextBtn2.setEnabled(true);
             }
         });
 
@@ -221,9 +233,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
-        final Button dobPickerButton = (Button) view.findViewById(R.id.dob_picker_button);
-        dobPickerButton.setOnClickListener(new View.OnClickListener() {
-
+        dob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDobPickerDialog();
@@ -232,31 +242,34 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
 
 
-        Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
-/*  TEST NPE
+        final Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
         if (!user.getTosAccepted()) {
             saveBtn.setText("continue");
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    screen3.setVisibility(View.GONE);
-                    screen4.setVisibility(View.VISIBLE);
+                    saveBtn.setEnabled(false);
+                    if (validateScreenThree()) {
+                        screen3.setVisibility(View.GONE);
+                        screen4.setVisibility(View.VISIBLE);
+                    }
+                    saveBtn.setEnabled(true);
+
                 }
             });
-            CheckBox acceptTos = (CheckBox) view.findViewById(R.id.acceptTos);
+            acceptTos = (CheckBox) view.findViewById(R.id.acceptTos);
             acceptTos.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 user.setTosAccepted(((CheckBox) v).isChecked());
-                                             }
-                                         });
+                @Override
+                public void onClick(View v) {
+                    user.setTosAccepted(((CheckBox) v).isChecked());
+                }
+            });
             Button acceptAndSave = (Button) view.findViewById(R.id.accept_and_save);
             setSaveBtnClick(acceptAndSave);
         } else {
             setSaveBtnClick(saveBtn);
         }
-*/
-        this.view = view;
+         this.view = view;
         return view;
     }
 
@@ -264,7 +277,13 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (!validateScreenThree()) {
+                    return;
+                }
+                if ((acceptTos != null && !acceptTos.isChecked()) || !user.getTosAccepted()) {
+                    acceptTos.setError("you must accept the terms of service");
+                    return;
+                }
                 screen3.setVisibility(View.GONE);
                 screen4.setVisibility(View.GONE);
                 updatingScreen.setVisibility(View.VISIBLE);
@@ -315,9 +334,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
                 }*/
                 user.setFundDestination("bank");
-
-                Log.i ("UpdateSave:", "DOB String = " + mDobString);
-                user.setDateOfBirth(mDobString);
+                user.setDateOfBirth(dob.getText().toString());
 
                 // TODO: in prod uncomment below. In sandbox use test cc number & expiration
                 /*String sCard = credit_card.getText().toString();
@@ -338,28 +355,98 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         });
     }
 
-    public class dobPickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener{
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int year         = c.get (Calendar.YEAR);
-            int month        = c.get (Calendar.MONTH);
-            int day          = c.get (Calendar.DAY_OF_MONTH);
-
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+    private boolean validateScreenOne() {
+        boolean valid = true;
+        String first = firstName.getText().toString();
+        if (first.isEmpty() || first.length() < 2) {
+            firstName.setError("please enter a first name that is at least 2 characters long");
+            valid = false;
         }
-
-        public void onDateSet (DatePicker view, int year, int month, int day) {
-            month += 1;
-            mDobString = String.format("%1$04d-%2$02d-%3$02d", year, month, day);
-            user.setDateOfBirth(mDobString);
-            Log.i ("OnDateSet", "DOB String = " + mDobString);
+        String last = lastName.getText().toString();
+        if (last.isEmpty() || last.length() < 2) {
+            lastName.setError("please enter a last name that is at least 2 characters long");
+            valid = false;
         }
+        String address = addressLine1.getText().toString();
+        if (address.isEmpty() || address.length() < 6) {
+            addressLine1.setError("please enter a valid address");
+            valid = false;
+        }
+        String cityText = city.getText().toString();
+        if (cityText.isEmpty() || cityText.length() < 2) {
+            city.setError("please enter a valid city");
+            valid = false;
+        }
+        String stateText = state.getText().toString();
+        if (stateText.isEmpty() || stateText.length() != 2) {
+            state.setError("please enter your state");
+            valid = false;
+        }
+        return valid;
     }
 
-    private void showDobPickerDialog (){
-        DialogFragment dobFragment = new dobPickerFragment();
-        dobFragment.show(getFragmentManager(), "datePicker");
+    private boolean validateScreenTwo() {
+        boolean valid = true;
+        String zipString = zip.getText().toString();
+        if (zipString.isEmpty() || zipString.length() != 5) {
+            zip.setError("please enter your 5 digit zip code");
+            valid = false;
+        }
+        String emailString = email.getText().toString();
+        if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
+            email.setError("please enter a valid email");
+            valid = false;
+        }
+        String phoneString = phone.getText().toString();
+        if (phoneString.isEmpty() || !Patterns.PHONE.matcher(phoneString).matches()) {
+            phone.setError("please enter a valid phone number");
+            valid = false;
+        }
+        return valid;
+    }
+
+    private boolean validateScreenThree() {
+        boolean valid = true;
+        String dobString = dob.getText().toString();
+        if (dobString.isEmpty()) {
+            dob.setError("please enter your date of birth");
+            valid = false;
+        }
+        return valid;
+    }
+
+
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+        // when dialog box is closed, below method will be called.
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            month += 1;
+            dob.setText(String.format("%1$04d-%2$02d-%3$02d", year, month, day));
+            Log.i("OnDateSet", "DOB String = " + dob.getText().toString());
+        }
+    };
+
+    private void showDobPickerDialog() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (user.getDateOfBirth() != null) {
+            String[] dobArray = user.getDateOfBirth().split("-");
+            if (dobArray[0] != null) {
+                year = Integer.parseInt(dobArray[0]);
+            }
+            if (dobArray[1] != null) {
+                month = Integer.parseInt(dobArray[1]) - 1;
+            }
+            if (dobArray[2] != null) {
+                day = Integer.parseInt(dobArray[2]);
+            }
+        }
+
+        DobPickerFragment dobPicker = new DobPickerFragment(context, android.R.style.Theme_Holo_Light_Dialog, datePickerListener, year, month, day);
+        DatePickerDialog dialog = dobPicker.getPicker();
+        dialog.show();
     }
 
 
@@ -507,7 +594,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
         });
     }
 
@@ -526,7 +614,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     paymentDestinationSpinner.setSelection(1);
                     break;
                 case "mobile_phone":
-                    phoneLayout.setVisibility(View.VISIBLE);
                     paymentDestinationSpinner.setSelection(2);
                     break;
                 case "bank":
@@ -543,25 +630,23 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 String destination = (String) parentView.getItemAtPosition(position);
                 switch (destination) {
                     case VENMO_EMAIL_STRING:
-                        phoneLayout.setVisibility(View.GONE);
                         routingNumberLayout.setVisibility(View.GONE);
                         accntNumberLayout.setVisibility(View.GONE);
                         break;
                     case VENMO_PHONE_STRING:
-                        phoneLayout.setVisibility(View.VISIBLE);
                         routingNumberLayout.setVisibility(View.GONE);
                         accntNumberLayout.setVisibility(View.GONE);
                         break;
                     case BANK_STRING:
                         routingNumberLayout.setVisibility(View.VISIBLE);
                         accntNumberLayout.setVisibility(View.VISIBLE);
-                        phoneLayout.setVisibility(View.GONE);
                         break;
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
         });
     }
 }
