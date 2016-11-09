@@ -165,7 +165,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
         dob = (TextView) view.findViewById(R.id.dob);
         dob.setText(user.getDateOfBirth());
-        Log.i("UpdateACcount", "dob from user data = " + user.getDateOfBirth());
+        Log.i("UpdateAccount", "dob from user data = " + user.getDateOfBirth());
 
         credit_card = (EditText) view.findViewById(R.id.credit_card);
         credit_card.setText(user.getCreditCardNumber());
@@ -241,6 +241,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         });
 
 
+
         final Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
         if (!user.getTosAccepted()) {
             saveBtn.setText("continue");
@@ -268,8 +269,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             setSaveBtnClick(saveBtn);
         }
-
-        this.view = view;
+         this.view = view;
         return view;
     }
 
