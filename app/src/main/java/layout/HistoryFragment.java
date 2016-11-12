@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
@@ -55,6 +56,7 @@ public class HistoryFragment extends Fragment {
     private HistoryCardAdapter historyCardAdapter;
     public ScrollView parentScroll;
     private View view;
+    private RelativeLayout noHistoryLayout;
     public static String snackbarMessage = null;
 
     private OnFragmentInteractionListener mListener;
@@ -98,6 +100,7 @@ public class HistoryFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         requestHistoryList.setLayoutManager(llm);
         this.view = view;
+        noHistoryLayout = (RelativeLayout) view.findViewById(R.id.no_history_layout);
         getHistory(this);
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
         if (snackbarMessage != null) {
@@ -260,6 +263,11 @@ public class HistoryFragment extends Fragment {
             @Override
             protected void onPostExecute(Void result) {
                 parentObjs = new ArrayList<>();
+                if (recentHistory == null || recentHistory.size() == 0) {
+                    noHistoryLayout.setVisibility(View.VISIBLE);
+                } else {
+                    noHistoryLayout.setVisibility(View.GONE);
+                }
                 for (History h : recentHistory) {
                     parentObjs.add(h);
                 }
