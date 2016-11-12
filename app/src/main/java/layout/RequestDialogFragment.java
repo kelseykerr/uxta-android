@@ -136,10 +136,15 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (request != null) {
-                    updateRequest();
+                requestBtn.setEnabled(false);
+                if (validateNewRequest()) {
+                    if (request != null) {
+                        updateRequest();
+                    } else {
+                        createRequest(v);
+                    }
                 } else {
-                    createRequest(v);
+                    requestBtn.setEnabled(true);
                 }
             }
         });
@@ -262,6 +267,16 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         return newRequest;
     }
 
+    private boolean validateNewRequest() {
+        boolean valid = true;
+        String itemString = itemName.getText().toString();
+        if (itemString.isEmpty()) {
+            itemName.setError("item name cannot be empty");
+            valid = false;
+        }
+        return valid;
+    }
+
     private void updateRequest() {
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -279,8 +294,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                     updateRequestObject();
                     ObjectMapper mapper = new ObjectMapper();
                     // we don't need to update the location or user info
-                    Request r = new Request();
-                    r = request;
+                    Request r = request;
                     r.setUser(null);
                     r.setLocation(null);
                     String requestJson = mapper.writeValueAsString(r);
@@ -293,7 +307,8 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                     responseCode = conn.getResponseCode();
                     Log.i("PUT /api/requests", "Response Code : " + responseCode);
                     if (responseCode != 200) {
-                        throw new IOException(conn.getResponseMessage());
+                        String output = AppUtils.getResponseContent(conn);
+                        throw new IOException(output);
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not update request: " + e.getMessage());
@@ -337,7 +352,8 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                     responseCode = conn.getResponseCode();
                     Log.i("POST /api/requests", "Response Code : " + responseCode);
                     if (responseCode != 200) {
-                        throw new IOException(conn.getResponseMessage());
+                        String output = AppUtils.getResponseContent(conn);
+                        throw new IOException(output);
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not create new request: " + e.getMessage());

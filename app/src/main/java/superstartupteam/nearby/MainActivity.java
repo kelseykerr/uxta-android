@@ -246,6 +246,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
+                    listMapText.setVisibility(View.INVISIBLE);
                     reselectHistory(menuItemId);
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);

@@ -2,11 +2,9 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
-import com.braintreepayments.api.PaymentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -15,12 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import layout.AccountFragment;
-import layout.UpdateAccountDialogFragment;
 import superstartupteam.nearby.model.User;
 
-/**
- * Created by kerrk on 10/15/16.
- */
 public class SharedAsyncMethods {
 
     public static String errorMessage;
@@ -36,7 +30,13 @@ public class SharedAsyncMethods {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    Integer responseCode = conn.getResponseCode();
                     String output = AppUtils.getResponseContent(conn);
+
+                    if (responseCode != 200) {
+                        throw new IOException(output);
+                    }
+
                     try {
                         User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
                         userFromServer.setFacebookId(user.getFacebookId());
@@ -56,41 +56,10 @@ public class SharedAsyncMethods {
 
     public static void updateUser(final User user, final Context context) {
         new AsyncTask<Void, Void, Integer>() {
-
             @Override
             protected Integer doInBackground(Void... params) {
-                Integer responseCode;
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    ObjectMapper mapper = new ObjectMapper();
-                    String updateJson = mapper.writeValueAsString(user);
-                    Log.i("updated account: ", updateJson);
-                    byte[] outputInBytes = updateJson.getBytes("UTF-8");
-                    OutputStream os = conn.getOutputStream();
-                    os.write(outputInBytes);
-                    os.close();
-
-                    responseCode = conn.getResponseCode();
-
-                    Log.i("PUT /users/me", "Response Code : " + responseCode);
-                    if (responseCode != 200) {
-                        throw new IOException(conn.getResponseMessage());
-                    }
-                    SharedAsyncMethods.getUserInfoFromServer(user, context);
-                    return responseCode;
-                } catch (IOException e) {
-                    String errorMessage = "Could not update account: " + e.getMessage();
-                    Log.e("ERROR ", errorMessage);
-                }
-                return 0;
+                return executeUpdate(user, context);
             }
-
         }.execute();
     }
 
@@ -99,36 +68,7 @@ public class SharedAsyncMethods {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                Integer responseCode;
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    ObjectMapper mapper = new ObjectMapper();
-                    String updateJson = mapper.writeValueAsString(user);
-                    Log.i("updated account: ", updateJson);
-                    byte[] outputInBytes = updateJson.getBytes("UTF-8");
-                    OutputStream os = conn.getOutputStream();
-                    os.write(outputInBytes);
-                    os.close();
-
-                    responseCode = conn.getResponseCode();
-
-                    Log.i("PUT /users/me", "Response Code : " + responseCode);
-                    if (responseCode != 200) {
-                        throw new IOException(conn.getResponseMessage());
-                    }
-                    SharedAsyncMethods.getUserInfoFromServer(user, context);
-                    return responseCode;
-                } catch (IOException e) {
-                    errorMessage = "Could not update account: " + e.getMessage();
-                    Log.e("ERROR ", errorMessage);
-                }
-                return 0;
+                return executeUpdate(user, context);
             }
 
             @Override
@@ -148,6 +88,40 @@ public class SharedAsyncMethods {
             }
 
         }.execute();
+    }
+
+    private static Integer executeUpdate(User user, Context context) {
+        Integer responseCode;
+        try {
+            URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(30000);
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+            conn.setRequestProperty("Content-Type", "application/json");
+            ObjectMapper mapper = new ObjectMapper();
+            String updateJson = mapper.writeValueAsString(user);
+            Log.i("updated account: ", updateJson);
+            byte[] outputInBytes = updateJson.getBytes("UTF-8");
+            OutputStream os = conn.getOutputStream();
+            os.write(outputInBytes);
+            os.close();
+
+            responseCode = conn.getResponseCode();
+
+            Log.i("PUT /users/me", "Response Code : " + responseCode);
+            if (responseCode != 200) {
+                String message = AppUtils.getResponseContent(conn);
+                throw new IOException(message);
+            }
+            SharedAsyncMethods.getUserInfoFromServer(user, context);
+            return responseCode;
+        } catch (IOException e) {
+            errorMessage = "Could not update account: " + e.getMessage();
+            Log.e("ERROR ", errorMessage);
+        }
+        return 0;
     }
 
 

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -31,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -154,6 +154,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         email.setText(user.getEmail());
         emailLayout = (TextInputLayout) view.findViewById(R.id.email_layout);
         phone = (EditText) view.findViewById(R.id.phone);
+        phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         phone.setText(user.getPhone());
         phoneLayout = (TextInputLayout) view.findViewById(R.id.phone_layout);
         bank_acct = (EditText) view.findViewById(R.id.bank_acct);
@@ -308,6 +309,11 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 String sEmail = email.getText().toString();
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
+                if (sPhone != null) {
+                    sPhone = sPhone.replaceAll("\\)", "");
+                    sPhone = sPhone.replaceAll("\\(", "");
+                    sPhone = sPhone.replaceAll(" ", "-");
+                }
                 user.setPhone(AppUtils.validateString(sPhone) ? sPhone : null);
                 // TODO: in prod uncomment below. In sandbox use test routing/acct numbers
                 /*String sBank = bank_acct.getText().toString();
