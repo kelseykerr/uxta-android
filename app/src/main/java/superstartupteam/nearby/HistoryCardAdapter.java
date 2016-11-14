@@ -283,7 +283,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
         if (isBuyer) {
             topDescription = beginning + r.getItemName() +
-                    " from " + resp.getSeller().getFirstName();
+                    " from " + resp.getSeller().getFirstName() != null ? resp.getSeller().getFirstName() : resp.getSeller().getName();
         } else {
             topDescription = beginning + r.getItemName() +
                     " to " + r.getUser().getFirstName();

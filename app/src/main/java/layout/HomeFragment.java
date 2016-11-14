@@ -102,7 +102,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private RecyclerView recList;
     private RequestAdapter requestAdapter;
     private List<Marker> requestMarkers = new ArrayList<>();
-    private TextView noResults;
+    private Spinner noResults; //map
+    private Spinner noResultsList;
     private ScrollView listView;
     private RelativeLayout requestMapView;
     private Double currentRadius;
@@ -194,6 +195,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                         getRequests(currentRadius, true);
                     }
                 } // to close the onItemSelected
+
                 public void onNothingSelected(AdapterView<?> parent) {
 
                 }
@@ -238,8 +240,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
 
-        noResults = (TextView) v.findViewById(R.id.no_results);
+        noResults = (Spinner) v.findViewById(R.id.no_results);
+        ArrayAdapter<String> noResultsAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
+                getResources().getStringArray(R.array.noResults));
+        noResults.setEnabled(false);
+        noResults.setAdapter(noResultsAdapter);
         noResults.setVisibility(View.GONE);
+
+        noResultsList = (Spinner) v.findViewById(R.id.no_results_list);
+        noResultsList.setEnabled(false);
+        noResultsList.setAdapter(noResultsAdapter);
+        noResultsList.setVisibility(View.GONE);
         getRequests(currentRadius, false);
         return v;
     }
@@ -252,7 +263,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                         user.getMerchantStatus().toString().toLowerCase().equals("active");
                 if (user.getMerchantId() != null && goodMerchantStatus) {
                     try {
-                        for (Request r:requests) {
+                        for (Request r : requests) {
                             if (r.getLatitude().equals(marker.getPosition().latitude) &&
                                     r.getLongitude().equals(marker.getPosition().longitude) &&
                                     marker.getTitle().equals(r.getItemName())) {
@@ -309,7 +320,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-
     public void getRequests(final Double radius, final boolean homeAddress) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -357,27 +367,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 requestMarkers.clear();
                 if (requests.size() < 1) {
                     noResults.setVisibility(View.VISIBLE);
+                    noResultsList.setVisibility(View.VISIBLE);
                     if (latLng != null && !homeLocation) {
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(latLng).zoom(15).build();
-                        map.animateCamera(CameraUpdateFactory
-                                .newCameraPosition(cameraPosition));
                         PrefUtils.setLatLng(latLng);
+                        updateZoom(null, latLng);
                     } else if (homeLocation != null && homeLocation && user.getHomeLongitude() != null
                             && user.getHomeLatitude() != null) {
                         LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(home).zoom(15).build();
-                        map.animateCamera(CameraUpdateFactory
-                                .newCameraPosition(cameraPosition));
+                        updateZoom(null, home);
                     }
                     return;
                 } else {
                     noResults.setVisibility(View.GONE);
+                    noResultsList.setVisibility(View.GONE);
                 }
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(currLocationMarker.getPosition());
-                int i = 0;
                 setMarkerClick();
                 for (Request request : requests) {
                     LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
@@ -397,30 +402,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     requestMarkers.add(marker);
                     builder.include(marker.getPosition());
                 }
-
-                LatLngBounds bounds = builder.build();
-                int padding = 120; // offset from edges of the map in pixels
-                cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-                map.moveCamera(cu);
-
-                CircleOptions options = new CircleOptions();
-                options.center(currLocationMarker.getPosition());
-                //Radius in meters
-                options.radius(currentRadius * 1609.344);
-                options.strokeWidth(10);
-
-                int zoomLevel = 11;
-                if (options != null) {
-                    double radius = options.getRadius();
-                    //radius = 300 * 1609.344; /*for Ken's testing */
-                    double scale = radius / 500;
-                    zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
-                }
-                cu = CameraUpdateFactory.zoomTo(zoomLevel);
-                map.moveCamera(cu);
+                updateZoom(currLocationMarker, null);
 
             }
         }.execute();
+    }
+
+    private void updateZoom(Marker marker, LatLng latLng) {
+        CircleOptions options = new CircleOptions();
+        options.center(marker != null ? marker.getPosition() : latLng);
+        //Radius in meters
+        options.radius(currentRadius * 1609.344);
+        options.strokeWidth(10);
+
+        double radius = options.getRadius();
+        //radius = 300 * 1609.344; /*for Ken's testing */
+        double scale = radius / 500;
+        int zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
+
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(zoomLevel)
+                .target(marker != null ? marker.getPosition() : latLng).build();
+        cu = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        map.moveCamera(cu);
     }
 
     @Override
@@ -557,11 +560,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         currLocationMarker = map.addMarker(markerOptions);
 
         //zoom to current position:
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(15).build();
-
-        map.animateCamera(CameraUpdateFactory
-                .newCameraPosition(cameraPosition));
+        updateZoom(currLocationMarker, null);
     }
 
     @Override
@@ -648,7 +647,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             View.OnClickListener mOnClickListener;
             Response response = null;
             Request request = null;
-            boolean hasRequestResponseParams = type !=  null &&
+            boolean hasRequestResponseParams = type != null &&
                     (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
                             || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
                             || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));

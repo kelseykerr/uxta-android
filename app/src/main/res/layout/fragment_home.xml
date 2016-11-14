@@ -18,14 +18,6 @@
             android:layout_marginTop="55dp"
             android:gravity="center">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="no requests were found within this radius"
-                android:textStyle="italic"
-                android:id="@+id/no_results"/>
-
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -60,6 +52,25 @@
                     android:layout_marginStart="10dp"
                     android:entries="@array/locationItems"
                     android:layout_height="wrap_content"/>
+
+                <!--<TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:text="no requests were found within this radius"
+                    android:textStyle="italic"
+                    android:id="@+id/no_results"/> -->
+
+                <Spinner
+                    android:id="@+id/no_results"
+                    android:layout_width="wrap_content"
+                    android:background="@color/white75"
+                    android:layout_gravity="center|bottom"
+                    android:layout_marginBottom="10dp"
+                    android:enabled="false"
+                    android:layout_marginStart="10dp"
+                    android:entries="@array/noResults"
+                    android:layout_height="wrap_content"/>
             </fragment>
         </RelativeLayout>
 
@@ -78,6 +89,17 @@
                     android:id="@+id/request_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+                <Spinner
+                    android:id="@+id/no_results_list"
+                    android:layout_width="wrap_content"
+                    android:background="@color/white75"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:enabled="false"
+                    android:layout_marginStart="10dp"
+                    android:entries="@array/noResults"
+                    android:layout_height="wrap_content"/>
 
             </RelativeLayout>
         </ScrollView>

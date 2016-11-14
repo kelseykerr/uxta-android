@@ -34,6 +34,9 @@
     <string name="braintree_tos">Nearby uses Braintree, a division of PayPal, Inc. (Braintree) for payment processing services. By using the Braintree payment processing services you agree to the Braintree Payment Services Agreement available at https://www.braintreepayments.com/legal/gateway-agreement, and the applicable bank agreement available at https://www.braintreepayments.com/legal/cea-wells.</string>
     <string name="dobLabel">date of birth</string>
     <string name="changeButtonLabel">CHANGE</string>
+    <string-array name="noResults">
+        <item>no requests found</item>
+    </string-array>
 
 
 </resources>
