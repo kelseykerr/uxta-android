@@ -15,6 +15,8 @@ import com.facebook.login.widget.LoginButton;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -31,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextView info;
     private LoginButton loginButton;
+    private Button fb;
     private CallbackManager callbackManager;
     private User user;
 
@@ -90,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
         info = (TextView) findViewById(R.id.info);
+        fb = (Button) findViewById(R.id.fb);
         loginButton = (LoginButton) findViewById(R.id.login_button);
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -169,9 +173,16 @@ public class LoginActivity extends AppCompatActivity {
         }.execute();
     }*/
 
+    public void onClick(View v) {
+        if (v == fb) {
+            loginButton.performClick();
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

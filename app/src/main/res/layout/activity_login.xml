@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:facebook="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@color/colorPrimary"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,18 +13,32 @@
         android:layout_marginTop="140dp"
         android:drawableStart="@drawable/rsz_nearby_logo_white_large"
         android:drawablePadding="0dp"
+        android:id="@+id/nearby_logo"
         android:contextClickable="true" />
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="10dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="180dp"
-        />
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/facebook_button"
+        android:layout_width="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/nearby_logo"
+        android:layout_height="match_parent">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/fb"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:onClick="onClick"
+            android:text="login with FaceBook"
+            android:textColor="@color/colorPrimary" />
+
+    </FrameLayout>
 
 </RelativeLayout>
