@@ -139,8 +139,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         returnTime = (TextView) view.findViewById(R.id.return_time);
         returnTime.setText("Return Time");
 
-        setDateFunctionality(pickupTime, pickupTimeLabel);
-        setDateFunctionality(returnTime, returnTimeLabel);
+        setDateFunctionality(pickupTime, pickupTimeLabel, false);
+        setDateFunctionality(returnTime, returnTimeLabel, true);
 
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_offer);
 
@@ -306,7 +306,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         return response;
     }
 
-    private void setDateFunctionality(final TextView time, final TextView label) {
+    private void setDateFunctionality(final TextView time, final TextView label, final boolean isReturn) {
 
         time.setOnTouchListener(new View.OnTouchListener() {
 
@@ -323,6 +323,22 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
                             DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
                             TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
+                            if (isReturn) {
+                                try {
+                                    Date pickupDate = new Date(pickupTime.getText().toString());
+                                    datePicker.setMinDate(pickupDate.getTime());
+                                } catch (Exception e) {
+                                    datePicker.setMinDate(System.currentTimeMillis());
+                                }
+                            } else {
+                                try {
+                                    Date returnDate = new Date(returnTime.getText().toString());
+                                    datePicker.setMinDate(System.currentTimeMillis());
+                                    datePicker.setMaxDate(returnDate.getTime());
+                                } catch (Exception e) {
+                                    datePicker.setMinDate(System.currentTimeMillis());
+                                }
+                            }
 
                             Calendar calendar = new GregorianCalendar(datePicker.getYear(),
                                     datePicker.getMonth(),

@@ -114,7 +114,7 @@
                 android:layout_below="@id/pickup_location_layout"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="-15dp"
                 android:text="Pickup Time"
                 android:textSize="12sp" />
@@ -174,7 +174,7 @@
                 android:layout_below="@id/return_location_layout"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="-15dp"
                 android:text="Return Time"
                 android:textSize="12sp" />

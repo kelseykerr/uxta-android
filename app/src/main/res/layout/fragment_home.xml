@@ -53,24 +53,23 @@
                     android:entries="@array/locationItems"
                     android:layout_height="wrap_content"/>
 
-                <!--<TextView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center|bottom"
-                    android:text="no requests were found within this radius"
-                    android:textStyle="italic"
-                    android:id="@+id/no_results"/> -->
-
-                <Spinner
                     android:id="@+id/no_results"
-                    android:layout_width="wrap_content"
-                    android:background="@color/white75"
-                    android:layout_gravity="center|bottom"
+                    android:layout_marginTop="30dp"
                     android:layout_marginBottom="10dp"
-                    android:enabled="false"
-                    android:layout_marginStart="10dp"
-                    android:entries="@array/noResults"
-                    android:layout_height="wrap_content"/>
+                    android:layout_gravity="center|bottom"
+                    android:textSize="18sp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/noRequestsFound"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"/>
+
             </fragment>
         </RelativeLayout>
 
@@ -89,17 +88,22 @@
                     android:id="@+id/request_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-                <Spinner
-                    android:id="@+id/no_results_list"
+
+                <TextView
                     android:layout_width="wrap_content"
-                    android:background="@color/white75"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/no_results_list"
+                    android:layout_marginTop="30dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="10dp"
-                    android:enabled="false"
-                    android:layout_marginStart="10dp"
-                    android:entries="@array/noResults"
-                    android:layout_height="wrap_content"/>
+                    android:textSize="18sp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="@color/white"
+                    android:text="@string/noRequestsFound"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent"/>
 
             </RelativeLayout>
         </ScrollView>

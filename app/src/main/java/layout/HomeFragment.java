@@ -102,8 +102,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private RecyclerView recList;
     private RequestAdapter requestAdapter;
     private List<Marker> requestMarkers = new ArrayList<>();
-    private Spinner noResults; //map
-    private Spinner noResultsList;
+    private TextView noResults; //map
+    private TextView noResultsList;
     private ScrollView listView;
     private RelativeLayout requestMapView;
     private Double currentRadius;
@@ -240,16 +240,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
 
-        noResults = (Spinner) v.findViewById(R.id.no_results);
-        ArrayAdapter<String> noResultsAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
-                getResources().getStringArray(R.array.noResults));
-        noResults.setEnabled(false);
-        noResults.setAdapter(noResultsAdapter);
+        noResults = (TextView) v.findViewById(R.id.no_results);
         noResults.setVisibility(View.GONE);
 
-        noResultsList = (Spinner) v.findViewById(R.id.no_results_list);
-        noResultsList.setEnabled(false);
-        noResultsList.setAdapter(noResultsAdapter);
+        noResultsList = (TextView) v.findViewById(R.id.no_results_list);
         noResultsList.setVisibility(View.GONE);
         getRequests(currentRadius, false);
         return v;
@@ -463,6 +457,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         try {
             map.setMyLocationEnabled(true);
+            map.getUiSettings().setMyLocationButtonEnabled(false);
         } catch (SecurityException e) {
             Log.e("map permission error: ", "unable to get user's current location, " + e.getMessage());
         }
