@@ -62,7 +62,6 @@
 
         <activity android:name=".ScannerActivity"></activity>
 
-        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         <receiver
             android:name=".ConnectivityReceiver"
             android:process=":remote"></receiver>
@@ -72,5 +71,7 @@
             android:exported="false" />
 
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>
