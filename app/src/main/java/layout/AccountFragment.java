@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import superstartupteam.nearby.LoginActivity;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.User;
@@ -51,6 +53,7 @@ public class AccountFragment extends Fragment {
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
+    private View view;
     public static String snackbarMessage = null;
     public static UpdateAccountDialogFragment updateAccountDialog;
 
@@ -142,8 +145,12 @@ public class AccountFragment extends Fragment {
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                updateAccountDialog.show(getFragmentManager(), "dialog");
+                if (!MainActivity.isNetworkConnected()) {
+                    showNoConnectionSnackbar();
+                } else {
+                    updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                    updateAccountDialog.show(getFragmentManager(), "dialog");
+                }
             }
         });
 
@@ -240,6 +247,7 @@ public class AccountFragment extends Fragment {
         } else {
             noMerchantText.setVisibility(View.GONE);
         }
+        this.view = view;
         return view;
 
     }
@@ -288,6 +296,26 @@ public class AccountFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
+    }
+
+    private void showNoConnectionSnackbar() {
+        Snackbar snackbar = Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
+                Snackbar.LENGTH_LONG)
+                .setAction("open settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                    }
+                });
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snackbar.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+        snackbar.getView().getRootView().setLayoutParams(params);
+        snackbar.show();
     }
 
 }

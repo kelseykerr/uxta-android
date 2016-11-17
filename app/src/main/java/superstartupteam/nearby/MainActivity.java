@@ -10,6 +10,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity
     private boolean readNotification = false;
     private BraintreeFragment mBraintreeFragment;
     public static User updatedUser;
+    public static ConnectivityManager connMgr;
 
     /**
      * Root of the layout of this Activity.
@@ -128,6 +131,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
         user = PrefUtils.getCurrentUser(MainActivity.this);
         if (user == null || user.getAccessToken() == null) {
             if(user != null && user.getAccessToken() != null){
@@ -512,6 +517,11 @@ public class MainActivity extends AppCompatActivity
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
+    }
+
+    public static boolean isNetworkConnected() {
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
 

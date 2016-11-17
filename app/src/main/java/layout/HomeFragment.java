@@ -1,5 +1,6 @@
 package layout;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -16,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,6 +64,7 @@ import java.util.Map;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.RequestAdapter;
@@ -313,8 +316,32 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         newFragment.show(getFragmentManager(), "dialog");
     }
 
+    private void showNoConnectionSnackbar() {
+        Snackbar snackbar = Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
+                Snackbar.LENGTH_LONG)
+                .setAction("open settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                    }
+                });
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snackbar.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+        snackbar.getView().getRootView().setLayoutParams(params);
+        snackbar.show();
+    }
+
 
     public void getRequests(final Double radius, final boolean homeAddress) {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoConnectionSnackbar();
+            return;
+        }
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

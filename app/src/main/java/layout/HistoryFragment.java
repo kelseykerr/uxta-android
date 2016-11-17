@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
@@ -30,6 +31,7 @@ import java.util.List;
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.HistoryCardAdapter;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.ScannerActivity;
@@ -229,7 +231,22 @@ public class HistoryFragment extends Fragment {
 
     }
 
+    private void showNoNetworkSnack() {
+        Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
+                Snackbar.LENGTH_LONG)
+                .setAction("open settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                    }
+                }).show();
+    }
+
     public void getHistory(final HistoryFragment thisFragment) {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoNetworkSnack();
+            return;
+        }
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

@@ -35,5 +35,6 @@
     <string name="dobLabel">date of birth</string>
     <string name="changeButtonLabel">CHANGE</string>
     <string name="noRequestsFound">no requests found</string>
+    <string name="noNetworkConnection">you aren\'t connected to the network</string>
 
 </resources>

@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -277,7 +280,22 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         return valid;
     }
 
+    private void showNoNetworkSnack() {
+        Snackbar.make(view, R.string.noNetworkConnection,
+                Snackbar.LENGTH_LONG)
+                .setAction("open settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                    }
+                }).show();
+    }
+
     private void updateRequest() {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoNetworkSnack();
+            return;
+        }
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
@@ -327,6 +345,10 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
     }
 
     private void createRequest(View v) {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoNetworkSnack();
+            return;
+        }
         // AsyncTask<Params, Progress, Result>
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -373,6 +395,9 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
 
 
     public void getCategories() {
+        if (!MainActivity.isNetworkConnected()) {
+            return;
+        }
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
