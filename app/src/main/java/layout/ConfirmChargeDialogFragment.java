@@ -24,11 +24,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.InputFilterMinMax;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Transaction;
@@ -46,7 +49,8 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     private View view;
     private String transactionId;
 
-    public static ConfirmChargeDialogFragment newInstance(Double calculatedPrice, String description, String transactionId) {
+    public static ConfirmChargeDialogFragment newInstance(Double calculatedPrice, String description,
+                                                          String transactionId) {
         ConfirmChargeDialogFragment fragment = new ConfirmChargeDialogFragment();
         Bundle args = new Bundle();
         args.putString("DESCRIPTION", description);
@@ -86,7 +90,9 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
         TextView chargeDescription = (TextView) view.findViewById(R.id.charge_description);
         chargeDescription.setText(description);
         EditText price = (EditText) view.findViewById(R.id.final_price);
-        price.setText(calculatedPrice.toString());
+        BigDecimal formattedValue = AppUtils.formatCurrency(calculatedPrice);
+
+        price.setText(formattedValue.toString());
         price.setFilters(new InputFilter[]{ new InputFilterMinMax(0, originalPrice)});
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_confirm_charge);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -179,6 +185,7 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode != null && responseCode == 200) {
+                    ((MainActivity) getActivity()).goToHistory("confirmed charge");
                     dismiss();
                 }
 
