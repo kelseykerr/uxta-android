@@ -46,29 +46,30 @@
                 android:src="@drawable/x_svg"
                 android:tint="@color/colorAccent" />
 
-            <TextView
-                android:id="@+id/money_sign"
-                android:layout_width="wrap_content"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/offer_price_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cancel_offer"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="73dp"
-                android:text="$"
-                android:textSize="20sp" />
+                android:layout_marginTop="80dp"
+                app:hintEnabled="false"
+                app:errorEnabled="true"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
-            <EditText
-                android:id="@+id/response_offer_price"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="60dp"
-                android:layout_toEndOf="@+id/money_sign"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textColor="@color/colorAccent"
-                android:theme="@style/EditTextTheme" />
+                <EditText
+                    android:id="@+id/response_offer_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/offer_price"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:hint="$0.00"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
 
             <!--<Spinner
                 android:id="@+id/offer_type"
@@ -86,10 +87,10 @@
                 android:id="@+id/pickup_location_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/response_offer_price"
+                android:layout_below="@id/offer_price_layout"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
@@ -195,6 +196,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/return_time"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginBottom="32dp">
 
                 <TextView

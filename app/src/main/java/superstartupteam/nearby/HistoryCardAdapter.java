@@ -32,6 +32,7 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     private LayoutInflater mInflater;
     private HistoryFragment historyFragment;
     private Context context;
+    private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+
 
     public HistoryCardAdapter(List<History> history, HistoryFragment fragment) {
         this.recentHistory = history;
@@ -283,7 +286,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
         if (isBuyer) {
             topDescription = beginning + r.getItemName() +
-                    " from " + resp.getSeller().getFirstName() != null ? resp.getSeller().getFirstName() : resp.getSeller().getName();
+                    " from " + (resp.getSeller().getFirstName() != null ?
+                    resp.getSeller().getFirstName() : resp.getSeller().getName());
         } else {
             topDescription = beginning + r.getItemName() +
                     " to " + r.getUser().getFirstName();
@@ -297,7 +301,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (isBuyer && resp.getSeller().getPhone() != null) {
                 requestViewHolder.showMessageUserIcon = true;
             }
-            String exchangeTime = "<b>exchange time:</b> " + resp.getExchangeTime();
+            String formattedDate = resp.getExchangeTime() != null ? formatter.format(resp.getExchangeTime()) : null;
+            String exchangeTime = "<b>exchange time:</b> " + formattedDate;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
             requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
@@ -324,7 +329,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (isBuyer && resp.getSeller().getPhone() != null) {
                 requestViewHolder.showMessageUserIcon = true;
             }
-            String returnTime = "<b>return time:</b> " + resp.getReturnTime();
+            String formatedDate = resp.getReturnTime() != null ? formatter.format(resp.getReturnTime()) : null;
+            String returnTime = "<b>return time:</b> " + formatedDate;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
             requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));

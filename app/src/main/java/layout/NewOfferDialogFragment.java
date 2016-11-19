@@ -13,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,6 +75,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private TextView returnLocation;
     private TextView returnTimeLabel;
     private TextView returnTime;
+    private Date exchangeDate;
+    private Date returnDate;
 
 
     public NewOfferDialogFragment() {
@@ -127,6 +132,24 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
 
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
+
+        offerPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String str = offerPrice.getText().toString();
+                if (str.isEmpty() || str.startsWith("$")) {
+                    return;
+                }
+                offerPrice.setText("$" + offerPrice.getText().toString());
+                offerPrice.setSelection(offerPrice.getText().toString().length());
+
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
         pickupTimeLabel = (TextView) view.findViewById(R.id.pickup_time_label);
         pickupTimeLabel.setVisibility(View.GONE);
@@ -146,6 +169,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                exchangeDate = null;
+                returnDate = null;
                 dismiss();
             }
         });
@@ -283,14 +308,14 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         response.setExchangeLocation(pickupLocation.getText().toString());
         try {
             Date exchangeTime = new Date(pickupTime.getText().toString());
-            response.setExchangeTime(exchangeTime);
+            response.setExchangeTime(exchangeDate);
         } catch (Exception e) {
             Log.i("New Offer Dialog", "**exchange time wasn't set");
         }
         response.setReturnLocation(returnLocation.getText().toString());
         try {
             Date rTime = new Date(returnTime.getText().toString());
-            response.setReturnTime(rTime);
+            response.setReturnTime(returnDate);
         } catch (Exception e) {
             Log.i("New Offer Dialog", "**return time wasn't set");
         }
@@ -323,22 +348,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
                             DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
                             TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-                            if (isReturn) {
-                                try {
-                                    Date pickupDate = new Date(pickupTime.getText().toString());
-                                    datePicker.setMinDate(pickupDate.getTime());
-                                } catch (Exception e) {
-                                    datePicker.setMinDate(System.currentTimeMillis());
-                                }
-                            } else {
-                                try {
-                                    Date returnDate = new Date(returnTime.getText().toString());
-                                    datePicker.setMinDate(System.currentTimeMillis());
-                                    datePicker.setMaxDate(returnDate.getTime());
-                                } catch (Exception e) {
-                                    datePicker.setMinDate(System.currentTimeMillis());
-                                }
-                            }
 
                             Calendar calendar = new GregorianCalendar(datePicker.getYear(),
                                     datePicker.getMonth(),
@@ -347,7 +356,28 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                                     timePicker.getCurrentMinute());
 
                             Date newPickupTime = new Date(calendar.getTimeInMillis());
-                            time.setText(newPickupTime.toString());
+                            Date current = new Date();
+                            if (isReturn) {
+                                if (exchangeDate != null) {
+                                    newPickupTime = newPickupTime.before(exchangeDate) ? exchangeDate : newPickupTime;
+                                } else {
+                                    newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                                }
+                            } else {
+                                newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                                if (returnDate != null) {
+                                    newPickupTime = newPickupTime.after(returnDate) ? returnDate : newPickupTime;
+                                }
+                            }
+                            SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+                            String formattedDate = formatter.format(newPickupTime);
+
+                            time.setText(formattedDate);
+                            if (isReturn) {
+                                returnDate = newPickupTime;
+                            } else {
+                                exchangeDate = newPickupTime;
+                            }
                             label.setVisibility(View.VISIBLE);
                             alertDialog.dismiss();
                         }
