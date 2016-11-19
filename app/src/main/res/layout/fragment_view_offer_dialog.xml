@@ -54,6 +54,9 @@
                 android:layout_marginTop="80dp"
                 app:hintEnabled="false"
                 app:errorEnabled="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
@@ -61,8 +64,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/offer_price"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginStart="5dp"
                     android:hint="$0.00"
                     android:inputType="numberDecimal"
                     android:maxLines="1"
@@ -91,7 +92,9 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="-10dp"
+                app:hintEnabled="true"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
@@ -101,57 +104,46 @@
                     android:layout_below="@id/response_offer_price"
                     android:hint="Pickup Location"
                     android:inputType="text"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
-                android:id="@+id/pickup_time_label"
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/pickup_time_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@id/pickup_location_layout"
-                android:layout_marginBottom="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="-15dp"
-                android:text="Pickup Time"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/pickup_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/pickup_time_label"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:clickable="true"
-                android:textColor="@color/colorAccent"
-                android:textSize="18sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/pickup_time"
-                android:layout_marginBottom="32dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp">
+                android:layout_marginTop="-10dp"
+                app:hintEnabled="true"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
-                <TextView
+                <EditText
+                    android:id="@+id/pickup_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/border_bottom" />
-            </LinearLayout>
+                    android:layout_below="@id/response_offer_price"
+                    android:hint="Pickup Time"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
 
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/return_location_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/pickup_time"
+                android:layout_below="@id/pickup_time_layout"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
@@ -167,53 +159,37 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
-                android:id="@+id/return_time_label"
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/return_time_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@id/return_location_layout"
-                android:layout_marginBottom="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="-15dp"
-                android:text="Return Time"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/return_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/return_time_label"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:clickable="true"
-                android:text=""
-                android:textColor="@color/colorAccent"
-                android:textSize="18sp" />
-
-            <LinearLayout
-                android:id="@+id/return_time_underline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/return_time"
-                android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="-10dp"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
-                <TextView
+                <EditText
+                    android:id="@+id/return_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/border_bottom" />
-
-            </LinearLayout>
+                    android:hint="Return Time"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
 
 
             <Button
                 android:id="@+id/accept_offer_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/return_time_label"
-                android:layout_marginTop="45dp"
+                android:layout_below="@id/return_time_layout"
+                android:layout_marginTop="15dp"
                 android:background="@drawable/primary_btn"
                 android:text="accept/update offer"
                 android:textColor="#ffffff" />

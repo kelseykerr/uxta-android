@@ -70,7 +70,6 @@
                 app:ms_floatingLabelColor="@color/colorAccent"
                 app:ms_floatingLabelText="rent or buy?"
                 app:ms_highlightColor="@color/colorPrimary"
-                app:ms_hint="rent or buy?"
                 app:ms_hintColor="@color/colorAccent"
                 app:ms_multiline="false"
                 app:ms_thickness=".5dp" />
@@ -93,6 +92,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
@@ -104,7 +104,6 @@
                     android:hint="name"
                     android:maxLength="100"
                     android:maxLines="1"
-                    android:singleLine="true"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>

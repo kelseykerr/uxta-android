@@ -55,15 +55,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/edit_profile_text"
-                app:errorTextAppearance="@color/redPink"
                 app:errorEnabled="true"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/first_name"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="first name"
                     android:inputType="text"
                     android:maxLines="1"
@@ -75,15 +76,17 @@
                 android:id="@+id/last_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_below="@id/first_name_layout"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/last_name"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="last name"
                     android:inputType="text"
                     android:maxLines="1"
@@ -95,15 +98,17 @@
                 android:id="@+id/address_line1_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_below="@id/last_name_layout"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/address_line1"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="address"
                     android:inputType="text"
                     android:maxLines="1"
@@ -116,15 +121,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/address_line1_layout"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/address_line2"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="address line 2"
                     android:inputType="text"
                     android:maxLines="1"
@@ -136,16 +143,18 @@
                 android:id="@+id/city_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_below="@id/address_line2_layout"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/city"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="city"
                     android:inputType="text"
                     android:maxLines="1"
@@ -157,16 +166,18 @@
                 android:id="@+id/state_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_below="@id/city_layout"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/state"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="state"
                     android:inputType="text"
                     android:maxLength="2"
@@ -242,15 +253,17 @@
                 android:id="@+id/zipcode_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/zipcode"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="zipcode"
                     android:inputType="number"
                     android:maxLength="5"
@@ -262,15 +275,17 @@
                 android:id="@+id/email_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/email"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="email"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
@@ -282,15 +297,17 @@
                 android:id="@+id/phone_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/phone"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="phone number"
                     android:inputType="phone"
                     android:maxLength="14"
@@ -300,11 +317,11 @@
 
             <fr.ganfra.materialspinner.MaterialSpinner
                 android:id="@+id/payment_destination_spinner"
-                android:layout_width="290dp"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="15dp"
                 android:layout_marginTop="10dp"
                 android:paddingBottom="0dp"
                 android:paddingStart="0dp"
@@ -329,16 +346,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 android:visibility="gone"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/bank_acct"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="bank account number"
                     android:inputType="number"
                     android:textColor="@color/colorAccent"
@@ -349,16 +368,18 @@
                 android:id="@+id/routing_number_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="-10dp"
                 android:visibility="gone"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/routing_number"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="routing number"
                     android:inputType="number"
                     android:textColor="@color/colorAccent"
@@ -427,7 +448,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/edit_profile_text3"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="-5dp"
                 android:text="@string/dobLabel"
                 android:textSize="12sp" />
@@ -437,7 +458,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/dob_label"
-                android:layout_marginStart="15dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
                 android:textSize="16sp"
                 android:textColor="@color/colorAccent"
@@ -449,24 +471,26 @@
                 android:layout_height="1dp"
                 android:layout_below="@id/dob"
                 android:layout_marginBottom="80dp"
-                android:layout_marginEnd="50dp"
-                android:layout_marginStart="18dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="8dp"
                 android:background="@color/colorAccent" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/credit_card_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 android:layout_below="@id/dob"
                 android:layout_marginTop="20dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/credit_card"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="credit card number"
                     android:inputType="number"
                     android:textColor="@color/colorAccent"
@@ -479,14 +503,16 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/credit_card_layout"
                 android:layout_marginTop="-10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
                 app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
                 app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                 <EditText
                     android:id="@+id/exp_date"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
                     android:hint="expiration date"
                     android:inputType="number"
                     android:textColor="@color/colorAccent"

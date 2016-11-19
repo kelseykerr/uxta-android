@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
     private Spinner rentalSpinner;
     private Button requestBtn;
     private Button closeRequestBtn;
+    private TextInputLayout itemNameLayout;
     private EditText itemName;
     private EditText description;
     private View view;
@@ -114,7 +116,10 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
             dialogTitle.setText("Edit Request");
         }
+        itemNameLayout = (TextInputLayout) view.findViewById(R.id.request_name_layout);
         itemName = (EditText) view.findViewById(R.id.request_name);
+        itemName.setBackground(itemName.getBackground().getConstantState().newDrawable());
+
         description = (EditText) view.findViewById(R.id.request_description);
 
         //Let's not do categories for the MVP...we can add this back in later
@@ -134,7 +139,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, rentBuyList);
         rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
-        rentalSpinner.setSelection(1);
+        rentalSpinner.setSelection(0);
 
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
@@ -274,7 +279,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         boolean valid = true;
         String itemString = itemName.getText().toString();
         if (itemString.isEmpty()) {
-            itemName.setError("item name cannot be empty");
+            itemNameLayout.setError("item name cannot be empty");
             valid = false;
         }
         return valid;

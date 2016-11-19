@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -56,9 +57,11 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
     private Context context;
     private TextView exchangeTimeLabel;
     private TextView exchangeTime;
+    private Date exchangeTimeDate;
     private LinearLayout exchangeTimeBorder;
     private boolean initialExchangeOverride = true;
     private String description;
+    private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
     private ExchangeOverrideDialogFragment.OnFragmentInteractionListener mListener;
 
 
@@ -177,11 +180,10 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
                     if (exchangeTime.getText() == null) {
                         nullExchangeTimeSnack();
                     }
-                    Date eTime = new Date(exchangeTime.getText().toString());
                     Transaction t = new Transaction();
                     t.setId(transactionId);
                     Transaction.ExchangeOverride override = new Transaction.ExchangeOverride();
-                    override.time = eTime;
+                    override.time = exchangeTimeDate;
                     if (initialExchangeOverride) {
                         t.setExchangeOverride(override);
                     } else {
@@ -218,7 +220,9 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
                             timePicker.getCurrentMinute());
 
                     Date newPickupTime = new Date(calendar.getTimeInMillis());
-                    exchangeTime.setText(newPickupTime.toString());
+                    String formattedDate = formatter.format(newPickupTime);
+                    exchangeTimeDate = newPickupTime;
+                    exchangeTime.setText(formattedDate);
                     exchangeTimeLabel.setVisibility(View.VISIBLE);
                     alertDialog.dismiss();
                 }

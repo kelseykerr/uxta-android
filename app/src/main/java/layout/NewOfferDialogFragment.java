@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -66,15 +66,16 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private OnFragmentInteractionListener mListener;
     private Spinner offerTypeSpinner;
     private Button submitOfferBtn;
+    private TextInputLayout offerPriceLayout;
     private EditText offerPrice;
     private List<String> offerTypes = new ArrayList<>();
     private View view;
     private EditText pickupLocation;
-    private TextView pickupTimeLabel;
-    private TextView pickupTime;
+    private TextInputLayout pickupTimeLayout;
+    private EditText pickupTime;
     private TextView returnLocation;
-    private TextView returnTimeLabel;
-    private TextView returnTime;
+    private TextInputLayout returnTimeLayout;
+    private EditText returnTime;
     private Date exchangeDate;
     private Date returnDate;
 
@@ -127,10 +128,15 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         submitOfferBtn = (Button) view.findViewById(R.id.submit_offer_button);
         submitOfferBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                createOffer(v);
+                submitOfferBtn.setEnabled(false);
+                if (validateForm()) {
+                    createOffer(v);
+                } else {
+                    submitOfferBtn.setEnabled(true);
+                }
             }
         });
-
+        offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
 
         offerPrice.addTextChangedListener(new TextWatcher() {
@@ -151,19 +157,15 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
 
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
-        pickupTimeLabel = (TextView) view.findViewById(R.id.pickup_time_label);
-        pickupTimeLabel.setVisibility(View.GONE);
-        pickupTime = (TextView) view.findViewById(R.id.pickup_time);
-        pickupTime.setText("Pickup Time");
+        pickupTimeLayout = (TextInputLayout) view.findViewById(R.id.pickup_time_layout);
+        pickupTime = (EditText) view.findViewById(R.id.pickup_time);
 
         returnLocation = (EditText) view.findViewById(R.id.return_location);
-        returnTimeLabel = (TextView) view.findViewById(R.id.return_time_label);
-        returnTimeLabel.setVisibility(View.GONE);
-        returnTime = (TextView) view.findViewById(R.id.return_time);
-        returnTime.setText("Return Time");
+        returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
+        returnTime = (EditText) view.findViewById(R.id.return_time);
 
-        setDateFunctionality(pickupTime, pickupTimeLabel, false);
-        setDateFunctionality(returnTime, returnTimeLabel, true);
+        setDateFunctionality(pickupTime, false);
+        setDateFunctionality(returnTime, true);
 
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_offer);
 
@@ -171,6 +173,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             public void onClick(View v) {
                 exchangeDate = null;
                 returnDate = null;
+                clearErrors();
                 dismiss();
             }
         });
@@ -259,6 +262,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
+                    submitOfferBtn.setEnabled(true);
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully created offer");
                 } else if (responseCode == 406) {
@@ -275,6 +279,29 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                 }
             }
         }.execute();
+    }
+
+    private void clearErrors() {
+        offerPriceLayout.setError(null);
+        pickupTimeLayout.setError(null);
+        returnTimeLayout.setError(null);
+    }
+
+    private boolean validateForm() {
+        boolean good = true;
+        if (offerPrice.getText().toString().isEmpty()) {
+            offerPriceLayout.setError("price cannot be empty");
+            good = false;
+        }
+        if (exchangeDate != null && exchangeDate.before(new Date())) {
+            pickupTimeLayout.setError("this must be a date in the future");
+            good = false;
+        }
+        if (returnDate != null && returnDate.before(new Date())) {
+            returnTimeLayout.setError("this must be a date in the future");
+            good = false;
+        }
+        return good;
     }
 
 
@@ -306,21 +333,19 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         response.setRequestId(requestId);
         response.setSellerId(user.getId());
         response.setExchangeLocation(pickupLocation.getText().toString());
-        try {
-            Date exchangeTime = new Date(pickupTime.getText().toString());
+        if (exchangeDate != null) {
             response.setExchangeTime(exchangeDate);
-        } catch (Exception e) {
-            Log.i("New Offer Dialog", "**exchange time wasn't set");
         }
         response.setReturnLocation(returnLocation.getText().toString());
-        try {
-            Date rTime = new Date(returnTime.getText().toString());
+        if (returnDate != null) {
             response.setReturnTime(returnDate);
-        } catch (Exception e) {
-            Log.i("New Offer Dialog", "**return time wasn't set");
         }
-        double offer = Double.parseDouble(offerPrice.getText().toString());
-        response.setOfferPrice(offer);
+        String offerString = offerPrice.getText().toString();
+        if (!offerString.isEmpty()) {
+            offerString = offerString.replace("$", "");
+            double offer = Double.parseDouble(offerString);
+            response.setOfferPrice(offer);
+        }
         /*String offerType = offerTypeSpinner.getSelectedItem().toString();
         if (offerType.equals("per day")) {
             offerType= "per_day";
@@ -331,7 +356,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         return response;
     }
 
-    private void setDateFunctionality(final TextView time, final TextView label, final boolean isReturn) {
+    private void setDateFunctionality(final EditText time, final boolean isReturn) {
 
         time.setOnTouchListener(new View.OnTouchListener() {
 
@@ -378,7 +403,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                             } else {
                                 exchangeDate = newPickupTime;
                             }
-                            label.setVisibility(View.VISIBLE);
                             alertDialog.dismiss();
                         }
                     });

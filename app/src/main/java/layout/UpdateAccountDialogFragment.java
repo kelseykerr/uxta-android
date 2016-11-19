@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,14 +53,22 @@ import superstartupteam.nearby.model.User;
 public class UpdateAccountDialogFragment extends DialogFragment {
     private Context context;
     private User user;
+    private TextInputLayout firstNameLayout;
     private EditText firstName;
+    private TextInputLayout lastNameLayout;
     private EditText lastName;
+    private TextInputLayout addressLine1Layout;
     private EditText addressLine1;
     private EditText addressLine2;
+    private TextInputLayout cityLayout;
     private EditText city;
+    private TextInputLayout stateLayout;
     private EditText state;
+    private TextInputLayout zipLayout;
     private EditText zip;
+    private TextInputLayout emailLayout;
     private EditText email;
+    private TextInputLayout phoneLayout;
     private EditText phone;
     private SwitchCompat notificationsNearHome;
     private SwitchCompat notificationsNearby;
@@ -76,8 +85,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private static final String VENMO_EMAIL_STRING = "venmo - link by email";
     private static final String VENMO_PHONE_STRING = "venmo - link by mobile phone";
     private static final String BANK_STRING = "deposit directly to bank";
-    private TextInputLayout emailLayout;
-    private TextInputLayout phoneLayout;
     private TextInputLayout accntNumberLayout;
     private TextInputLayout routingNumberLayout;
     private TextView dob;
@@ -136,27 +143,35 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
+        firstNameLayout = (TextInputLayout) view.findViewById(R.id.first_name_layout);
         firstName = (EditText) view.findViewById(R.id.first_name);
+        Drawable drawable = firstName.getBackground().getConstantState().newDrawable();
+        firstName.setBackgroundDrawable(drawable);
         firstName.setText(user.getFirstName());
+        lastNameLayout = (TextInputLayout) view.findViewById(R.id.last_name_layout);
         lastName = (EditText) view.findViewById(R.id.last_name);
         lastName.setText(user.getLastName());
+        addressLine1Layout = (TextInputLayout) view.findViewById(R.id.address_line1_layout);
         addressLine1 = (EditText) view.findViewById(R.id.address_line1);
         addressLine1.setText(user.getAddress());
         addressLine2 = (EditText) view.findViewById(R.id.address_line2);
         addressLine2.setText(user.getAddressLine2());
+        cityLayout = (TextInputLayout) view.findViewById(R.id.city_layout);
         city = (EditText) view.findViewById(R.id.city);
         city.setText(user.getCity());
+        stateLayout = (TextInputLayout) view.findViewById(R.id.state_layout);
         state = (EditText) view.findViewById(R.id.state);
         state.setText(user.getState());
+        zipLayout = (TextInputLayout) view.findViewById(R.id.zipcode_layout);
         zip = (EditText) view.findViewById(R.id.zipcode);
         zip.setText(user.getZip());
+        emailLayout = (TextInputLayout) view.findViewById(R.id.email_layout);
         email = (EditText) view.findViewById(R.id.email);
         email.setText(user.getEmail());
-        emailLayout = (TextInputLayout) view.findViewById(R.id.email_layout);
+        phoneLayout = (TextInputLayout) view.findViewById(R.id.phone_layout);
         phone = (EditText) view.findViewById(R.id.phone);
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         phone.setText(user.getPhone());
-        phoneLayout = (TextInputLayout) view.findViewById(R.id.phone_layout);
         bank_acct = (EditText) view.findViewById(R.id.bank_acct);
         bank_acct.setText(user.getBankAccountNumber());
         accntNumberLayout = (TextInputLayout) view.findViewById(R.id.bank_acct_layout);
@@ -365,27 +380,27 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         boolean valid = true;
         String first = firstName.getText().toString();
         if (first.isEmpty() || first.length() < 2) {
-            firstName.setError("please enter a first name that is at least 2 characters long");
+            firstNameLayout.setError("please enter a first name that is at least 2 characters long");
             valid = false;
         }
         String last = lastName.getText().toString();
         if (last.isEmpty() || last.length() < 2) {
-            lastName.setError("please enter a last name that is at least 2 characters long");
+            lastNameLayout.setError("please enter a last name that is at least 2 characters long");
             valid = false;
         }
         String address = addressLine1.getText().toString();
         if (address.isEmpty() || address.length() < 6) {
-            addressLine1.setError("please enter a valid address");
+            addressLine1Layout.setError("please enter a valid address");
             valid = false;
         }
         String cityText = city.getText().toString();
         if (cityText.isEmpty() || cityText.length() < 2) {
-            city.setError("please enter a valid city");
+            cityLayout.setError("please enter a valid city");
             valid = false;
         }
         String stateText = state.getText().toString();
         if (stateText.isEmpty() || stateText.length() != 2) {
-            state.setError("please enter your state");
+            stateLayout.setError("please enter your state");
             valid = false;
         }
         return valid;
@@ -395,17 +410,17 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         boolean valid = true;
         String zipString = zip.getText().toString();
         if (zipString.isEmpty() || zipString.length() != 5) {
-            zip.setError("please enter your 5 digit zip code");
+            zipLayout.setError("please enter your 5 digit zip code");
             valid = false;
         }
         String emailString = email.getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
-            email.setError("please enter a valid email");
+            emailLayout.setError("please enter a valid email");
             valid = false;
         }
         String phoneString = phone.getText().toString();
         if (phoneString.isEmpty() || !Patterns.PHONE.matcher(phoneString).matches()) {
-            phone.setError("please enter a valid phone number");
+            phoneLayout.setError("please enter a valid phone number");
             valid = false;
         }
         return valid;

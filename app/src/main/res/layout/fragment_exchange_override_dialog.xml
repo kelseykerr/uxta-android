@@ -30,8 +30,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:paddingBottom="8dp"
-                android:paddingEnd="25dp"
-                android:paddingStart="8dp"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
                 android:paddingTop="20dp"
                 android:src="@drawable/x_svg"
                 android:tint="@color/colorAccent" />
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/exchange_override_text"
                 android:layout_marginBottom="10dp"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="10dp"
                 android:text="Exchange Time"
                 android:textSize="12sp" />
@@ -53,18 +53,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/exchange_time_label"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="5dp"
                 android:clickable="true"
                 android:textColor="@color/colorAccent"
                 android:textSize="18sp" />
 
             <LinearLayout
                 android:id="@+id/exchange_time_border"
-                android:layout_width="292dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/exchange_time"
                 android:layout_marginBottom="32dp"
-                android:layout_marginStart="20dp">
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp">
 
                 <TextView
                     android:layout_width="match_parent"

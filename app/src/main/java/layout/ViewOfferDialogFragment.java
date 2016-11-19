@@ -7,11 +7,13 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -61,6 +63,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private static Request request;
     private HistoryFragment.OnFragmentInteractionListener mListener;
     private Context context;
+    private TextInputLayout offerPriceLayout;
     private EditText offerPrice;
     private Spinner offerType;
     private EditText pickupLocation;
@@ -68,12 +71,12 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private Button updateRequestBtn;
     private Button rejectRequestBtn;
     private ImageButton backButton;
-    private TextView pickupTime;
-    private TextView returnTime;
+    private TextInputLayout pickupTimeLayout;
+    private EditText pickupTime;
+    private TextInputLayout returnTimeLayout;
+    private EditText returnTime;
     private User user;
     private View view;
-    private TextView pickupLabel;
-    private TextView returnLabel;
     private Date returnDate;
     private Date exchangeDate;
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
@@ -112,37 +115,25 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                              Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
         View view = inflater.inflate(R.layout.fragment_view_offer_dialog, container, false);
-        pickupTime = (TextView) view.findViewById(R.id.pickup_time);
-        /*if (response.getExchangeTime() != null) {
-            String formattedTime = formatter.format(response.getExchangeTime());
-            exchangeDate = response.getExchangeTime();
-            pickupTime.setText(formattedTime);
-
-        } else {
-            String htmlString = "Pickup Time";
-            pickupLabel = (TextView) view.findViewById(R.id.pickup_time_label);
-            pickupLabel.setVisibility(View.GONE);
-            pickupTime.setText(Html.fromHtml(htmlString));
-        }*/
-
+        pickupTimeLayout = (TextInputLayout) view.findViewById(R.id.pickup_time_layout);
+        pickupTimeLayout.setErrorEnabled(true);
+        pickupTime = (EditText) view.findViewById(R.id.pickup_time);
         setDateTimeFunctionality(pickupTime, true);
 
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
         pickupLocation.setText(response.getExchangeLocation());
         returnLocation = (EditText) view.findViewById(R.id.return_location);
         returnLocation.setText(response.getReturnLocation());
-        returnTime = (TextView) view.findViewById(R.id.return_time);
+        returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
+        returnTime = (EditText) view.findViewById(R.id.return_time);
         if (!request.getRental()) {
             returnLocation.setVisibility(View.GONE);
             returnTime.setVisibility(View.GONE);
-            TextView returnTimeLabel = (TextView) view.findViewById(R.id.return_time_label);
-            returnTimeLabel.setVisibility(View.GONE);
-            LinearLayout returnTimeLine = (LinearLayout) view.findViewById(R.id.return_time_underline);
-            returnTimeLine.setVisibility(View.GONE);
         } else {
             this.view = view;
             setDateTimeFunctionality(returnTime, false);
         }
+        offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
         offerPrice.addTextChangedListener(new TextWatcher() {
             @Override
@@ -252,6 +243,11 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     }
 
     private void updateResponse() {
+        boolean goodForm = validateForm();
+        if (!goodForm) {
+            updateRequestBtn.setEnabled(true);
+            return;
+        }
         updateResponseObject();
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -309,7 +305,11 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     }
 
     private void updateResponseObject() {
-        double offer = Double.parseDouble(offerPrice.getText().toString());
+        String offerStr = offerPrice.getText().toString();
+        if (!offerStr.isEmpty()) {
+            offerStr = offerStr.replace("$", "");
+        }
+        double offer = Double.parseDouble(offerStr);
         response.setOfferPrice(offer);
         /*String type = offerType.getSelectedItem().toString();
         if (type.equals("per day")) {
@@ -319,40 +319,43 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         }
         response.setPriceType(type);*/
         response.setExchangeLocation(pickupLocation.getText().toString());
-        if (!pickupTime.getText().toString().equals("Pickup Time")) {
-            Date eDate = new Date(pickupTime.getText().toString());
-            response.setExchangeTime(eDate);
+        if (!pickupTime.getText().toString().isEmpty()) {
+            response.setExchangeTime(exchangeDate);
         }
         if (request.getRental()) {
             response.setReturnLocation(returnLocation.getText().toString());
-            if (!returnTime.getText().toString().equals("Return Time")) {
-                Date eDate = new Date(returnTime.getText().toString());
-                response.setReturnTime(eDate);
+            if (!returnTime.getText().toString().isEmpty()) {
+                response.setReturnTime(returnDate);
             }
         }
     }
 
-    private void setDateTimeFunctionality(final TextView textView, final boolean pickup) {
+    private boolean validateForm() {
+        boolean good = true;
+        if (offerPrice.getText().toString().isEmpty()) {
+            offerPriceLayout.setError("price cannot be empty");
+            good = false;
+        }
+        if (exchangeDate != null && exchangeDate.before(new Date())) {
+            pickupTimeLayout.setError("this must be a date in the future");
+            good = false;
+        }
+        if (returnDate != null && returnDate.before(new Date())) {
+            returnTimeLayout.setError("this must be a date in the future");
+            good = false;
+        }
+        return good;
+    }
+
+    private void setDateTimeFunctionality(final EditText textView, final boolean pickup) {
         if (pickup ? response.getExchangeTime() != null : response.getReturnTime() != null) {
             String formattedTime = pickup ? formatter.format(response.getExchangeTime()) : formatter.format(response.getReturnTime());
+            textView.setText(formattedTime);
             if (pickup) {
                 exchangeDate = response.getExchangeTime();
             } else {
                 returnDate = response.getReturnTime();
             }
-            textView.setText(formattedTime);
-        } else {
-            String htmlString = pickup ? "PickupTime" : "Return Time";
-            textView.setText(Html.fromHtml(htmlString));
-            if (pickup) {
-                pickupLabel = (TextView) view.findViewById(R.id.pickup_time_label);
-                pickupLabel.setVisibility(View.GONE);
-            } else {
-                returnLabel = (TextView) view.findViewById(R.id.return_time_label);
-                returnLabel.setVisibility(View.GONE);
-            }
-            textView.setTextSize(18);
-            textView.setText(Html.fromHtml(htmlString));
         }
 
         textView.setOnTouchListener(new View.OnTouchListener() {
@@ -399,9 +402,6 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                                 returnDate = newPickupTime;
                             } else {
                                 exchangeDate = newPickupTime;
-                            }
-                            if (returnLabel != null) {
-                                returnLabel.setVisibility(View.VISIBLE);
                             }
                             alertDialog.dismiss();
                         }
