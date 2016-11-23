@@ -21,10 +21,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -48,6 +53,7 @@ import java.net.URL;
 import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
 import layout.ExchangeOverrideDialogFragment;
+import layout.FiltersDialogFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewOfferDialogFragment;
@@ -71,14 +77,18 @@ public class MainActivity extends AppCompatActivity
         UpdateAccountDialogFragment.OnFragmentInteractionListener,
         ExchangeCodeDialogFragment.OnFragmentInteractionListener,
         ExchangeOverrideDialogFragment.OnFragmentInteractionListener,
+        FiltersDialogFragment.OnFragmentInteractionListener,
         BraintreeListener {
 
     private User user;
     private Toolbar toolbar;
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
-    private ImageButton newRequestButton;
     private TextView listMapText;
+    private RelativeLayout toolbarLine1;
+    private RelativeLayout toolbarLine2;
+    private EditText searchBar;
+    private ImageButton searchBtn;
     private String snackbarMessage;
     String currentText = "list";
     FragmentManager fragmentManager = getFragmentManager();
@@ -135,7 +145,7 @@ public class MainActivity extends AppCompatActivity
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         user = PrefUtils.getCurrentUser(MainActivity.this);
         if (user == null || user.getAccessToken() == null) {
-            if(user != null && user.getAccessToken() != null){
+            if (user != null && user.getAccessToken() != null) {
                 Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
                 finish();
@@ -156,14 +166,20 @@ public class MainActivity extends AppCompatActivity
         }
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
+        toolbarLine2 = (RelativeLayout) findViewById(R.id.toolbar_line_2);
+        //toolbarLine1 = (RelativeLayout) findViewById(R.id.toolbar_line_1);
+        TextView nearbyLogo = (TextView) findViewById(R.id.nearby_logo);
+        searchBar = (EditText) findViewById(R.id.search_bar);
+        setSearchBarDone();
+        searchBtn = (ImageButton) findViewById(R.id.search_button);
+        setSearchBtnClick();
         listMapText = (TextView) findViewById(R.id.list_map_text);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setTitle("");
         toolbar.setSubtitle("");
 
-        newRequestButton = (ImageButton) findViewById(R.id.new_request_button);
-        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_button_layout);
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_btn_layout);
         frameLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 user = PrefUtils.getCurrentUser(MainActivity.this);
@@ -196,6 +212,35 @@ public class MainActivity extends AppCompatActivity
         scheduleNotificationsAlarm();
     }
 
+    private void setSearchBtnClick() {
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String searchTerm = searchBar.getText().toString();
+                InputMethodManager inputManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+                searchBar.clearFocus();
+                HomeFragment.searchTerm = searchTerm;
+                HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                homeFragment.getRequests(null);
+            }
+        });
+    }
+
+    private void setSearchBarDone() {
+        searchBar.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    searchBtn.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
 
     public void showNewRequestDialog(View view) {
         DialogFragment newFragment = RequestDialogFragment
@@ -216,15 +261,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void filterRequests(View view) {
+        DialogFragment newFragment = FiltersDialogFragment
+                .newInstance();
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    listMapText.setVisibility(View.VISIBLE);
+                    toolbarLine2.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
-                        homeFragment.getRequests(null, false);
+                        homeFragment.getRequests(null);
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
                                 .show(fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG))
@@ -237,7 +288,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    listMapText.setVisibility(View.INVISIBLE);
+                    toolbarLine2.setVisibility(View.GONE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
@@ -251,7 +302,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    listMapText.setVisibility(View.INVISIBLE);
+                    toolbarLine2.setVisibility(View.GONE);
                     reselectHistory(menuItemId);
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
@@ -339,7 +390,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private int selectHistoryFragment(int menuItemId) {
-        listMapText.setVisibility(View.INVISIBLE);
+        toolbarLine2.setVisibility(View.GONE);
         int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
         int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
         HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
@@ -383,7 +434,7 @@ public class MainActivity extends AppCompatActivity
 
         // We should now have payment information => get nonce from braintree so that we can create a customer
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
-            if (updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
+            if (updatedUser != null && updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
                 //TODO: in prod, user the real cc number & expiration date
                 CardBuilder cardBuilder = new CardBuilder()
                         .cardNumber("4111111111111111")
@@ -392,6 +443,9 @@ public class MainActivity extends AppCompatActivity
             } else {
                 SharedAsyncMethods.updateUser(updatedUser, this, this, mLayout);
             }
+        } else if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
+            HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+            homeFragment.getRequests(null);
         }
     }
 

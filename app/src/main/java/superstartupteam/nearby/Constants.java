@@ -25,4 +25,6 @@ public class Constants {
     // Fragment Post-processing requests
     public static final int FPPR_REGISTER_BRAINTREE_CUSTOMER = 101;
 
+    public static final int FPPR_SUBMIT_FILTERS = 102;
+
 }

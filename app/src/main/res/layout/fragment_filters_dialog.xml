@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/filters_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="Filters"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/close_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="start"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingBottom="8dp"
+                android:paddingEnd="25dp"
+                android:paddingStart="8dp"
+                android:paddingTop="20dp"
+                android:src="@drawable/x_svg"
+                android:tint="@color/colorAccent" />
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/radius_spinner"
+                android:layout_below="@id/close_filters"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="true"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="Distance"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hint="Distance"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                app:ms_thickness=".5dp" />
+
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/sort_by_spinner"
+                android:layout_below="@id/radius_spinner"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="true"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="Sort By"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hint="Sort By"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                android:entries="@array/sortByItems"
+                app:ms_thickness=".5dp" />
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/location_spinner"
+                android:visibility="gone"
+                android:layout_below="@id/sort_by_spinner"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="true"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="Search By"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hint="Search By"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                android:entries="@array/locationItems"
+                app:ms_thickness=".5dp" />
+
+
+            <Button
+                android:id="@+id/filter_button"
+                android:layout_below="@id/location_spinner"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/primary_btn"
+                android:text="filter"
+                android:textColor="#ffffff" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

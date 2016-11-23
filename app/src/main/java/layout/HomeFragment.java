@@ -1,6 +1,5 @@
 package layout;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -109,13 +107,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private TextView noResultsList;
     private ScrollView listView;
     private RelativeLayout requestMapView;
-    private Double currentRadius;
     private CameraUpdate cu;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
     private View view;
     private LocalBroadcastManager mLocalBroadcastManager;
-    private Boolean homeLocation;
+    public static Boolean homeLocation = false;
+    public static Double currentRadius;
+    public static String sortBy;
     private Location currentLocation;
+    public static String searchTerm;
 
 
     private OnFragmentInteractionListener mListener;
@@ -162,7 +162,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         listView.setVisibility(View.GONE);
         requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
 
-        Spinner locationSpinner = (Spinner) v.findViewById(R.id.location_spinner);
+        /*Spinner locationSpinner = (Spinner) v.findViewById(R.id.location_spinner);
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
                 getResources().getStringArray(R.array.locationItems));
         locationSpinner.setAdapter(locationAdapter);
@@ -176,7 +176,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                             updateMapFocus(new LatLng(currentLocation.getLatitude(),
                                     currentLocation.getLongitude()));
                         }
-                        getRequests(currentRadius, false);
+                        getRequests(currentRadius);
                     } else {
                         homeLocation = true;
                         if (currLocationMarker != null) {
@@ -195,7 +195,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
                         map.animateCamera(CameraUpdateFactory
                                 .newCameraPosition(cameraPosition));
-                        getRequests(currentRadius, true);
+                        getRequests(currentRadius);
                     }
                 } // to close the onItemSelected
 
@@ -235,7 +235,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, radiusList);
 
         // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
+        spinner.setAdapter(dataAdapter); */
 
         recList = (RecyclerView) v.findViewById(R.id.request_list);
         recList.setHasFixedSize(true);
@@ -248,7 +248,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResultsList = (TextView) v.findViewById(R.id.no_results_list);
         noResultsList.setVisibility(View.GONE);
-        getRequests(currentRadius, false);
+        getRequests(currentRadius);
         return v;
     }
 
@@ -337,9 +337,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-    public void getRequests(final Double radius, final boolean homeAddress) {
+    public void getRequests(final Double radius) {
         if (!MainActivity.isNetworkConnected()) {
             showNoConnectionSnackbar();
+            return;
+        }
+        else if (user == null) {
             return;
         }
         new AsyncTask<Void, Void, Void>() {
@@ -350,10 +353,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 }
                 try {
                     Double r = radius != null ? radius : currentRadius;
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests?radius=" + r +
-                            "&latitude=" + (homeAddress ? user.getHomeLatitude() : latLng.latitude)
-                            + "&longitude=" + (homeAddress ? user.getHomeLongitude() : latLng.longitude) +
-                            "&includeMine=false&expired=false");
+                    String urlString = Constants.NEARBY_API_PATH + "/requests?radius=" + r +
+                            "&latitude=" + (homeLocation ? user.getHomeLatitude() : latLng.latitude)
+                            + "&longitude=" + (homeLocation ? user.getHomeLongitude() : latLng.longitude) +
+                            "&includeMine=false&expired=false";
+                    if (searchTerm != null && !searchTerm.isEmpty()) {
+                        urlString += ("&searchTerm=" + searchTerm);
+                    }
+                    if (sortBy != null && !sortBy.isEmpty() && !sortBy.equals("best match")) {
+                        urlString += ("&sortBy=" + sortBy);
+                    }
+                    URL url = new URL(urlString);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
@@ -365,8 +375,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);
                     } catch (IOException e) {
-                        Log.e("Error", "Received an error while trying to fetch " +
-                                "requests from server, please try again later!");
+                        Log.e("Error", output);
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not get requests: " + e.getMessage());
@@ -430,6 +439,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void updateZoom(Marker marker, LatLng latLng) {
+        if (currentRadius == null) {
+            currentRadius = .1;
+        }
         CircleOptions options = new CircleOptions();
         options.center(marker != null ? marker.getPosition() : latLng);
         //Radius in meters
@@ -457,7 +469,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             if (value.equals(radiusString)) {
                 currentRadius = key;
                 // Get requests within that radius
-                getRequests(key, false);
+                getRequests(key);
                 break;
             }
         }
@@ -516,7 +528,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
-            getRequests(.1, false);
+            getRequests(.1);
             if (recList != null) {
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
@@ -562,7 +574,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        getRequests(.1, false);
+        getRequests(.1);
         requestAdapter.swap(requests);
         //ft.show(mapFragment).commit();
 
