@@ -2,7 +2,6 @@ package superstartupteam.nearby;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,7 +13,6 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Currency;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +20,6 @@ import java.util.List;
 import superstartupteam.nearby.model.BaseEntity;
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/21/16.

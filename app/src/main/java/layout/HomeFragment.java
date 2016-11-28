@@ -24,11 +24,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -161,81 +159,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         listView = (ScrollView) v.findViewById(R.id.list_view);
         listView.setVisibility(View.GONE);
         requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
-
-        /*Spinner locationSpinner = (Spinner) v.findViewById(R.id.location_spinner);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
-                getResources().getStringArray(R.array.locationItems));
-        locationSpinner.setAdapter(locationAdapter);
-        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
-            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedItem = parent.getItemAtPosition(position).toString();
-                    if (selectedItem.equals("current location")) {
-                        homeLocation = false;
-                        if (latLng != null) {
-                            updateMapFocus(new LatLng(currentLocation.getLatitude(),
-                                    currentLocation.getLongitude()));
-                        }
-                        getRequests(currentRadius);
-                    } else {
-                        homeLocation = true;
-                        if (currLocationMarker != null) {
-                            currLocationMarker.remove();
-                        }
-                        latLng = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title("Home Location");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                        currLocationMarker = map.addMarker(markerOptions);
-
-                        //zoom to current position:
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(latLng).zoom(15).build();
-
-                        map.animateCamera(CameraUpdateFactory
-                                .newCameraPosition(cameraPosition));
-                        getRequests(currentRadius);
-                    }
-                } // to close the onItemSelected
-
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            locationSpinner.setVisibility(View.VISIBLE);
-        } else {
-            locationSpinner.setVisibility(View.GONE);
-        }
-
-
-        // Spinner element
-        Spinner spinner = (Spinner) v.findViewById(R.id.radius_spinner);
-
-        // Spinner click listener
-        spinner.setOnItemSelectedListener(this);
-
-        // Spinner Drop down elements
-        List<String> radiusList = new ArrayList<>();
-        radiusMap.put(.1, ".1 mile radius");
-        radiusMap.put(.25, ".25 mile radius");
-        radiusMap.put(.5, ".5 mile radius");
-        radiusMap.put(1.0, "1 mile radius");
-        radiusMap.put(5.0, "5 mile radius");
-        radiusMap.put(10.0, "10 mile radius");
-        radiusList.add(radiusMap.get(.1));
-        radiusList.add(radiusMap.get(.25));
-        radiusList.add(radiusMap.get(.5));
-        radiusList.add(radiusMap.get(1.0));
-        radiusList.add(radiusMap.get(5.0));
-        radiusList.add(radiusMap.get(10.0));
-
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, radiusList);
-
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter); */
 
         recList = (RecyclerView) v.findViewById(R.id.request_list);
         recList.setHasFixedSize(true);

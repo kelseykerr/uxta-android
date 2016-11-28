@@ -1,8 +1,6 @@
 package superstartupteam.nearby;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +14,6 @@ import java.net.URL;
 
 import layout.AccountFragment;
 import superstartupteam.nearby.model.User;
-
-import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class SharedAsyncMethods {
 
