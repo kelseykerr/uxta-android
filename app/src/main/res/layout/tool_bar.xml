@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary">
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:id="@+id/toolbar_line_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -30,7 +30,7 @@
                 android:paddingBottom="10dp"
                 android:paddingEnd="25dp"
                 android:paddingStart="10dp"
-                android:paddingTop="15dp">
+                android:paddingTop="5dp">
 
                 <ImageButton
                     android:id="@+id/new_request_button"
@@ -53,10 +53,10 @@
                 android:paddingTop="7dp"
                 android:contextClickable="true"
                 android:drawablePadding="0dp"
-                android:drawableStart="@drawable/nearby_logo_2_white"
+                android:drawableStart="@drawable/nearby_white_toolbar"
                 android:layout_centerHorizontal="true" />
 
-        </RelativeLayout>
+        </RelativeLayout> -->
 
         <RelativeLayout
             android:id="@+id/toolbar_line_2"
@@ -64,8 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true"
-            android:layout_below="@id/toolbar_line_1">
+            android:focusableInTouchMode="true">
 
             <TextView
                 android:id="@+id/filter_text"

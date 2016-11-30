@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"
-            android:layout_marginTop="105dp"
+            android:layout_marginTop="55dp"
             android:gravity="center">
 
         </RelativeLayout>
@@ -50,8 +50,6 @@
 
             </fragment>
         </RelativeLayout>
-
-
 
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
     private TextView listMapText;
-    private RelativeLayout toolbarLine1;
+    //private RelativeLayout toolbarLine1;
     private RelativeLayout toolbarLine2;
     private EditText searchBar;
     private ImageButton searchBtn;
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity
     private BraintreeFragment mBraintreeFragment;
     public static User updatedUser;
     public static ConnectivityManager connMgr;
+    private FloatingActionButton fab;
+
 
     /**
      * Root of the layout of this Activity.
@@ -179,18 +183,16 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle("");
         toolbar.setSubtitle("");
 
-        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.new_request_btn_layout);
-        frameLayout.setOnClickListener(new View.OnClickListener() {
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                user = PrefUtils.getCurrentUser(MainActivity.this);
                 boolean goodCustomerStatus = user.getCustomerStatus() != null &&
                         user.getCustomerStatus().equals("valid");
                 if (user.getCustomerId() != null && goodCustomerStatus) {
                     showNewRequestDialog(v);
                 } else {
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
-                    homeFragment.displayNoNewRequestSnackbar();
-                }
+                    homeFragment.displayNoNewRequestSnackbar();                }
             }
         });
 
@@ -272,7 +274,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    toolbarLine2.setVisibility(View.VISIBLE);
+                    //toolbarLine2.setVisibility(View.VISIBLE);
+                    toolbar.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
                         homeFragment.getRequests(null);
@@ -288,7 +291,8 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    toolbarLine2.setVisibility(View.GONE);
+                    //toolbarLine2.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.GONE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
                                 .setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right)
@@ -302,7 +306,8 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    toolbarLine2.setVisibility(View.GONE);
+                    //toolbarLine2.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.GONE);
                     reselectHistory(menuItemId);
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
