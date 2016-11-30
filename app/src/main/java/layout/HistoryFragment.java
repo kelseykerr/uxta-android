@@ -289,11 +289,7 @@ public class HistoryFragment extends Fragment {
                     parentObjs.add(h);
                 }
                 requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
-                //historyCardAdapter = new HistoryCardAdapter(context, parentObjs, thisFragment);
                 historyCardAdapter = new HistoryCardAdapter(recentHistory, thisFragment);
-                //historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
-                //historyCardAdapter.setParentClickableViewAnimationDuration(0);
-                //historyCardAdapter.setParentAndIconExpandOnClick(false);
                 requestHistoryList.setAdapter(historyCardAdapter);
                 LinearLayoutManager llm = new LinearLayoutManager(context);
                 llm.setOrientation(LinearLayoutManager.VERTICAL);

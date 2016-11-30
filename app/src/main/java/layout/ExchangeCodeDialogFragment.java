@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -33,6 +34,7 @@ import java.net.URL;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.User;
@@ -118,6 +120,8 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                MainActivity ma = (MainActivity) getActivity();
+                ma.goToHistory(null);
                 dismiss();
             }
         });
