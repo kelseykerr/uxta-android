@@ -34,6 +34,7 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import layout.HistoryFragment;
@@ -376,7 +377,19 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.showConfirmChargeIcon = true;
             }
         } else {
+            requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
             requestViewHolder.showExchangeIcon = false;
+            requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
+            Date completedDate;
+            if (r.getRental()) {
+                completedDate = transaction.getReturnTime() != null ?
+                        transaction.getReturnTime() : transaction.getReturnOverride().time;
+            } else {
+                completedDate = transaction.getExchangeTime() != null ?
+                        transaction.getExchangeTime() : transaction.getExchangeOverride().time;
+            }
+            String diff = AppUtils.getTimeDiffString(completedDate);
+            requestViewHolder.vPostedDate.setText(diff);
             BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getFinalPrice());
             if (isBuyer) {
                 String price = "<b>Payment:</b> -$" + formattedValue;
@@ -387,6 +400,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
             requestViewHolder.vCategoryName.setVisibility(View.GONE);
             requestViewHolder.vStatus.setText(r.getStatus());
+            requestViewHolder.vStatus.setTextColor(Color.parseColor("#4EE2EC"));
+
         }
     }
 
