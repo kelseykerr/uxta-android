@@ -347,6 +347,8 @@ public class MainActivity extends AppCompatActivity
                             .commit();
                 } else if (menuItemId == R.id.bottomBarHomeItem) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    listMapText.setText("list");
+                    currentText = "list";
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
                         fragmentTransaction.remove(homeFragment);
