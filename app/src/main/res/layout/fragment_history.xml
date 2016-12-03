@@ -11,18 +11,29 @@
         android:id="@+id/no_history_layout"
         android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/no_history_text"
+            android:layout_centerVertical="true"
             android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
             android:textColor="@color/colorAccent"
-            android:textStyle="italic"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:text="no history to show"/>
+
+        <ImageButton
+            android:id="@+id/grey_pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:tint="@color/colorAccent"
+            android:layout_above="@id/no_history_text"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/pin_grey_150"/>
 
     </RelativeLayout>
 
