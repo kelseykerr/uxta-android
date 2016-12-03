@@ -94,6 +94,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private ScrollView screen4;
     private RelativeLayout updatingScreen;
     private CheckBox acceptTos;
+    private TextView acceptTosError;
 
 
     /**
@@ -273,11 +274,18 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
                 }
             });
+            acceptTosError = (TextView) view.findViewById(R.id.acceptTosError);
+            acceptTosError.setVisibility(View.GONE);
             acceptTos = (CheckBox) view.findViewById(R.id.acceptTos);
             acceptTos.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    user.setTosAccepted(((CheckBox) v).isChecked());
+                    boolean isChecked = ((CheckBox) v).isChecked();
+                    user.setTosAccepted(isChecked);
+                    if (isChecked) {
+                        acceptTos.setError(null);
+                        acceptTosError.setVisibility(View.GONE);
+                    }
                 }
             });
             Button acceptAndSave = (Button) view.findViewById(R.id.accept_and_save);
@@ -297,7 +305,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     return;
                 }
                 if ((acceptTos != null && !acceptTos.isChecked()) || !user.getTosAccepted()) {
-                    acceptTos.setError("you must accept the terms of service");
+                    acceptTos.setError("");
+                    acceptTosError.setVisibility(View.VISIBLE);
                     return;
                 }
                 screen3.setVisibility(View.GONE);
@@ -382,26 +391,36 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         if (first.isEmpty() || first.length() < 2) {
             firstNameLayout.setError("please enter a first name that is at least 2 characters long");
             valid = false;
+        } else {
+            firstNameLayout.setError(null);
         }
         String last = lastName.getText().toString();
         if (last.isEmpty() || last.length() < 2) {
             lastNameLayout.setError("please enter a last name that is at least 2 characters long");
             valid = false;
+        } else {
+            lastNameLayout.setError(null);
         }
         String address = addressLine1.getText().toString();
         if (address.isEmpty() || address.length() < 6) {
             addressLine1Layout.setError("please enter a valid address");
             valid = false;
+        } else {
+            addressLine1Layout.setError(null);
         }
         String cityText = city.getText().toString();
         if (cityText.isEmpty() || cityText.length() < 2) {
             cityLayout.setError("please enter a valid city");
             valid = false;
+        } else {
+            cityLayout.setError(null);
         }
         String stateText = state.getText().toString();
         if (stateText.isEmpty() || stateText.length() != 2) {
             stateLayout.setError("please enter your state");
             valid = false;
+        } else {
+            stateLayout.setError(null);
         }
         return valid;
     }
@@ -412,16 +431,22 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         if (zipString.isEmpty() || zipString.length() != 5) {
             zipLayout.setError("please enter your 5 digit zip code");
             valid = false;
+        } else {
+            zipLayout.setError(null);
         }
         String emailString = email.getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailLayout.setError("please enter a valid email");
             valid = false;
+        } else {
+            emailLayout.setError(null);
         }
         String phoneString = phone.getText().toString();
         if (phoneString.isEmpty() || !Patterns.PHONE.matcher(phoneString).matches()) {
             phoneLayout.setError("please enter a valid phone number");
             valid = false;
+        } else {
+            phoneLayout.setError(null);
         }
         return valid;
     }
@@ -432,6 +457,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         if (dobString.isEmpty()) {
             dob.setError("please enter your date of birth");
             valid = false;
+        } else {
+            dob.setError(null);
         }
         return valid;
     }

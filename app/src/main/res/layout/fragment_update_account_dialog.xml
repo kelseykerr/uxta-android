@@ -606,14 +606,25 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
                 android:text="@string/braintree_tos"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <CheckBox
                 android:id="@+id/acceptTos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/braintree_tos"
+                android:textColor="@color/colorAccent"
                 android:text="accept terms of service" />
+
+            <TextView
+                android:id="@+id/acceptTosError"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/acceptTos"
+                android:layout_marginStart="5dp"
+                android:text="you must accept the terms of service"
+                android:textColor="@color/redPink"/>
 
             <Button
                 android:id="@+id/accept_and_save"

@@ -25,11 +25,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -171,8 +169,6 @@ public class MainActivity extends AppCompatActivity
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
         toolbarLine2 = (RelativeLayout) findViewById(R.id.toolbar_line_2);
-        //toolbarLine1 = (RelativeLayout) findViewById(R.id.toolbar_line_1);
-        TextView nearbyLogo = (TextView) findViewById(R.id.nearby_logo);
         searchBar = (EditText) findViewById(R.id.search_bar);
         setSearchBarDone();
         searchBtn = (ImageButton) findViewById(R.id.search_button);
@@ -212,6 +208,10 @@ public class MainActivity extends AppCompatActivity
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
         checkNotificationOnOpen();
         scheduleNotificationsAlarm();
+        if (user.getTosAccepted() == null || user.getTosAccepted().equals(Boolean.FALSE)) {
+            AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+            AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+        }
     }
 
     private void setSearchBtnClick() {
@@ -274,7 +274,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
-                    //toolbarLine2.setVisibility(View.VISIBLE);
                     toolbar.setVisibility(View.VISIBLE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
@@ -291,7 +290,6 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
-                    //toolbarLine2.setVisibility(View.GONE);
                     toolbar.setVisibility(View.GONE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
@@ -306,7 +304,6 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    //toolbarLine2.setVisibility(View.GONE);
                     toolbar.setVisibility(View.GONE);
                     reselectHistory(menuItemId);
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
