@@ -155,7 +155,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 //responseStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
             case "pending":
-                responseStatus.setTextColor(Color.parseColor("#FFD700"));
+                responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_yellow));
+                //responseStatus.setTextColor(Color.parseColor("#FFD700"));
                 break;
             case "closed":
                 responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_red));
