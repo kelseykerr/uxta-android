@@ -2,6 +2,7 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
@@ -150,13 +151,15 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         status = status.toLowerCase();
         switch (status) {
             case "accepted":
-                responseStatus.setTextColor(Color.parseColor("#4EE2EC"));
+                responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
+                //responseStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
             case "pending":
                 responseStatus.setTextColor(Color.parseColor("#FFD700"));
                 break;
             case "closed":
-                responseStatus.setTextColor(Color.parseColor("#E52B50"));
+                responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_red));
+                //responseStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
         }
     }
@@ -165,13 +168,16 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         status = status.toLowerCase();
         switch (status) {
             case "open":
-                requestStatus.setTextColor(Color.parseColor("#26D39C"));
+                requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_green));
+                //requestStatus.setTextColor(Color.parseColor("#26D39C"));
                 break;
             case "closed":
-                requestStatus.setTextColor(Color.parseColor("#E52B50"));
+                requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_red));
+                //requestStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
             case "fulfilled":
-                requestStatus.setTextColor(Color.parseColor("#4EE2EC"));
+                requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
+                //requestStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
         }
     }
@@ -187,8 +193,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         final Response resp = h.getResponses().get(0);
         String buyerName = r.getUser().getFirstName() != null ?
                 r.getUser().getFirstName() : r.getUser().getFullName();
-        String htmlString = "offered a <b>" +
-                r.getItemName() + "</b> to " + buyerName;
+        String htmlString = "Offered a " +
+                r.getItemName() + " to " + buyerName;
         String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         requestViewHolder.vPostedDate.setText(diff);
@@ -196,7 +202,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
         requestViewHolder.vDescription.setText("");
         requestViewHolder.vDescription.setVisibility(View.GONE);
-        requestViewHolder.vStatus.setText(resp.getResponseStatus().toString());
+        requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toLowerCase());
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
         if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
             requestViewHolder.showEditIcon = false;
@@ -210,8 +216,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showExchangeIcon = false;
         requestViewHolder.showMessageUserIcon = false;
-        String htmlString = "requested a <b>" +
-                r.getItemName() + "</b>";
+        String htmlString = "Requested a " +
+                r.getItemName();
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
         requestViewHolder.vPostedDate.setText(diff);
@@ -226,7 +232,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.vDescription.setVisibility(View.GONE);
         }
-        requestViewHolder.vStatus.setText(r.getStatus());
+        requestViewHolder.vStatus.setText(r.getStatus().toLowerCase());
         setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
             /*
              * only display the edit button if the request is open...they shouldn't need to edit
@@ -236,6 +242,16 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.showEditIcon = false;
         } else {
             requestViewHolder.showEditIcon = true;
+            int count = 0;
+            for (Response resp: h.getResponses()) {
+                if (resp.getResponseStatus().toString().toLowerCase().equals("pending")) {
+                    count++;
+                }
+            }
+            if (count > 0) {
+                String ooString="<u>" + count + " pending" + (count > 1 ? " offers</u>" : " offer</u>");
+                requestViewHolder.vOpenOffers.setText(Html.fromHtml(ooString));
+            }
         }
         if (h.getResponses() != null && h.getResponses().size() > 0 &&
                 !r.getStatus().toString().equalsIgnoreCase("closed")) {
@@ -307,7 +323,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
             requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
-            requestViewHolder.vStatus.setText("Awaiting initial exchange");
+            requestViewHolder.vTransactionStatus.setText("Awaiting initial exchange");
+            requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
             requestViewHolder.showCancelTransactionIcon = true;
             if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
@@ -335,11 +352,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
             requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));
-            requestViewHolder.vStatus.setText("Awaiting return");
+            requestViewHolder.vTransactionStatus.setText("Awaiting return");
+            requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride returnOverride = transaction.getReturnOverride();
             if (returnOverride != null && !returnOverride.sellerAccepted && !returnOverride.declined) {
                 requestViewHolder.showExchangeIcon = false;
-                requestViewHolder.vStatus.setText("Pending return override approval");
+                requestViewHolder.vTransactionStatus.setText("Pending return override approval");
                 if (isSeller) {
                     String description = r.getUser().getFirstName() +
                             " submitted a return override. Was the " +
@@ -363,7 +381,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
             requestViewHolder.vDescription.setVisibility(View.GONE);
             if (isBuyer) {
-                requestViewHolder.vStatus.setText("Processing Payment");
+                requestViewHolder.vTransactionStatus.setText("Processing Payment");
+                requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
                 requestViewHolder.showExchangeIcon = false;
             } else {
                 requestViewHolder.showExchangeIcon = false;
@@ -371,8 +390,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                         r.getItemName() + " to " + r.getUser().getFirstName();
                 historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
                         description, transaction.getId());
-                requestViewHolder.vStatus.setText("CONFIRM CHARGE!");
-                requestViewHolder.vStatus.setTextColor(Color.parseColor("#E52B50"));
+                requestViewHolder.vTransactionStatus.setText("CONFIRM CHARGE!");
+                requestViewHolder.vTransactionStatus.setTextColor(Color.parseColor("#E52B50"));
+                requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
                 requestViewHolder.showEditIcon = false;
                 requestViewHolder.showConfirmChargeIcon = true;
             }
@@ -399,9 +419,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vDescription.setText(Html.fromHtml(price));
             }
             requestViewHolder.vCategoryName.setVisibility(View.GONE);
-            requestViewHolder.vStatus.setText(r.getStatus());
-            requestViewHolder.vStatus.setTextColor(Color.parseColor("#4EE2EC"));
-
+            requestViewHolder.vStatus.setText(r.getStatus().toLowerCase());
+            requestViewHolder.vStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
         }
     }
 
@@ -507,6 +526,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private TextView vDescription;
         private Context context;
         private TextView vStatus;
+        private TextView vOpenOffers;
         private RelativeLayout mCardBackground;
         private CardView historyCard;
         private ImageView menuBtn;
@@ -519,6 +539,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private ListView responseList;
         private FrameLayout cardView;
         private LinearLayout responseSeparator;
+        private TextView vTransactionStatus;
 
         public HistoryCardViewHolder(Context context, View v) {
             super(v);
@@ -528,6 +549,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             vDescription = (TextView) v.findViewById(R.id.description);
             cardView = (FrameLayout) itemView.findViewById(R.id.my_history_card_view);
             vStatus = (TextView) v.findViewById(R.id.history_card_status);
+            vOpenOffers = (TextView) v.findViewById(R.id.open_offers);
             this.context = context;
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
             historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
@@ -535,6 +557,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             menuBtn = (ImageView) v.findViewById(R.id.card_menu);
             responseList = (ListView) v.findViewById(R.id.response_list);
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
+            vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
         }
     }
 }
