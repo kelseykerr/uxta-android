@@ -8,6 +8,7 @@
     android:weightSum="1">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/new_request_sv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="20dp"
@@ -52,11 +53,11 @@
                 android:id="@+id/rental_spinner"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/cancel_request"
                 android:layout_marginBottom="40dp"
-                android:layout_marginTop="20dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
-                android:layout_below="@id/cancel_request"
+                android:layout_marginTop="20dp"
                 android:paddingBottom="0dp"
                 android:paddingStart="0dp"
                 android:textColor="@color/colorAccent"
@@ -87,8 +88,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/request_name_layout"
                 android:layout_width="match_parent"
-                android:layout_below="@id/rental_spinner"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/rental_spinner"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 app:errorEnabled="true"
@@ -111,8 +112,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/request_description_layout"
                 android:layout_width="match_parent"
-                android:layout_below="@id/request_name_layout"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/request_name_layout"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 app:errorEnabled="true"
@@ -132,11 +133,51 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:id="@+id/map_text"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/request_description_layout"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:textSize="12dp"
+                android:layout_marginStart="10dp"
+                android:text="click to select your request location:"
+                />
+
+            <RelativeLayout
+                android:id="@+id/request_map_view"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:paddingBottom="30dp"
+                android:layout_below="@id/map_text"
+                android:background="#ffffff">
+
+                <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/request_map"
+                    android:name="com.google.android.gms.maps.MapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <Spinner
+                        android:id="@+id/location_spinner"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:background="@color/white75"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:entries="@array/locationItems"
+                        android:layout_height="wrap_content"/>
+                </fragment>
+            </RelativeLayout>
+
             <Button
                 android:id="@+id/create_request_button"
-                android:layout_below="@id/request_description_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/request_map_view"
                 android:layout_marginBottom="15dp"
                 android:background="@drawable/primary_btn"
                 android:text="create request"
@@ -144,9 +185,9 @@
 
             <Button
                 android:id="@+id/close_request_button"
-                android:layout_below="@id/create_request_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/create_request_button"
                 android:background="@color/colorAccent"
                 android:text="close request"
                 android:textColor="#ffffff" />

@@ -3,10 +3,13 @@ package layout;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,13 +26,32 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,11 +69,18 @@ import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Category;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
+import superstartupteam.nearby.service.RequestNotificationService;
 
 /**
  * Created by kerrk on 8/23/16.
  */
-public class RequestDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class RequestDialogFragment extends DialogFragment
+        implements AdapterView.OnItemSelectedListener,
+        OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, GoogleMap.OnMarkerClickListener {
+    public static Request request;
     private User user;
     private Context context;
     private Spinner typeSpinner;
@@ -65,7 +95,22 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
     private EditText itemName;
     private EditText description;
     private View view;
-    public static Request request;
+    private MapFragment mapFragment;
+    private GoogleMap map;
+    private CameraUpdate cu;
+    private GoogleApiClient mGoogleApiClient;
+    private Location currentLocation;
+    private FragmentManager fm;
+    private FragmentTransaction ft;
+    public static Boolean homeLocation = false;
+    private LatLng latLng;
+    private LocationRequest mLocationRequest;
+    private Location mLastLocation;
+    private Marker currLocationMarker;
+    private RelativeLayout mapView;
+    private ScrollView newRequestSV;
+    private int zoomLevel = 15;
+
 
     public RequestDialogFragment() {
 
@@ -116,6 +161,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
             dialogTitle.setText("Edit Request");
         }
+        newRequestSV = (ScrollView) view.findViewById(R.id.new_request_sv);
         itemNameLayout = (TextInputLayout) view.findViewById(R.id.request_name_layout);
         itemName = (EditText) view.findViewById(R.id.request_name);
         itemName.setBackground(itemName.getBackground().getConstantState().newDrawable());
@@ -188,6 +234,17 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                 //categorySpinner.setSelection(1);
             }
             description.setText(request.getDescription());
+        } else {
+            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.request_map);
+            fm = this.getFragmentManager();
+            ft = fm.beginTransaction();
+            mapFragment.getMapAsync(this);
+
+            mapView = (RelativeLayout) view.findViewById(R.id.request_map_view);
+            mapView.setVisibility(View.VISIBLE);
+            TextView mapText = (TextView) view.findViewById(R.id.map_text);
+            mapText.setVisibility(View.VISIBLE);
+            setupLocationSpinner(view);
         }
         return view;
     }
@@ -236,10 +293,6 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
-    }
-
     private void updateRequestObject() {
         request.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
         /*if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
@@ -254,7 +307,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
         request.setDescription(description.getText().toString());
     }
 
-    private Request createNewRequestObject() {
+    private Request createNewRequestObject(Double lat, Double lng) {
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
@@ -269,8 +322,8 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             }
         }*/
         newRequest.setPostDate(new Date());
-        newRequest.setLatitude(PrefUtils.latLng.latitude);
-        newRequest.setLongitude(PrefUtils.latLng.longitude);
+        newRequest.setLatitude(lat);
+        newRequest.setLongitude(lng);
         newRequest.setLocation(null);
         return newRequest;
     }
@@ -354,6 +407,10 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             showNoNetworkSnack();
             return;
         }
+        final Double lat = currLocationMarker.getPosition() != null
+                ? currLocationMarker.getPosition().latitude : PrefUtils.latLng.latitude;
+        final Double lng = currLocationMarker.getPosition() != null
+                ? currLocationMarker.getPosition().longitude : PrefUtils.latLng.longitude;
         // AsyncTask<Params, Progress, Result>
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -368,7 +425,7 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     conn.setRequestProperty("Content-Type", "application/json");
 
-                    Request newRequest = createNewRequestObject();
+                    Request newRequest = createNewRequestObject(lat, lng);
                     ObjectMapper mapper = new ObjectMapper();
                     String requestJson = mapper.writeValueAsString(newRequest);
                     byte[] outputInBytes = requestJson.getBytes("UTF-8");
@@ -397,7 +454,6 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
             }
         }.execute();
     }
-
 
     public void getCategories() {
         if (!MainActivity.isNetworkConnected()) {
@@ -450,5 +506,206 @@ public class RequestDialogFragment extends DialogFragment implements AdapterView
 
     public void onNothingSelected(AdapterView<?> arg0) {
     }
+
+    public interface OnFragmentInteractionListener {
+        public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
+    }
+
+    @Override
+    public void onMapReady(final GoogleMap map) {
+        this.map = map;
+        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                if (cu != null) {
+                    //map.moveCamera(cu);
+                }
+            }
+        });
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        try {
+            map.setMyLocationEnabled(true);
+            map.getUiSettings().setMyLocationButtonEnabled(false);
+            map.getUiSettings().setZoomGesturesEnabled(false);
+            map.getUiSettings().setAllGesturesEnabled(false);
+            map.getUiSettings().setScrollGesturesEnabled(false);
+            map.setOnMarkerClickListener(this);
+        } catch (SecurityException e) {
+            Log.e("map permission error: ", "unable to get user's current location, " + e.getMessage());
+        }
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latlng) {
+                if (currLocationMarker != null) {
+                    currLocationMarker.remove();
+                }
+                currLocationMarker = map.addMarker(new MarkerOptions()
+                        .position(latlng)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+            }
+        });
+        buildGoogleApiClient();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        try {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        } catch (SecurityException e) {
+            Log.e("map permission error: ", "unable to get user's last location, " + e.getMessage());
+        }
+        if (mLastLocation != null) {
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            PrefUtils.setLatLng(latLng);
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Request location");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+            currLocationMarker = map.addMarker(markerOptions);
+        }
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000); //5 seconds
+        mLocationRequest.setFastestInterval(3000); //3 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        try {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+        } catch (SecurityException e) {
+            Log.e("map permission error: ", "unable to request location updates, " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(context, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(context, "onConnectionFailed", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        currentLocation = location;
+        if (homeLocation != null && homeLocation) {
+            return;
+        }
+        updateMapFocus(new LatLng(location.getLatitude(), location.getLongitude()));
+        //If you only need one location, unregister the listener
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        fm = this.getFragmentManager();
+        ft = fm.beginTransaction();
+    }
+
+    private void updateMapFocus(LatLng ll) {
+        if (currLocationMarker != null) {
+            currLocationMarker.remove();
+        }
+        latLng = new LatLng(ll.latitude, ll.longitude);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
+        RequestNotificationService.latLng = latLng;
+        markerOptions.title("Current Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        currLocationMarker = map.addMarker(markerOptions);
+        //zoom to current position:
+        updateZoom(currLocationMarker, null);
+    }
+
+    private void updateZoom(Marker marker, LatLng latLng) {
+        CircleOptions options = new CircleOptions();
+        options.center(marker != null ? marker.getPosition() : latLng);
+        //Radius in meters
+        options.radius(AppUtils.DEFAULT_REQUEST_RADIUS * 1609.344);
+        options.strokeWidth(10);
+
+        double radius = options.getRadius();
+        double scale = radius / 500;
+        zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
+
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(zoomLevel)
+                .target(marker != null ? marker.getPosition() : latLng).build();
+        cu = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        map.moveCamera(cu);
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        return true;
+    }
+
+    public void setupLocationSpinner(View view) {
+        Spinner locationSpinner = (Spinner) view.findViewById(R.id.location_spinner);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
+                getResources().getStringArray(R.array.locationItems));
+        locationSpinner.setAdapter(locationAdapter);
+        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
+            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    if (selectedItem.equals("current location")) {
+                        homeLocation = false;
+                        if (latLng != null) {
+                            updateMapFocus(new LatLng(currentLocation.getLatitude(),
+                                    currentLocation.getLongitude()));
+                        }
+                    } else {
+                        homeLocation = true;
+                        if (currLocationMarker != null) {
+                            currLocationMarker.remove();
+                        }
+                        latLng = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLng);
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                        currLocationMarker = map.addMarker(markerOptions);
+
+                        //zoom to current position:
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(latLng).zoom(zoomLevel).build();
+
+                        map.animateCamera(CameraUpdateFactory
+                                .newCameraPosition(cameraPosition));
+                    }
+                } // to close the onItemSelected
+
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            locationSpinner.setVisibility(View.VISIBLE);
+        } else {
+            locationSpinner.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        android.app.Fragment fragment = getFragmentManager()
+                .findFragmentById(R.id.request_map);
+        if (null != fragment) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.remove(fragment);
+            ft.commit();
+        }
+    }
+
 
 }

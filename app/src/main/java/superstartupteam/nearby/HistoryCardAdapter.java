@@ -2,24 +2,18 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -27,9 +21,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
-import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
-import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
 import java.math.BigDecimal;
@@ -152,15 +143,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         switch (status) {
             case "accepted":
                 responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
-                //responseStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
             case "pending":
                 responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_yellow));
-                //responseStatus.setTextColor(Color.parseColor("#FFD700"));
                 break;
             case "closed":
                 responseStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_red));
-                //responseStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
         }
     }
@@ -170,15 +158,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         switch (status) {
             case "open":
                 requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_green));
-                //requestStatus.setTextColor(Color.parseColor("#26D39C"));
                 break;
             case "closed":
                 requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_red));
-                //requestStatus.setTextColor(Color.parseColor("#E52B50"));
                 break;
             case "fulfilled":
                 requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
-                //requestStatus.setTextColor(Color.parseColor("#4EE2EC"));
                 break;
         }
     }

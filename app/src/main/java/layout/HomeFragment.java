@@ -321,41 +321,37 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 if (requests.size() < 1) {
                     noResults.setVisibility(View.VISIBLE);
                     noResultsList.setVisibility(View.VISIBLE);
-                    if (latLng != null && !homeLocation) {
-                        PrefUtils.setLatLng(latLng);
-                        updateZoom(null, latLng);
-                    } else if (homeLocation != null && homeLocation && user.getHomeLongitude() != null
-                            && user.getHomeLatitude() != null) {
-                        LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
-                        updateZoom(null, home);
-                    }
-                    return;
                 } else {
                     noResults.setVisibility(View.GONE);
                     noResultsList.setVisibility(View.GONE);
-                }
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                builder.include(currLocationMarker.getPosition());
-                setMarkerClick();
-                for (Request request : requests) {
-                    LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title(request.getItemName());
-                    if (request.getDescription() != null && request.getDescription().length() > 0) {
-                        markerOptions.snippet(request.getDescription());
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    builder.include(currLocationMarker.getPosition());
+                    setMarkerClick();
+                    for (Request request : requests) {
+                        LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLng);
+                        markerOptions.title(request.getItemName());
+                        if (request.getDescription() != null && request.getDescription().length() > 0) {
+                            markerOptions.snippet(request.getDescription());
+                        }
+
+                        float[] hsv = new float[3];
+                        Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+                        Marker marker = map.addMarker(markerOptions);
+                        requestMarkers.add(marker);
+                        builder.include(marker.getPosition());
                     }
-
-                    float[] hsv = new float[3];
-                    Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
-
-                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                    Marker marker = map.addMarker(markerOptions);
-                    requestMarkers.add(marker);
-                    builder.include(marker.getPosition());
                 }
-                updateZoom(currLocationMarker, null);
+                if (latLng != null && !homeLocation) {
+                    PrefUtils.setLatLng(latLng);
+                    updateZoom(null, latLng);
+                } else if (homeLocation != null && homeLocation && user.getHomeLongitude() != null
+                        && user.getHomeLatitude() != null) {
+                    LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
+                    updateZoom(null, home);
+                }
 
             }
         }.execute();
