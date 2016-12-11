@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import layout.AccountFragment;
+import layout.HomeFragment;
 import superstartupteam.nearby.model.User;
 
 public class SharedAsyncMethods {
@@ -42,6 +43,9 @@ public class SharedAsyncMethods {
                         userFromServer.setFacebookId(user.getFacebookId());
                         userFromServer.setAccessToken(user.getAccessToken());
                         PrefUtils.setCurrentUser(userFromServer, context);
+                        HomeFragment.user = userFromServer;
+                        RequestAdapter.user = userFromServer;
+                        MainActivity.user = userFromServer;
                     } catch (IOException e) {
                         Log.e("Error", "Received an error while trying to read " +
                                 "user info from server: " + e.getMessage());
@@ -60,6 +64,63 @@ public class SharedAsyncMethods {
             protected Integer doInBackground(Void... params) {
                 return executeUpdate(user, context);
             }
+        }.execute();
+    }
+
+    public static void updateUserPayment(final User user, final Context context,
+                                       final MainActivity mainActivity) {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode;
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/customer");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    ObjectMapper mapper = new ObjectMapper();
+                    String updateJson = mapper.writeValueAsString(user);
+                    Log.i("updated user: ", updateJson);
+                    byte[] outputInBytes = updateJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+
+                    Log.i("POST /customer", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+                        String message = AppUtils.getResponseContent(conn);
+                        throw new IOException(message);
+                    }
+                    SharedAsyncMethods.getUserInfoFromServer(user, context);
+                    return responseCode;
+                } catch (IOException e) {
+                    errorMessage = "Could not update user payment: " + e.getMessage();
+                    Log.e("ERROR ", errorMessage);
+                }
+                return 0;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                if (responseCode != null && responseCode == 200) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+
+                    }
+                    AccountFragment.dismissPaymentDialog();
+                    mainActivity.goToAccount("successfully updated payment info");
+                } else {
+                    AccountFragment.dismissPaymentDialog();
+                    mainActivity.goToAccount(errorMessage);
+                }
+            }
+
         }.execute();
     }
 

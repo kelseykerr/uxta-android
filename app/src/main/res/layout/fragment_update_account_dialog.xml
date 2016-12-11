@@ -315,139 +315,11 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
-            <fr.ganfra.materialspinner.MaterialSpinner
-                android:id="@+id/payment_destination_spinner"
-                android:layout_width="match_parent"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
-                android:layout_marginTop="10dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="0dp"
-                android:textColor="@color/colorAccent"
-                app:ms_alignLabels="true"
-                app:ms_arrowColor="@color/colorAccent"
-                app:ms_arrowSize="16dp"
-                app:ms_baseColor="@color/colorAccent"
-                app:ms_enableErrorLabel="false"
-                app:ms_enableFloatingLabel="false"
-                app:ms_errorColor="@color/redPink"
-                app:ms_floatingLabelColor="@color/colorAccent"
-                app:ms_floatingLabelText="how do you want to get paid?"
-                app:ms_highlightColor="@color/colorPrimary"
-                app:ms_hint="how do you want to get paid?"
-                app:ms_hintColor="@color/colorAccent"
-                app:ms_multiline="false"
-                app:ms_thickness=".5dp" />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/bank_acct_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="-10dp"
-                android:visibility="gone"
-                app:errorEnabled="true"
-                app:errorTextAppearance="@style/TextErrorStyle"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/bank_acct"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="bank account number"
-                    android:inputType="number"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/routing_number_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="-10dp"
-                android:visibility="gone"
-                app:errorEnabled="true"
-                app:errorTextAppearance="@style/TextErrorStyle"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/routing_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="routing number"
-                    android:inputType="number"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
-
-            <Button
-                android:id="@+id/next_button_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:background="@drawable/primary_btn"
-                android:text="continue"
-                android:textColor="@color/white" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/account_3"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="20dp"
-        android:descendantFocusability="beforeDescendants"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:visibility="gone">
-
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/edit_profile_text3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_horizontal"
-                android:text="Edit Profile"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/back_last"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_gravity="start"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:paddingBottom="8dp"
-                android:paddingEnd="25dp"
-                android:paddingStart="8dp"
-                android:paddingTop="20dp"
-                android:src="@drawable/ic_keyboard_backspace_black_24dp"
-                android:tint="@color/colorAccent" />
-
-
             <TextView
                 android:id="@+id/dob_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/edit_profile_text3"
+                android:layout_below="@id/phone_layout"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="-5dp"
                 android:text="@string/dobLabel"
@@ -464,60 +336,14 @@
                 android:textSize="16sp"
                 android:textColor="@color/colorAccent"
                 android:theme="@style/EditTextTheme" />
-
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/dob"
-                android:layout_marginBottom="80dp"
+                android:layout_marginBottom="20dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="8dp"
                 android:background="@color/colorAccent" />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/credit_card_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_below="@id/dob"
-                android:layout_marginTop="20dp"
-                app:errorEnabled="true"
-                app:errorTextAppearance="@style/TextErrorStyle"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/credit_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="credit card number"
-                    android:inputType="number"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/exp_date_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/credit_card_layout"
-                android:layout_marginTop="-10dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                app:errorEnabled="true"
-                app:errorTextAppearance="@style/TextErrorStyle"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/exp_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="expiration date"
-                    android:inputType="number"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/notifications_near_home"
@@ -547,42 +373,46 @@
                 android:textOn="enabled"
                 android:thumb="@drawable/switch_compat_thumb" />
 
-            <TextView
-                android:id="@+id/radius_spinner_label"
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_below="@id/notifications_nearby"
-                android:layout_marginStart="10dp"
-                android:text="Notifications radius: " />
+                android:layout_height="wrap_content">
 
-            <Spinner
-                android:id="@+id/radius_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/notifications_nearby"
-                android:layout_toEndOf="@+id/radius_spinner_label"
-                android:background="@color/white"
-                android:prompt="@string/radius_spinner_title"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/radius_spinner_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Notifications radius: " />
+
+                <Spinner
+                    android:id="@+id/radius_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/radius_spinner_label"
+                    android:background="@color/white"
+                    android:prompt="@string/radius_spinner_title"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
 
             <Button
-                android:id="@+id/save_profile_button"
+                android:id="@+id/next_button_2"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/radius_spinner"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/primary_btn"
-                android:text="save"
+                android:text="continue"
                 android:textColor="@color/white" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </ScrollView>
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/account_4"
+        android:id="@+id/account_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"

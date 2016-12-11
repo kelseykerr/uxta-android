@@ -83,6 +83,8 @@ public class User extends BaseEntity {
 
     public String customerStatus;
 
+    private Boolean removedMerchantDestination;
+
     @JsonIgnore
     private String creditCardNumber;
 
@@ -118,6 +120,7 @@ public class User extends BaseEntity {
         this.tosAccepted = fromServer.tosAccepted;
         this.isPaymentSetup = fromServer.isPaymentSetup;
         this.customerStatus = fromServer.customerStatus;
+        this.removedMerchantDestination = fromServer.removedMerchantDestination;
     }
 
     public String getUserId() {
@@ -414,6 +417,14 @@ public class User extends BaseEntity {
 
     public void setCustomerStatus(String customerStatus) {
         this.customerStatus = customerStatus;
+    }
+
+    public Boolean getRemovedMerchantDestination() {
+        return removedMerchantDestination;
+    }
+
+    public void setRemovedMerchantDestination(Boolean removedMerchantDestination) {
+        this.removedMerchantDestination = removedMerchantDestination;
     }
 }
 

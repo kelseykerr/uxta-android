@@ -30,7 +30,7 @@ public class AppUtils {
     public static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
     public static final Double DEFAULT_REQUEST_RADIUS = .25;
 
-     public static <T extends BaseEntity> T jsonStringToPojo(Class<T> c, String jsonString) throws IOException{
+     public static <T extends BaseEntity> T jsonStringToPojo(Class<T> c, String jsonString) throws IOException {
          ObjectMapper mapper = new ObjectMapper();
          T pojo = mapper.readValue(jsonString, c);
          return pojo;

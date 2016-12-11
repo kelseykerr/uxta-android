@@ -16,6 +16,7 @@ import java.util.List;
 
 import layout.AccountFragment;
 import layout.HomeFragment;
+import layout.PaymentDialogFragment;
 import layout.UpdateAccountDialogFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.User;
@@ -23,7 +24,7 @@ import superstartupteam.nearby.model.User;
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private List<Request> requests;
-    private User user;
+    public static User user;
     private View view;
     private HomeFragment homeFragment;
 
@@ -62,7 +63,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         requestViewHolder.vMakeOfferButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 boolean goodMerchantStatus = user.getMerchantStatus() != null &&
-                        user.getMerchantStatus().toString().toLowerCase().equals("active");
+                        user.getMerchantStatus().toString().toLowerCase().equals("active") &&
+                        (user.getRemovedMerchantDestination() == null || !user.getRemovedMerchantDestination());
                 if (user.getMerchantId() != null && goodMerchantStatus) {
                     int position=(Integer)v.getTag();
                     Request r = requests.get(position);
@@ -87,9 +89,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                         snack.setAction("update account", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                                AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
                                 FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
-                                AccountFragment.updateAccountDialog.show(fm, "dialog");
+                                AccountFragment.paymentDialogFragment.show(fm, "dialog");
                             }
                         });
                     }

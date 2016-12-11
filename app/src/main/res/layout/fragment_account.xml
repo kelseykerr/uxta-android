@@ -9,9 +9,9 @@
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/account_parent_scrollview"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:descendantFocusability="beforeDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true">
@@ -33,8 +33,8 @@
                 android:id="@+id/user_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_below="@+id/profileImage"
+                android:layout_centerHorizontal="true"
                 android:textColor="#585757"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -62,10 +62,10 @@
 
             <TextView
                 android:id="@+id/user_city_state_zip"
-                android:layout_below="@+id/user_address_line_2"
-                android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/user_address_line_2"
+                android:layout_centerHorizontal="true"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:textColor="#585757"
@@ -74,9 +74,9 @@
             <LinearLayout
                 android:id="@+id/user_email_phone"
                 android:layout_width="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/user_city_state_zip">
+                android:layout_below="@+id/user_city_state_zip"
+                android:layout_centerHorizontal="true">
 
                 <TextView
                     android:id="@+id/user_email"
@@ -103,46 +103,112 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/user_email_phone"
                 android:layout_centerHorizontal="true"
-                android:paddingEnd="15dp"
-                android:paddingStart="15dp"
-                android:textStyle="italic"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp"
                 android:textColor="#585757"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="italic" />
 
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/account_buttons"
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/action_bar"
+                android:layout_width="fill_parent"
+                android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
-                android:paddingBottom="20dp"
-                android:layout_below="@+id/notifications_text">
+                android:layout_below="@+id/notifications_text"
+                android:orientation="horizontal"
+                android:weightSum="3">
 
-                <TextView
-                    android:id="@+id/updateAccount_button"
-                    android:layout_marginTop="15dp"
-                    android:layout_width="100dp"
-                    android:layout_height="fill_parent"
-                    android:padding="10dp"
-                    android:gravity="center"
-                    android:background="@drawable/primary_btn"
-                    android:text="Edit Profile"
-                    android:textColor="#fff" />
+                <RelativeLayout
+                    android:id="@+id/edit_accnt_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
 
+                    <ImageView
+                        android:id="@+id/edit_accnt_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_mode_edit_black_24dp" />
 
-                <TextView
-                    android:id="@+id/logout_button"
-                    android:layout_width="100dp"
-                    android:layout_height="fill_parent"
-                    android:layout_marginStart="35dp"
-                    android:layout_marginTop="15dp"
-                    android:background="@drawable/primary_btn"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="Logout"
-                    android:textColor="#fff" />
+                    <TextView
+                        android:id="@+id/edit_acct_text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/edit_accnt_btn"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:text="edit account"
+                        android:textSize="12sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:id="@+id/payments_layout">
+
+                    <ImageView
+                        android:id="@+id/edit_payments_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_credit_card_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/edit_payments_text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/edit_payments_btn"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:text="payments"
+                        android:textSize="12sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/logout_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+
+                    <ImageView
+                        android:id="@+id/logout_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_exit_to_app_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/logout_text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/logout_btn"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_horizontal"
+                        android:text="logout"
+                        android:textSize="12sp" />
+
+                </RelativeLayout>
 
             </LinearLayout>
 
@@ -150,16 +216,15 @@
                 android:id="@+id/no_customer_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/account_buttons"
+                android:layout_below="@+id/action_bar"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
                 android:paddingEnd="15dp"
                 android:paddingStart="15dp"
-                android:layout_marginTop="5dp"
-                android:textColor="@color/redPink"
-                android:visibility="gone"
                 android:text="Please add payment info so you can make requests!"
+                android:textColor="@color/redPink"
                 android:textSize="14sp"
-                />
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/no_merchant_text"
@@ -167,14 +232,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/no_customer_text"
                 android:layout_centerHorizontal="true"
-                android:paddingEnd="15dp"
-                android:visibility="gone"
-                android:paddingStart="15dp"
                 android:layout_marginTop="5dp"
-                android:textColor="@color/redPink"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp"
                 android:text="Please link your bank account or venmo so you can make offers!"
+                android:textColor="@color/redPink"
                 android:textSize="14sp"
-                />
+                android:visibility="gone" />
         </RelativeLayout>
     </ScrollView>
 

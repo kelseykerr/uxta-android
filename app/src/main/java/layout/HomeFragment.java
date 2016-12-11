@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     FragmentTransaction ft;
     MapFragment mapFragment;
     private Context context;
-    private User user;
+    public static User user;
     private List<Request> requests = new ArrayList<>();
     private RecyclerView recList;
     private RequestAdapter requestAdapter;
@@ -180,7 +180,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onInfoWindowClick(Marker marker) {
                 boolean goodMerchantStatus = user.getMerchantStatus() != null &&
-                        user.getMerchantStatus().toString().toLowerCase().equals("active");
+                        user.getMerchantStatus().toString().toLowerCase().equals("active") &&
+                        (user.getRemovedMerchantDestination() == null || !user.getRemovedMerchantDestination());
                 if (user.getMerchantId() != null && goodMerchantStatus) {
                     try {
                         for (Request r : requests) {
@@ -221,8 +222,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                         snack.setAction("update account", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                                AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                                AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+                                AccountFragment.paymentDialogFragment.show(getFragmentManager(), "dialog");
                             }
                         });
                     }
@@ -641,13 +642,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     };
 
     public void displayNoNewRequestSnackbar() {
-        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
+        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment destination information to your account",
                 Snackbar.LENGTH_LONG)
                 .setAction("update account", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                        AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+                        AccountFragment.paymentDialogFragment.show(getFragmentManager(), "dialog");
                     }
                 });
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)

@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -33,7 +31,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,11 +39,11 @@ import java.util.List;
 import java.util.Locale;
 
 import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.DobPickerFragment;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
+import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 
@@ -73,25 +70,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private SwitchCompat notificationsNearHome;
     private SwitchCompat notificationsNearby;
     private Double currentRadius;
-    private EditText bank_acct;
-    private EditText routing_number;
-    private EditText credit_card;
-    private EditText exp_date;
     private OnFragmentInteractionListener mListener;
     private View view;
-    private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/yy", Locale.US);
-    private String mLastInput;
-    private Spinner paymentDestinationSpinner;
-    private static final String VENMO_EMAIL_STRING = "venmo - link by email";
-    private static final String VENMO_PHONE_STRING = "venmo - link by mobile phone";
-    private static final String BANK_STRING = "deposit directly to bank";
-    private TextInputLayout accntNumberLayout;
-    private TextInputLayout routingNumberLayout;
     private TextView dob;
     private ScrollView screen1;
     private ScrollView screen2;
     private ScrollView screen3;
-    private ScrollView screen4;
     private RelativeLayout updatingScreen;
     private CheckBox acceptTos;
     private TextView acceptTosError;
@@ -135,7 +119,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         screen1 = (ScrollView) view.findViewById(R.id.account_1);
         screen2 = (ScrollView) view.findViewById(R.id.account_2);
         screen3 = (ScrollView) view.findViewById(R.id.account_3);
-        screen4 = (ScrollView) view.findViewById(R.id.account_4);
         updatingScreen = (RelativeLayout) view.findViewById(R.id.updating_account_screen);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_edit_profile);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -173,22 +156,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         phone = (EditText) view.findViewById(R.id.phone);
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         phone.setText(user.getPhone());
-        bank_acct = (EditText) view.findViewById(R.id.bank_acct);
-        bank_acct.setText(user.getBankAccountNumber());
-        accntNumberLayout = (TextInputLayout) view.findViewById(R.id.bank_acct_layout);
-        routingNumberLayout = (TextInputLayout) view.findViewById(R.id.routing_number_layout);
-        routing_number = (EditText) view.findViewById(R.id.routing_number);
-        routing_number.setText(user.getBankRoutingNumber());
 
         dob = (TextView) view.findViewById(R.id.dob);
         dob.setText(user.getDateOfBirth());
         Log.i("UpdateAccount", "dob from user data = " + user.getDateOfBirth());
-
-        credit_card = (EditText) view.findViewById(R.id.credit_card);
-        credit_card.setText(user.getCreditCardNumber());
-        exp_date = (EditText) view.findViewById(R.id.exp_date);
-        exp_date.setText(user.getCcExpirationDate());
-        setExpDateWatcher();
 
         notificationsNearHome = (SwitchCompat) view.findViewById(R.id.notifications_near_home);
         if (user.getHomeLocationNotifications() != null) {
@@ -204,11 +175,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             notificationsNearby.setChecked(false);
         }
         configureRadiusSpinner(view);
-        configureDestinationSpinner(view);
 
         final Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
-        final Button nextBtn2 = (Button) view.findViewById(R.id.next_button_2);
-
         nextBtn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,32 +189,13 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
             }
         });
-        nextBtn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nextBtn2.setEnabled(false);
-                if (validateScreenTwo()) {
-                    screen2.setVisibility(View.GONE);
-                    screen3.setVisibility(View.VISIBLE);
-                }
-                nextBtn2.setEnabled(true);
-            }
-        });
 
         ImageButton backMiddle = (ImageButton) view.findViewById(R.id.back_middle);
-        ImageButton backLast = (ImageButton) view.findViewById(R.id.back_last);
         backMiddle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 screen2.setVisibility(View.GONE);
                 screen1.setVisibility(View.VISIBLE);
-            }
-        });
-        backLast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                screen3.setVisibility(View.GONE);
-                screen2.setVisibility(View.VISIBLE);
             }
         });
 
@@ -259,16 +208,16 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
 
 
-        final Button saveBtn = (Button) view.findViewById(R.id.save_profile_button);
+        final Button saveBtn = (Button) view.findViewById(R.id.next_button_2);
         if (!user.getTosAccepted()) {
             saveBtn.setText("continue");
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     saveBtn.setEnabled(false);
-                    if (validateScreenThree()) {
-                        screen3.setVisibility(View.GONE);
-                        screen4.setVisibility(View.VISIBLE);
+                    if (validateScreenTwo()) {
+                        screen2.setVisibility(View.GONE);
+                        screen3.setVisibility(View.VISIBLE);
                     }
                     saveBtn.setEnabled(true);
 
@@ -291,6 +240,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             Button acceptAndSave = (Button) view.findViewById(R.id.accept_and_save);
             setSaveBtnClick(acceptAndSave);
         } else {
+            saveBtn.setText("save");
             setSaveBtnClick(saveBtn);
         }
          this.view = view;
@@ -301,7 +251,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!validateScreenThree()) {
+                if (!validateScreenTwo()) {
                     return;
                 }
                 if ((acceptTos != null && !acceptTos.isChecked()) || !user.getTosAccepted()) {
@@ -309,8 +259,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     acceptTosError.setVisibility(View.VISIBLE);
                     return;
                 }
+                screen2.setVisibility(View.GONE);
                 screen3.setVisibility(View.GONE);
-                screen4.setVisibility(View.GONE);
                 updatingScreen.setVisibility(View.VISIBLE);
                 String first = firstName.getText().toString();
                 user.setFirstName(first);
@@ -339,48 +289,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     sPhone = sPhone.replaceAll(" ", "-");
                 }
                 user.setPhone(AppUtils.validateString(sPhone) ? sPhone : null);
-                // TODO: in prod uncomment below. In sandbox use test routing/acct numbers
-                /*String sBank = bank_acct.getText().toString();
-                user.setBankAccountNumber(sBank);
-                String sRouting = routing_number.getText().toString();
-                user.setBankRoutingNumber(sRouting);*/
-                user.setBankAccountNumber("1123581321");
-                user.setBankRoutingNumber("071101307");
-                /**
-                 * TODO: when switching to production, uncomment the below snippet.
-                 * TODO: In sandbox we want to use the test cc so destination will always be bank
-                 * */
-                /*String destination = paymentDestinationSpinner.getSelectedItem().toString();
-                switch (destination) {
-                    case VENMO_EMAIL_STRING:
-                        user.setFundDestination("email");
-                        break;
-                    case VENMO_PHONE_STRING:
-                        user.setFundDestination("mobile_phone");
-                        break;
-                    case BANK_STRING:
-                        user.setFundDestination("bank");
-                        break;
-
-                }*/
-                user.setFundDestination("bank");
-                user.setDateOfBirth(dob.getText().toString());
-
-                // TODO: in prod uncomment below. In sandbox use test cc number & expiration
-                /*String sCard = credit_card.getText().toString();
-
-                user.setCreditCardNumber(sCard);
-                String sExpDate = exp_date.getText().toString();
-                user.setCcExpirationDate(sExpDate);*/
-                user.setCreditCardNumber("4111111111111111");
-                user.setCcExpirationDate("05/19");
-                MainActivity.updatedUser = user;
-
-                PrefUtils.setCurrentUser(MainActivity.updatedUser, context);
-
-                String nextFragment = " ";
-                Uri url = null;
-                mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER);
+                SharedAsyncMethods.updateUser(user, context, (MainActivity) getActivity(), view);
             }
         });
     }
@@ -448,11 +357,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             phoneLayout.setError(null);
         }
-        return valid;
-    }
-
-    private boolean validateScreenThree() {
-        boolean valid = true;
         String dobString = dob.getText().toString();
         if (dobString.isEmpty()) {
             dob.setError("please enter your date of birth");
@@ -559,56 +463,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
-    private void setExpDateWatcher() {
-        exp_date.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //Your query to fetch Data
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String input = s.toString();
-                Calendar expiryDateDate = Calendar.getInstance();
-                try {
-                    expiryDateDate.setTime(dateFormatter.parse(input));
-                } catch (java.text.ParseException e) {
-                    if (s.length() == 2 && !mLastInput.endsWith("/")) {
-                        int month = Integer.parseInt(input);
-                        if (month <= 12) {
-                            exp_date.setText(exp_date.getText().toString() + "/");
-                            exp_date.setSelection(exp_date.getText().toString().length());
-                        }
-                    } else if (s.length() == 2 && mLastInput.endsWith("/")) {
-                        int month = Integer.parseInt(input);
-                        if (month <= 12) {
-                            exp_date.setText(exp_date.getText().toString().substring(0, 1));
-                            exp_date.setSelection(exp_date.getText().toString().length());
-                        } else {
-                            exp_date.setText("");
-                            exp_date.setSelection(exp_date.getText().toString().length());
-                            Toast.makeText(context, "Enter a valid month", Toast.LENGTH_LONG).show();
-                        }
-                    } else if (s.length() == 1) {
-                        int month = Integer.parseInt(input);
-                        if (month > 1) {
-                            exp_date.setText("0" + exp_date.getText().toString() + "/");
-                            exp_date.setSelection(exp_date.getText().toString().length());
-                        }
-                    }
-                    mLastInput = exp_date.getText().toString();
-                    return;
-                }
-            }
-
-        });
-
-    }
-
     private List<Double> getRadiusList() {
         List<Double> radiusList = new ArrayList<>();
         radiusList.add(.1);
@@ -639,57 +493,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                                        int position, long id) {
                 Double radius = (Double) parentView.getItemAtPosition(position);
                 currentRadius = radius;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });
-    }
-
-    private void configureDestinationSpinner(View v) {
-        paymentDestinationSpinner = (Spinner) v.findViewById(R.id.payment_destination_spinner);
-        List<String> destinations = new ArrayList<>();
-        destinations.add(VENMO_EMAIL_STRING);
-        destinations.add(VENMO_PHONE_STRING);
-        destinations.add(BANK_STRING);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item, destinations);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-        paymentDestinationSpinner.setAdapter(adapter);
-        if (user.getFundDestination() != null) {
-            switch (user.getFundDestination()) {
-                case "email":
-                    paymentDestinationSpinner.setSelection(1);
-                    break;
-                case "mobile_phone":
-                    paymentDestinationSpinner.setSelection(2);
-                    break;
-                case "bank":
-                    routingNumberLayout.setVisibility(View.VISIBLE);
-                    accntNumberLayout.setVisibility(View.VISIBLE);
-                    paymentDestinationSpinner.setSelection(3);
-                    break;
-            }
-        }
-        paymentDestinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
-                String destination = (String) parentView.getItemAtPosition(position);
-                switch (destination) {
-                    case VENMO_EMAIL_STRING:
-                        routingNumberLayout.setVisibility(View.GONE);
-                        accntNumberLayout.setVisibility(View.GONE);
-                        break;
-                    case VENMO_PHONE_STRING:
-                        routingNumberLayout.setVisibility(View.GONE);
-                        accntNumberLayout.setVisibility(View.GONE);
-                        break;
-                    case BANK_STRING:
-                        routingNumberLayout.setVisibility(View.VISIBLE);
-                        accntNumberLayout.setVisibility(View.VISIBLE);
-                        break;
-                }
             }
 
             @Override

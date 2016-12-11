@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
+import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -56,6 +58,10 @@ public class AccountFragment extends Fragment {
     private View view;
     public static String snackbarMessage = null;
     public static UpdateAccountDialogFragment updateAccountDialog;
+    public static PaymentDialogFragment paymentDialogFragment;
+    private RelativeLayout editAccntLayout;
+    private RelativeLayout logoutLayout;
+    private RelativeLayout paymentsLayout;
 
     private boolean updateAccountRequest;
 
@@ -87,6 +93,12 @@ public class AccountFragment extends Fragment {
     public static void dismissUpdateAccountDialog() {
         if (updateAccountDialog != null) {
             updateAccountDialog.dismiss();
+        }
+    }
+
+    public static void dismissPaymentDialog() {
+        if (paymentDialogFragment != null) {
+            paymentDialogFragment.dismiss();
         }
     }
 
@@ -126,9 +138,9 @@ public class AccountFragment extends Fragment {
         }.execute();
 
 
-        btnLogout = (TextView) view.findViewById(R.id.logout_button);
+        logoutLayout = (RelativeLayout) view.findViewById(R.id.logout_layout);
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PrefUtils.clearCurrentUser(context);
@@ -140,9 +152,9 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        editProfile = (TextView) view.findViewById(R.id.updateAccount_button);
+        editAccntLayout = (RelativeLayout) view.findViewById(R.id.edit_accnt_layout);
 
-        editProfile.setOnClickListener(new View.OnClickListener() {
+        editAccntLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!MainActivity.isNetworkConnected()) {
@@ -150,6 +162,19 @@ public class AccountFragment extends Fragment {
                 } else {
                     updateAccountDialog = UpdateAccountDialogFragment.newInstance();
                     updateAccountDialog.show(getFragmentManager(), "dialog");
+                }
+            }
+        });
+
+        paymentsLayout = (RelativeLayout) view.findViewById(R.id.payments_layout);
+        paymentsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!MainActivity.isNetworkConnected()) {
+                    showNoConnectionSnackbar();
+                } else {
+                    paymentDialogFragment = PaymentDialogFragment.newInstance();
+                    paymentDialogFragment.show(getFragmentManager(), "dialog");
                 }
             }
         });
@@ -239,7 +264,8 @@ public class AccountFragment extends Fragment {
         boolean displayMerchantStatus = user.getMerchantStatus() != null &&
                 !user.getMerchantStatus().toLowerCase().equals("pending") &&
                 !user.getMerchantStatus().toLowerCase().equals("active");
-        if (user.getMerchantId() == null || displayMerchantStatus) {
+        if (user.getMerchantId() == null || displayMerchantStatus ||
+                (user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination())) {
             noMerchantText.setVisibility(View.VISIBLE);
             if (user.getMerchantStatusMessage() != null) {
                 noMerchantText.setText(user.getMerchantStatusMessage());

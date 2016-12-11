@@ -57,6 +57,9 @@ import layout.FiltersDialogFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewOfferDialogFragment;
+import layout.PaymentDestinationDialogFragment;
+import layout.PaymentDetailsDialogFragment;
+import layout.PaymentDialogFragment;
 import layout.RequestDialogFragment;
 import layout.UpdateAccountDialogFragment;
 import layout.ViewOfferDialogFragment;
@@ -78,9 +81,12 @@ public class MainActivity extends AppCompatActivity
         ExchangeCodeDialogFragment.OnFragmentInteractionListener,
         ExchangeOverrideDialogFragment.OnFragmentInteractionListener,
         FiltersDialogFragment.OnFragmentInteractionListener,
+        PaymentDialogFragment.OnFragmentInteractionListener,
+        PaymentDestinationDialogFragment.OnFragmentInteractionListener,
+        PaymentDetailsDialogFragment.OnFragmentInteractionListener,
         BraintreeListener {
 
-    private User user;
+    public static User user;
     private Toolbar toolbar;
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
@@ -183,12 +189,13 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 boolean goodCustomerStatus = user.getCustomerStatus() != null &&
-                        user.getCustomerStatus().equals("valid");
+                        user.getCustomerStatus().equals("valid") && user.isPaymentSetup;
                 if (user.getCustomerId() != null && goodCustomerStatus) {
                     showNewRequestDialog(v);
                 } else {
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
-                    homeFragment.displayNoNewRequestSnackbar();                }
+                    homeFragment.displayNoNewRequestSnackbar();
+                }
             }
         });
 
@@ -436,7 +443,7 @@ public class MainActivity extends AppCompatActivity
 
         Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
-        // We should now have payment information => get nonce from braintree so that we can create a customer
+        // We should now have payment information => get nonce from braintree so that we can update customer payment
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
             if (updatedUser != null && updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
                 //TODO: in prod, user the real cc number & expiration date
@@ -445,7 +452,7 @@ public class MainActivity extends AppCompatActivity
                         .expirationDate("09/2018");
                 Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
             } else {
-                SharedAsyncMethods.updateUser(updatedUser, this, this, mLayout);
+                SharedAsyncMethods.updateUserPayment(updatedUser, this, this);
             }
         } else if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
             HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
@@ -499,6 +506,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void goToAccount(String message) {
+        SharedAsyncMethods.getUserInfoFromServer(user, this);
         AccountFragment fragment = (AccountFragment) fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG);
         if (fragment != null) {
             fragment.parentScroll.scrollTo(0, 0);
@@ -517,7 +525,7 @@ public class MainActivity extends AppCompatActivity
                 );
                 String nonce = paymentMethodNonce.getNonce();
                 user.setPaymentMethodNonce(nonce);
-                SharedAsyncMethods.updateUser(user, this);
+                SharedAsyncMethods.updateUserPayment(user, this, this);
                 String deviceData = data.getStringExtra(BraintreePaymentActivity.EXTRA_DEVICE_DATA);
             }
         }
@@ -554,7 +562,7 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
                             updatedUser.setPaymentMethodNonce(paymentMethodNonce.getNonce());
-                            SharedAsyncMethods.updateUser(updatedUser, act, act, mLayout);
+                            SharedAsyncMethods.updateUserPayment(updatedUser, act, act);
                         }
                     });
                 } catch (InvalidArgumentException e) {
