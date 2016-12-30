@@ -374,7 +374,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             month += 1;
             dob.setText(String.format("%1$04d-%2$02d-%3$02d", year, month, day));
-            Log.i("OnDateSet", "DOB String = " + dob.getText().toString());
+            Log.i("OnDateSet ", "DOB String = " + dob.getText().toString());
         }
     };
 

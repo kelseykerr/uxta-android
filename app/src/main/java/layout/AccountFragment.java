@@ -62,6 +62,7 @@ public class AccountFragment extends Fragment {
     private RelativeLayout editAccntLayout;
     private RelativeLayout logoutLayout;
     private RelativeLayout paymentsLayout;
+    private RelativeLayout privacyLayout;
 
     private boolean updateAccountRequest;
 
@@ -176,6 +177,19 @@ public class AccountFragment extends Fragment {
                     paymentDialogFragment = PaymentDialogFragment.newInstance();
                     paymentDialogFragment.show(getFragmentManager(), "dialog");
                 }
+            }
+        });
+
+        privacyLayout = (RelativeLayout) view.findViewById(R.id.privacy_layout);
+
+        privacyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://thenearbyapp.com";
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
         });
 
