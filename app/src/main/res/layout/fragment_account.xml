@@ -195,7 +195,7 @@
                         android:gravity="center_horizontal"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:tint="@color/colorAccent"
-                        android:src="@drawable/ic_lock_black_24dp" />
+                        android:src="@drawable/ic_lock_outline_black_24dp" />
 
                     <TextView
                         android:id="@+id/view_privacy_policy_text"

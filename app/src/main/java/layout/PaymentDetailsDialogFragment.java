@@ -217,6 +217,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
+                    user.setIsPaymentSetup(false);
                     SharedAsyncMethods.getUserInfoFromServer(user, context);
                     AccountFragment.dismissPaymentDialog();
                     dismiss();
