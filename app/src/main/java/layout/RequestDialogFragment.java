@@ -600,7 +600,9 @@ public class RequestDialogFragment extends DialogFragment
         //If you only need one location, unregister the listener
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getFragmentManager();
-        ft = fm.beginTransaction();
+        if (fm != null) {
+            ft = fm.beginTransaction();
+        }
     }
 
     private void updateMapFocus(LatLng ll) {

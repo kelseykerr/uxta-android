@@ -265,8 +265,8 @@ public class AccountFragment extends Fragment {
         }
         noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
         noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
-        boolean displayCustomerStatus = user.getCustomerStatus() != null &&
-                !user.getCustomerStatus().toLowerCase().equals("valid");
+        boolean displayCustomerStatus = (user.getCustomerStatus() != null &&
+                !user.getCustomerStatus().toLowerCase().equals("valid")) || !user.getIsPaymentSetup();
         if (user.getCustomerId() == null || displayCustomerStatus) {
             noCustomerText.setVisibility(View.VISIBLE);
             if (displayCustomerStatus) {
