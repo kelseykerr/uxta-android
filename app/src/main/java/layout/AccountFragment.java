@@ -185,7 +185,7 @@ public class AccountFragment extends Fragment {
         privacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://thenearbyapp.com";
+                String url = "http://thenearbyapp.com/privacy/privacypolicy.htm";
 
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
