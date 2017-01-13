@@ -46,6 +46,8 @@ import superstartupteam.nearby.R;
 import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
+import static android.support.v7.appcompat.R.styleable.SwitchCompat;
+
 
 public class UpdateAccountDialogFragment extends DialogFragment {
     private Context context;
@@ -283,6 +285,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 String sEmail = email.getText().toString();
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
+                user.setDateOfBirth(dob.getText().toString());
                 if (sPhone != null) {
                     sPhone = sPhone.replaceAll("\\)", "");
                     sPhone = sPhone.replaceAll("\\(", "");
