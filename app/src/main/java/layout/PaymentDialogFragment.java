@@ -142,10 +142,12 @@ public class PaymentDialogFragment extends DialogFragment {
             protected void onPostExecute(Integer i) {
                 loadingScreen.setVisibility(View.GONE);
                 paymentsScreen.setVisibility(View.VISIBLE);
+                // merchant account is inactive if the status is null or the status is not "pending" or "active"
+                boolean merchantInactive = user.getMerchantStatus() == null || (!user.getMerchantStatus().toLowerCase().equals("pending") &&
+                        !user.getMerchantStatus().toLowerCase().equals("active"));
                 if (i != null && i.equals(200)) {
                     if ((user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination())
-                            || (!user.getMerchantStatus().toLowerCase().equals("pending") &&
-                            !user.getMerchantStatus().toLowerCase().equals("active")))  {
+                            || merchantInactive)  {
                         addAccountText.setVisibility(View.VISIBLE);
                         destinationText.setVisibility(View.GONE);
                         destinationBtn.setVisibility(View.GONE);
