@@ -248,6 +248,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     String output = AppUtils.getResponseContent(conn);
                     exchangeCode = output;
                     try {

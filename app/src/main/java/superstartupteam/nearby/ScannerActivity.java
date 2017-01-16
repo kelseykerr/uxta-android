@@ -137,6 +137,7 @@ public class ScannerActivity extends AppCompatActivity implements
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("PUT");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
                     responseCode = conn.getResponseCode();
                     Log.i("PUT /transactions/code", "Response Code: " + responseCode);

@@ -1,8 +1,12 @@
 package superstartupteam.nearby;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -12,30 +16,30 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import superstartupteam.nearby.model.User;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private TextView info;
-    private LoginButton loginButton;
+    private LoginButton facebookLoginButton;
+    private SignInButton googleSignInBtn;
+    private static final int RC_SIGN_IN_GOOGLE = 9001;
     private Button fb;
+    private Button google;
     private CallbackManager callbackManager;
     private User user;
+    private GoogleApiClient mGoogleApiClient;
+    private static final String TAG = "LoginActivity";
 
     @Override
     public void onResume() {
@@ -83,6 +87,16 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(Constants.GOOGLE_WEB_CLIENT_ID)
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
@@ -94,42 +108,13 @@ public class LoginActivity extends AppCompatActivity {
         }
         info = (TextView) findViewById(R.id.info);
         fb = (Button) findViewById(R.id.fb);
-        loginButton = (LoginButton) findViewById(R.id.login_button);
+        facebookLoginButton = (LoginButton) findViewById(R.id.login_button);
 
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                try {
-                                    Log.i("token-> ", loginResult.getAccessToken().getToken() +
-                                            " <- token");
-                                    user = new User();
-                                    user.setFacebookId(object.getString("id").toString());
-                                    user.setAccessToken(loginResult.getAccessToken().getToken());
-                                    PrefUtils.setCurrentUser(user, LoginActivity.this);
-
-                                    SharedAsyncMethods.getUserInfoFromServer(user, LoginActivity.this);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,email,gender");
-                request.setParameters(parameters);
-                request.executeAsync();
+                facebookLoginSuccess(loginResult);
             }
-
 
             @Override
             public void onCancel() {
@@ -141,48 +126,107 @@ public class LoginActivity extends AppCompatActivity {
                 info.setText("Login attempt failed.");
             }
         });
-    }
-
-    /*public void getUserInfoFromServer() {
-        new AsyncTask<Void, Void, Void>() {
+        google = (Button) findViewById(R.id.google_auth);
+        google.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    String output = AppUtils.getResponseContent(conn);
-                    Log.i("***user***", output);
-                    try {
-                        User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
-                        userFromServer.setFacebookId(user.getFacebookId());
-                        userFromServer.setAccessToken(user.getAccessToken());
-                        PrefUtils.setCurrentUser(userFromServer, LoginActivity.this);
-                    } catch (IOException e) {
-                        Log.e("Error", "Received an error while trying to read " +
-                                "user info from server: " + e.getMessage());
-                    }
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get user info from server: " + e.getMessage());
+            public void onClick(View view) {
+                if (user != null) {
+                    user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
                 }
-                return null;
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
             }
-        }.execute();
-    }*/
+        });
+        googleSignInBtn = (SignInButton) findViewById(R.id.google_sign_in_button);
+    }
 
     public void onClick(View v) {
         if (v == fb) {
-            loginButton.performClick();
+            facebookLoginButton.performClick();
+            if (user != null) {
+                user.setAuthMethod(Constants.FB_AUTH_METHOD);
+            }
         }
+    }
+
+    public void facebookLoginSuccess(final LoginResult loginResult) {
+        GraphRequest request = GraphRequest.newMeRequest(
+                loginResult.getAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject object,
+                            GraphResponse response) {
+                        try {
+                            Log.i("token-> ", loginResult.getAccessToken().getToken());
+                            user = new User();
+                            user.setAuthMethod(Constants.FB_AUTH_METHOD);
+                            user.setFacebookId(object.getString("id").toString());
+                            user.setAccessToken(loginResult.getAccessToken().getToken());
+                            PrefUtils.setCurrentUser(user, LoginActivity.this);
+                            SharedAsyncMethods.getUserInfoFromServer(user, LoginActivity.this);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            Thread.sleep(2000);
+                            startActivity(intent);
+                            finish();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,email,gender");
+        request.setParameters(parameters);
+        request.executeAsync();
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN_GOOGLE) {
+            if (user != null) {
+                user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
+            }
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            try {
+                Log.i("token-> ", acct.getIdToken());
+                user = new User();
+                user.setGoogleId(acct.getId());
+                user.setAccessToken(acct.getIdToken());
+                user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
+                PrefUtils.setCurrentUser(user, LoginActivity.this);
+                SharedAsyncMethods.getUserInfoFromServer(user, LoginActivity.this);
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Thread.sleep(2000);
+                startActivity(intent);
+                finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Signed out, show unauthenticated UI.
+            Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
+            //TODO: show error message
+        }
     }
 }

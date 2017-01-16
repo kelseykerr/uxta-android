@@ -365,6 +365,7 @@ public class RequestDialogFragment extends DialogFragment
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("PUT");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
 
                     updateRequestObject();
@@ -423,6 +424,7 @@ public class RequestDialogFragment extends DialogFragment
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
 
                     Request newRequest = createNewRequestObject(lat, lng);
@@ -469,6 +471,7 @@ public class RequestDialogFragment extends DialogFragment
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         ObjectMapper mapper = new ObjectMapper();

@@ -31,6 +31,7 @@ public class SharedAsyncMethods {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     Integer responseCode = conn.getResponseCode();
                     String output = AppUtils.getResponseContent(conn);
 
@@ -42,6 +43,7 @@ public class SharedAsyncMethods {
                         User userFromServer = AppUtils.jsonStringToPojo(User.class, output);
                         userFromServer.setFacebookId(user.getFacebookId());
                         userFromServer.setAccessToken(user.getAccessToken());
+                        userFromServer.setAuthMethod(user.getAuthMethod());
                         PrefUtils.setCurrentUser(userFromServer, context);
                         HomeFragment.user = userFromServer;
                         RequestAdapter.user = userFromServer;
@@ -80,6 +82,7 @@ public class SharedAsyncMethods {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
                     ObjectMapper mapper = new ObjectMapper();
                     String updateJson = mapper.writeValueAsString(user);
@@ -160,6 +163,7 @@ public class SharedAsyncMethods {
             conn.setConnectTimeout(30000);
             conn.setRequestMethod("PUT");
             conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+            conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
             conn.setRequestProperty("Content-Type", "application/json");
             ObjectMapper mapper = new ObjectMapper();
             String updateJson = mapper.writeValueAsString(user);

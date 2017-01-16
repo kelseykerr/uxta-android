@@ -156,6 +156,7 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("PUT");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
 
                     conn.setRequestProperty("Content-Type", "application/json");
 

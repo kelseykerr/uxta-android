@@ -68,6 +68,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
     private Button saveBtn;
     private RelativeLayout updatingAccountScreen;
     private RelativeLayout infoScreen;
+    private String errorMessage;
 
     public static PaymentDestinationDialogFragment newInstance(PaymentDetails pymtDetails, String destinationTxt) {
         paymentDetails = pymtDetails;
@@ -246,6 +247,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("DELETE");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     //conn.setRequestProperty("Content-Type", "application/json");
 
                     responseCode = conn.getResponseCode();
@@ -317,6 +319,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
 
                     ObjectMapper mapper = new ObjectMapper();
@@ -335,8 +338,8 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not update payment destination: " + e.getMessage());
-                    dismiss();
-                    ((MainActivity) getActivity()).goToAccount("Could not update payment destination: " + e.getMessage());
+                    errorMessage = e.getMessage();
+                    responseCode = 400;
                 }
                 return responseCode;
             }
@@ -347,6 +350,9 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     AccountFragment.dismissPaymentDialog();
                     dismiss();
                     ((MainActivity) getActivity()).goToAccount("updated payment destination");
+                } else {
+                    dismiss();
+                    ((MainActivity) getActivity()).goToAccount("Could not update payment destination: " + errorMessage);
                 }
             }
         }.execute();

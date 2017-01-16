@@ -293,6 +293,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     String output = AppUtils.getResponseContent(conn);
                     int responseCode = conn.getResponseCode();
                     Log.i("GET /requests", "Response Code : " + responseCode);

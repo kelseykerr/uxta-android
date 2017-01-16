@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "491459641376-3dlu720luktd74t1jjf58ej8gfjpvs3c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "superstartupteam.nearby",
+            "certificate_hash": "133920FE42E6C052D5332A6CC4C698C0B12EC257"
+          }
+        },
+        {
+          "client_id": "491459641376-2en8gnmrkjnq2ga3p5vd5fam55p823g6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "superstartupteam.nearby",
+            "certificate_hash": "BE96A450E8A5CE3846834FC38E1DAA78AC3E59CA"
+          }
+        },
+        {
           "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
           "client_type": 3
         }

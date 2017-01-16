@@ -199,6 +199,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("DELETE");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
 
                     responseCode = conn.getResponseCode();
                     Log.i("DELETE /customer", "Response Code : " + responseCode);

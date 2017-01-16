@@ -63,6 +63,7 @@ public class NearbyInstanceIdService extends FirebaseInstanceIdService {
                     conn.setRequestMethod("PUT");
                     User user = PrefUtils.getCurrentUser(context);
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     int responseCode = conn.getResponseCode();
                     Log.i("PUT /fcmToken", "Response Code : " + responseCode);
                     if (responseCode != 204) {

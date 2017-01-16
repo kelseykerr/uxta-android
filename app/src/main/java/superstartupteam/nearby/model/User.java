@@ -17,6 +17,9 @@ public class User extends BaseEntity {
     private String facebookId;
 
     @JsonIgnore
+    private String googleId;
+
+    @JsonIgnore
     private String gender;
 
     private String email;
@@ -26,6 +29,12 @@ public class User extends BaseEntity {
 
     @JsonIgnore
     private String accessToken;
+
+    @JsonIgnore
+    private String authMethod;
+
+    @JsonIgnore
+    private String googleAccessToken;
 
     private String firstName;
 
@@ -94,6 +103,8 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String braintreeClientToken;
 
+    private String pictureUrl;
+
     public User() {
 
     }
@@ -121,6 +132,9 @@ public class User extends BaseEntity {
         this.isPaymentSetup = fromServer.isPaymentSetup;
         this.customerStatus = fromServer.customerStatus;
         this.removedMerchantDestination = fromServer.removedMerchantDestination;
+        if (fromServer.authMethod != null) {
+            this.authMethod = fromServer.authMethod;
+        }
     }
 
     public String getUserId() {
@@ -426,5 +440,38 @@ public class User extends BaseEntity {
     public void setRemovedMerchantDestination(Boolean removedMerchantDestination) {
         this.removedMerchantDestination = removedMerchantDestination;
     }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public String getGoogleAccessToken() {
+        return googleAccessToken;
+    }
+
+    public void setGoogleAccessToken(String googleAccessToken) {
+        this.googleAccessToken = googleAccessToken;
+    }
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+
+    public String getAuthMethod() {
+        return this.authMethod;
+    }
+
+    public void setAuthMethod(String authMethod) {
+        this.authMethod = authMethod;
+    }
+
 }
 

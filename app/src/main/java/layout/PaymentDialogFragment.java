@@ -119,6 +119,7 @@ public class PaymentDialogFragment extends DialogFragment {
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     responseCode = conn.getResponseCode();
                     String output = AppUtils.getResponseContent(conn);
                     if (responseCode != 200) {

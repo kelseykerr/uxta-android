@@ -177,6 +177,7 @@ public class ConfirmExchangeOverrideDialogFragment extends DialogFragment {
                     conn.setRequestMethod("PUT");
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     ObjectMapper mapper = new ObjectMapper();
                     String responseJson = mapper.writeValueAsString(t);
                     byte[] outputInBytes = responseJson.getBytes("UTF-8");

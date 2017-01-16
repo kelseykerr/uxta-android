@@ -211,7 +211,8 @@ public class MainActivity extends AppCompatActivity
         getBraintreeClientToken(this);
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
-        Log.i("****FCM TOKEN*", FirebaseInstanceId.getInstance().getToken() + "***");
+        Log.i("auth method: ", user.getAuthMethod() + "********");
+        Log.i("****FCM TOKEN: ", FirebaseInstanceId.getInstance().getToken() + "***");
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
         checkNotificationOnOpen();
         scheduleNotificationsAlarm();
@@ -544,6 +545,7 @@ public class MainActivity extends AppCompatActivity
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     String token = AppUtils.getResponseContent(conn);
                     user.setBraintreeClientToken(token);
                 } catch (IOException e) {

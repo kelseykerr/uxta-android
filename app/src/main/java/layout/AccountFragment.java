@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -23,18 +25,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
-
-import org.w3c.dom.Text;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
-import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -45,7 +51,7 @@ import superstartupteam.nearby.model.User;
  * Use the {@link AccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountFragment extends Fragment {
+public class AccountFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
     private Context context;
     private Bitmap bitmap;
     private TextView btnLogout;
@@ -63,6 +69,8 @@ public class AccountFragment extends Fragment {
     private RelativeLayout logoutLayout;
     private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
+    public static GoogleApiClient mGoogleApiClient;
+    private static final String TAG = "AccountFragment";
 
     private boolean updateAccountRequest;
 
@@ -88,6 +96,15 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(Constants.GOOGLE_WEB_CLIENT_ID)
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
         super.onCreate(savedInstanceState);
     }
 
@@ -110,46 +127,15 @@ public class AccountFragment extends Fragment {
         user = PrefUtils.getCurrentUser(context);
         View view = inflater.inflate(R.layout.fragment_account, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
-
+        setProfilePic();
         updateAccountRequest = false;
-
-        // fetching facebook's profile picture
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                URL imageURL = null;
-                try {
-                    imageURL = new URL("https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                profileImage.setImageBitmap(bitmap);
-            }
-        }.execute();
-
 
         logoutLayout = (RelativeLayout) view.findViewById(R.id.logout_layout);
 
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PrefUtils.clearCurrentUser(context);
-                // We can logout from facebook by calling following method
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(context, LoginActivity.class);
-                startActivity(intent);
-                //finish();
+                logout();
             }
         });
 
@@ -255,7 +241,7 @@ public class AccountFragment extends Fragment {
             notificationsText.setText(htmlString);
         } else {
             String htmlString = "you will receive notifications about requests within " +
-                    user.getNotificationRadius() + " of your " + (homeNotifs ? "home" :  "current location");
+                    user.getNotificationRadius() + " of your " + (homeNotifs ? "home" : "current location");
             notificationsText.setText(htmlString);
         }
         if (snackbarMessage != null) {
@@ -356,6 +342,82 @@ public class AccountFragment extends Fragment {
                 params.bottomMargin + 150);
         snackbar.getView().getRootView().setLayoutParams(params);
         snackbar.show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    public void logout() {
+        PrefUtils.clearCurrentUser(context);
+        if (user.getAuthMethod() == null || user.getAuthMethod().equals(Constants.FB_AUTH_METHOD)) {
+            // We can logout from facebook by calling following method
+            LoginManager.getInstance().logOut();
+            Intent intent = new Intent(context, LoginActivity.class);
+            startActivity(intent);
+            //finish();
+        } else {
+            mGoogleApiClient.connect();
+            mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                @Override
+                public void onConnected(@Nullable Bundle bundle) {
+                    if (mGoogleApiClient.isConnected()) {
+                        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                if (status.isSuccess()) {
+                                    Log.d(TAG, "User Logged out");
+                                    Intent intent = new Intent(context, LoginActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onConnectionSuspended(int i) {
+                    Log.d(TAG, "Google API Client Connection Suspended");
+                }
+
+            });
+
+        }
+    }
+
+    public void setProfilePic() {
+        final boolean googlePic = user.getAuthMethod() != null &&
+                user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD) &&
+                user.getPictureUrl() != null;
+        final boolean facebookPic = user.getAuthMethod() != null &&
+                user.getAuthMethod().equals(Constants.FB_AUTH_METHOD);
+        if (googlePic || facebookPic) {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    URL imageURL = null;
+                    try {
+                        imageURL = new URL(googlePic ? user.getPictureUrl() : "https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
+                        bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    profileImage.setImageBitmap(bitmap);
+                }
+            }.execute();
+        }
     }
 
 }

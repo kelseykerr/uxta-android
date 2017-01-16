@@ -211,7 +211,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
 
         final Button saveBtn = (Button) view.findViewById(R.id.next_button_2);
-        if (!user.getTosAccepted()) {
+        if (user.getTosAccepted() == null || !user.getTosAccepted()) {
             saveBtn.setText("continue");
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
