@@ -20,6 +20,7 @@ import java.util.List;
 import superstartupteam.nearby.model.BaseEntity;
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.User;
 
 /**
  * Created by kerrk on 8/21/16.
@@ -115,6 +116,22 @@ public class AppUtils {
     public static BigDecimal formatCurrency(Double value) {
         BigDecimal formattedValue = BigDecimal.valueOf(value);
         return formattedValue.setScale(AppUtils.USD.getDefaultFractionDigits(), AppUtils.DEFAULT_ROUNDING);
+    }
+
+    public static boolean canAddPayments(User user) {
+        return validateField(user.getFirstName()) &&
+                validateField(user.getLastName()) &&
+                validateField(user.getPhone()) &&
+                validateField(user.getEmail()) &&
+                validateField(user.getDateOfBirth()) &&
+                validateField(user.getAddress()) &&
+                validateField(user.getCity()) &&
+                validateField(user.getState()) &&
+                validateField(user.getZip());
+    }
+
+    public static boolean validateField(String field) {
+        return field != null && !field.isEmpty();
     }
 
 }

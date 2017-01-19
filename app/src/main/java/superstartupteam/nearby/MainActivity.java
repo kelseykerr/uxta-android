@@ -188,13 +188,18 @@ public class MainActivity extends AppCompatActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                boolean goodCustomerStatus = user.getCustomerStatus() != null &&
-                        user.getCustomerStatus().equals("valid") && user.isPaymentSetup;
-                if (user.getCustomerId() != null && goodCustomerStatus) {
-                    showNewRequestDialog(v);
-                } else {
+                if (!AppUtils.canAddPayments(user)) {
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
-                    homeFragment.displayNoNewRequestSnackbar();
+                    homeFragment.displayUpdateAccountSnackbar();
+                } else {
+                    boolean goodCustomerStatus = user.getCustomerStatus() != null &&
+                            user.getCustomerStatus().equals("valid") && user.isPaymentSetup;
+                    if (user.getCustomerId() != null && goodCustomerStatus) {
+                        showNewRequestDialog(v);
+                    } else {
+                        HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                        homeFragment.displayNoNewRequestSnackbar();
+                    }
                 }
             }
         });

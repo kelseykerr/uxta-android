@@ -65,8 +65,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 boolean goodMerchantStatus = user.getMerchantStatus() != null &&
                         user.getMerchantStatus().toString().toLowerCase().equals("active") &&
                         (user.getRemovedMerchantDestination() == null || !user.getRemovedMerchantDestination());
-                if (user.getMerchantId() != null && goodMerchantStatus) {
-                    int position=(Integer)v.getTag();
+                if (!AppUtils.canAddPayments(user)) {
+                    Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
+                            Snackbar.LENGTH_LONG);
+                    snack.setAction("update account", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                            FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
+                            AccountFragment.updateAccountDialog.show(fm, "dialog");
+                        }
+                    });
+                    snack.show();
+                } else if (user.getMerchantId() != null && goodMerchantStatus) {
+                    int position = (Integer) v.getTag();
                     Request r = requests.get(position);
                     homeFragment.showDialog(r.getId());
                 } else {
@@ -103,7 +115,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     }
 
 
-
     @Override
     public RequestViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.
@@ -115,7 +126,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         return new RequestViewHolder(context, itemView);
     }
 
-    public void swap(List<Request> newRequests){
+    public void swap(List<Request> newRequests) {
         requests.clear();
         requests.addAll(newRequests);
         notifyDataSetChanged();
@@ -131,9 +142,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         public RequestViewHolder(Context context, View v) {
             super(v);
-            vItemName =  (TextView) v.findViewById(R.id.item_name);
-            vCategoryName = (TextView)  v.findViewById(R.id.category_name);
-            vPostedDate = (TextView)  v.findViewById(R.id.posted_date);
+            vItemName = (TextView) v.findViewById(R.id.item_name);
+            vCategoryName = (TextView) v.findViewById(R.id.category_name);
+            vPostedDate = (TextView) v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
             vMakeOfferButton = (ImageButton) v.findViewById(R.id.make_offer_button);
             this.context = context;

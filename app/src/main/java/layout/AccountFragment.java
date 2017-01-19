@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.MainActivity;
@@ -58,6 +59,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     private TextView editProfile;
     private TextView noCustomerText;
     private TextView noMerchantText;
+    private TextView missingUserInfoText;
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
@@ -125,7 +127,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         user = PrefUtils.getCurrentUser(context);
-        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        final View view = inflater.inflate(R.layout.fragment_account, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
         setProfilePic();
         updateAccountRequest = false;
@@ -159,6 +161,18 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             public void onClick(View v) {
                 if (!MainActivity.isNetworkConnected()) {
                     showNoConnectionSnackbar();
+                } else if (!AppUtils.canAddPayments(user)) {
+                    Snackbar snackbar = Snackbar
+                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Snackbar.LENGTH_LONG);
+                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snackbar.getView().getRootView().getLayoutParams();
+
+                    params.setMargins(params.leftMargin,
+                            params.topMargin,
+                            params.rightMargin,
+                            params.bottomMargin + 150);
+                    snackbar.getView().getRootView().setLayoutParams(params);
+                    snackbar.show();
                 } else {
                     paymentDialogFragment = PaymentDialogFragment.newInstance();
                     paymentDialogFragment.show(getFragmentManager(), "dialog");
@@ -249,11 +263,25 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                     .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
             snackbar.show();
         }
+        missingUserInfoText = (TextView) view.findViewById(R.id.missing_user_info_text);
         noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
         noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
         boolean displayCustomerStatus = (user.getCustomerStatus() != null &&
-                !user.getCustomerStatus().toLowerCase().equals("valid")) || !user.getIsPaymentSetup();
-        if (user.getCustomerId() == null || displayCustomerStatus) {
+                !user.getCustomerStatus().toLowerCase().equals("valid")) ||
+                !user.getIsPaymentSetup() || user.getCustomerId() == null;
+        boolean displayMerchantStatus = (user.getMerchantStatus() != null &&
+                !user.getMerchantStatus().toLowerCase().equals("pending") &&
+                !user.getMerchantStatus().toLowerCase().equals("active")) ||
+                user.getMerchantId() == null ||
+                (user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination());
+        if (!AppUtils.canAddPayments(user)) {
+            displayCustomerStatus = false;
+            displayMerchantStatus = false;
+            missingUserInfoText.setVisibility(View.VISIBLE);
+        } else {
+            missingUserInfoText.setVisibility(View.GONE);
+        }
+        if (displayCustomerStatus) {
             noCustomerText.setVisibility(View.VISIBLE);
             if (displayCustomerStatus) {
                 noCustomerText.setText(user.getCustomerStatus());
@@ -261,11 +289,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         } else {
             noCustomerText.setVisibility(View.GONE);
         }
-        boolean displayMerchantStatus = user.getMerchantStatus() != null &&
-                !user.getMerchantStatus().toLowerCase().equals("pending") &&
-                !user.getMerchantStatus().toLowerCase().equals("active");
-        if (user.getMerchantId() == null || displayMerchantStatus ||
-                (user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination())) {
+        if (displayMerchantStatus) {
             noMerchantText.setVisibility(View.VISIBLE);
             if (user.getMerchantStatusMessage() != null) {
                 noMerchantText.setText(user.getMerchantStatusMessage());
@@ -400,7 +424,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                 protected Void doInBackground(Void... params) {
                     URL imageURL = null;
                     try {
-                        imageURL = new URL(googlePic ? user.getPictureUrl() : "https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
+                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=200" : "https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
                         bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
                     } catch (MalformedURLException e) {
                         e.printStackTrace();

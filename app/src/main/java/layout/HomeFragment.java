@@ -642,6 +642,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         }
     };
 
+    public void displayUpdateAccountSnackbar() {
+        Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
+                Snackbar.LENGTH_LONG)
+                .setAction("update account", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                        AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                    }
+                });
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snack.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+
+        snack.getView().getRootView().setLayoutParams(params);
+        snack.show();
+    }
+
     public void displayNoNewRequestSnackbar() {
         Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment destination information to your account",
                 Snackbar.LENGTH_LONG)
