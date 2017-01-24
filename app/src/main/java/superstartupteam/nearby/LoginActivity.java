@@ -1,7 +1,10 @@
 package superstartupteam.nearby;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +26,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import org.json.JSONObject;
 
@@ -38,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private Button google;
     private CallbackManager callbackManager;
     private User user;
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
     private static final String TAG = "LoginActivity";
 
     @Override
@@ -93,10 +98,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .build();
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        mGoogleApiClient = GoogleApiClientSingleton.getInstance(googleApiClient).getGoogleApiClient();
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
@@ -130,6 +136,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         google.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                google.setEnabled(false);
                 if (user != null) {
                     user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
                 }
@@ -226,7 +233,34 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         } else {
             // Signed out, show unauthenticated UI.
             Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
+            google.setEnabled(true);
             //TODO: show error message
         }
+    }
+
+    public void handleGoogleSignout(final Context context) {
+        mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+            @Override
+            public void onConnected(@Nullable Bundle bundle) {
+                if (mGoogleApiClient.isConnected()) {
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            if (status.isSuccess()) {
+                                Log.d(TAG, "User Logged out");
+                                Intent intent = new Intent(context, LoginActivity.class);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onConnectionSuspended(int i) {
+                Log.d(TAG, "Google API Client Connection Suspended");
+            }
+
+        });
     }
 }

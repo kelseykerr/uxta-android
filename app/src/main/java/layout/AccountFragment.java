@@ -38,6 +38,7 @@ import java.net.URL;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.GoogleApiClientSingleton;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -104,9 +105,11 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                 .build();
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        mGoogleApiClient = GoogleApiClientSingleton.getInstance(googleApiClient).getGoogleApiClient();
+
         super.onCreate(savedInstanceState);
     }
 
@@ -372,15 +375,16 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        Log.i(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     public void logout() {
-        PrefUtils.clearCurrentUser(context);
+        Log.i(TAG, "************************logging out");
         if (user.getAuthMethod() == null || user.getAuthMethod().equals(Constants.FB_AUTH_METHOD)) {
             // We can logout from facebook by calling following method
             LoginManager.getInstance().logOut();
             Intent intent = new Intent(context, LoginActivity.class);
+            PrefUtils.clearCurrentUser(context);
             startActivity(intent);
             //finish();
         } else {
@@ -393,8 +397,9 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                             @Override
                             public void onResult(@NonNull Status status) {
                                 if (status.isSuccess()) {
-                                    Log.d(TAG, "User Logged out");
+                                    Log.i(TAG, "User Logged out");
                                     Intent intent = new Intent(context, LoginActivity.class);
+                                    PrefUtils.clearCurrentUser(context);
                                     startActivity(intent);
                                 }
                             }
@@ -404,7 +409,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
 
                 @Override
                 public void onConnectionSuspended(int i) {
-                    Log.d(TAG, "Google API Client Connection Suspended");
+                    Log.i(TAG, "Google API Client Connection Suspended");
                 }
 
             });
