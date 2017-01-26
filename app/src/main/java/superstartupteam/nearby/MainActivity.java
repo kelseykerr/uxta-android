@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -42,6 +45,15 @@ import com.braintreepayments.api.interfaces.PaymentMethodNonceCreatedListener;
 import com.braintreepayments.api.models.CardBuilder;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
@@ -84,7 +96,8 @@ public class MainActivity extends AppCompatActivity
         PaymentDialogFragment.OnFragmentInteractionListener,
         PaymentDestinationDialogFragment.OnFragmentInteractionListener,
         PaymentDetailsDialogFragment.OnFragmentInteractionListener,
-        BraintreeListener {
+        BraintreeListener,
+        GoogleApiClient.OnConnectionFailedListener {
 
     public static User user;
     private Toolbar toolbar;
@@ -103,9 +116,11 @@ public class MainActivity extends AppCompatActivity
     private Request request;
     private boolean readNotification = false;
     private BraintreeFragment mBraintreeFragment;
+    public static GoogleApiClient mGoogleApiClient;
     public static User updatedUser;
     public static ConnectivityManager connMgr;
     private FloatingActionButton fab;
+    private ProgressDialog mProgressDialog;
 
 
     /**
@@ -159,6 +174,17 @@ public class MainActivity extends AppCompatActivity
                 finish();
             }
         }
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(Constants.GOOGLE_WEB_CLIENT_ID)
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
         SharedAsyncMethods.getUserInfoFromServer(user, this);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_landing);
@@ -226,6 +252,34 @@ public class MainActivity extends AppCompatActivity
             AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
         }
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (user != null && user.getAuthMethod() != null && user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD)) {
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            if (opr.isDone()) {
+                // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+                // and the GoogleSignInResult will be available instantly.
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                handleSignInResult(result);
+            } else {
+                // If the user has not previously signed in on this device or the sign-in has expired,
+                // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+                // single sign-on will occur in this branch.
+                showProgressDialog();
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        hideProgressDialog();
+                        handleSignInResult(googleSignInResult);
+                    }
+                });
+            }
+        }
+    } // Always call the superclass method first
+
 
     private void setSearchBtnClick() {
         searchBtn.setOnClickListener(new View.OnClickListener() {
@@ -595,6 +649,79 @@ public class MainActivity extends AppCompatActivity
     public static boolean isNetworkConnected() {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            try {
+                Log.i("token-> ", acct.getIdToken());
+                //user = new User();
+                user.setGoogleId(acct.getId());
+                user.setAccessToken(acct.getIdToken());
+                user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
+                PrefUtils.setCurrentUser(user, MainActivity.this);
+                //SharedAsyncMethods.getUserInfoFromServer(user, MainActivity.this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Signed out, show unauthenticated UI.
+            Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
+            //TODO: show error message
+        }
+    }
+
+    public void handleGoogleSignout(final Context context) {
+        mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+            @Override
+            public void onConnected(@Nullable Bundle bundle) {
+                if (mGoogleApiClient.isConnected()) {
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            if (status.isSuccess()) {
+                                Log.d(TAG, "User Logged out");
+                                Intent intent = new Intent(context, LoginActivity.class);
+                                PrefUtils.clearCurrentUser(context);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onConnectionSuspended(int i) {
+                Log.d(TAG, "Google API Client Connection Suspended");
+            }
+
+        });
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("loading...");
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
     }
 
 

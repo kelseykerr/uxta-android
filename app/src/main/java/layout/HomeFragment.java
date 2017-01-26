@@ -171,8 +171,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResultsList = (TextView) v.findViewById(R.id.no_results_list);
         noResultsList.setVisibility(View.GONE);
-        getRequests(currentRadius);
+        //getRequests(currentRadius);
         return v;
+    }
+
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getRequests(currentRadius);
     }
 
     private void setMarkerClick() {
@@ -264,6 +270,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public void getRequests(final Double radius) {
         if (!MainActivity.isNetworkConnected()) {
             showNoConnectionSnackbar();
+            return;
+        }
+        if (!isAdded()) {
             return;
         }
         else if (user == null) {

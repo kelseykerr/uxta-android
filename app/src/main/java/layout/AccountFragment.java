@@ -72,7 +72,6 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     private RelativeLayout logoutLayout;
     private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
-    public static GoogleApiClient mGoogleApiClient;
     private static final String TAG = "AccountFragment";
 
     private boolean updateAccountRequest;
@@ -99,17 +98,6 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken(Constants.GOOGLE_WEB_CLIENT_ID)
-                .build();
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-        mGoogleApiClient = GoogleApiClientSingleton.getInstance(googleApiClient).getGoogleApiClient();
-
         super.onCreate(savedInstanceState);
     }
 
@@ -388,32 +376,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             startActivity(intent);
             //finish();
         } else {
-            mGoogleApiClient.connect();
-            mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                @Override
-                public void onConnected(@Nullable Bundle bundle) {
-                    if (mGoogleApiClient.isConnected()) {
-                        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(@NonNull Status status) {
-                                if (status.isSuccess()) {
-                                    Log.i(TAG, "User Logged out");
-                                    Intent intent = new Intent(context, LoginActivity.class);
-                                    PrefUtils.clearCurrentUser(context);
-                                    startActivity(intent);
-                                }
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onConnectionSuspended(int i) {
-                    Log.i(TAG, "Google API Client Connection Suspended");
-                }
-
-            });
-
+            ((MainActivity)getActivity()).handleGoogleSignout(context);
         }
     }
 
