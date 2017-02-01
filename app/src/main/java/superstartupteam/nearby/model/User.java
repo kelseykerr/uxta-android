@@ -30,7 +30,6 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String accessToken;
 
-    @JsonIgnore
     private String authMethod;
 
     @JsonIgnore

@@ -2,11 +2,15 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -23,7 +28,10 @@ import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,6 +189,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 r.getUser().getFirstName() : r.getUser().getFullName();
         String htmlString = "Offered a " +
                 r.getItemName() + " to " + buyerName;
+        requestViewHolder.setUpProfileImage(r.getUser());
         String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         requestViewHolder.vPostedDate.setText(diff);
@@ -220,6 +229,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
         requestViewHolder.vStatus.setText(r.getStatus().toLowerCase());
         setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
+        requestViewHolder.setUpProfileImage(user);
+
             /*
              * only display the edit button if the request is open...they shouldn't need to edit
              * closed requests
@@ -258,6 +269,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
     }
 
+
     private void setUpTransactionCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         boolean isBuyer = user.getId().equals(r.getUser().getId());
         final boolean isSeller = !isBuyer;
@@ -295,6 +307,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             topDescription = beginning + r.getItemName() +
                     " to " + r.getUser().getFirstName();
         }
+        requestViewHolder.setUpProfileImage(isSeller ? r.getUser() : resp.getSeller());
         requestViewHolder.vItemName.setText(topDescription);
         if (!transaction.getExchanged()) {
             requestViewHolder.showExchangeIcon = true;
@@ -526,6 +539,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private FrameLayout cardView;
         private LinearLayout responseSeparator;
         private TextView vTransactionStatus;
+        private ImageButton profileImage;
 
         public HistoryCardViewHolder(Context context, View v) {
             super(v);
@@ -544,6 +558,37 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             responseList = (ListView) v.findViewById(R.id.response_list);
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
+            profileImage = (ImageButton) v.findViewById(R.id.profileImage);
+        }
+
+        private void setUpProfileImage(final User user) {
+            final boolean isGoogle = user.getAuthMethod() != null &&
+                    user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
+            Log.i("***", user.getFirstName() + "**" + user.getAuthMethod());
+            new AsyncTask<Void, Void, Void>() {
+                Bitmap bitmap;
+                @Override
+                protected Void doInBackground(Void... params) {
+                    URL imageURL = null;
+                    try {
+                        imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=100" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=100");
+                        bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    profileImage.setImageBitmap(bitmap);
+                }
+            }.execute();
+
         }
     }
 }
