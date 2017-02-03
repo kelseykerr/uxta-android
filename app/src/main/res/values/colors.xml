@@ -4,8 +4,8 @@
     <color name="colorPrimaryDark">#4EE2EC</color>
     <color name="colorAccent">#767474</color>
     <color name="mutedGrey">#d3d3d3</color>
-    <color name="yellow">#FFD700</color>
-    <color name="redPink">#E52B50</color>
+    <color name="yellow">#ffe34d</color>
+    <color name="redPink">#ec584e</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="offWhite">#fafafa</color>
@@ -13,4 +13,5 @@
     <color name="white75">#BFFFFFFF</color>
     <color name="primary_dark_material_dark">#767474</color>
     <color name="primary_material_dark">#767474</color>
+    <color name="green">#4eeccf</color>
 </resources>

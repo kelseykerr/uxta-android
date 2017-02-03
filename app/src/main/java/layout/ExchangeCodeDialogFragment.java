@@ -59,13 +59,16 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
     private Boolean loading = false;
     private String heading;
     private TextView forgotBtn;
+    private boolean initialExchange;
     private boolean forgot = false;
 
-    public static ExchangeCodeDialogFragment newInstance(String transactionId, String heading) {
+    public static ExchangeCodeDialogFragment newInstance(String transactionId, String heading,
+                                                         boolean initialExchange) {
         ExchangeCodeDialogFragment fragment = new ExchangeCodeDialogFragment();
         Bundle args = new Bundle();
         args.putString("TRANSACTION_ID", transactionId);
         args.putString("HEADING", heading);
+        args.putBoolean("INITIAL_EXCHANGE", initialExchange);
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,6 +91,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             transactionId = getArguments().getString("TRANSACTION_ID");
             heading = getArguments().getString("HEADING");
+            initialExchange = getArguments().getBoolean("INITIAL_EXCHANGE");
         }
 
     }
@@ -134,7 +138,8 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
                 HistoryFragment callback = (HistoryFragment) getTargetFragment();
                 callback.showExchangeOverrideDialog(transactionId, heading, "If you forgot to " +
                         "submit the exchange when it happened, enter the time the exchange occurred and " +
-                        "the other user will be asked to verify the exchange happened.");
+                        "the other user will be asked to verify the exchange happened.", initialExchange);
+                dismiss();
             }
         });
 

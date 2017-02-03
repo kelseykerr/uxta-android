@@ -169,7 +169,7 @@ public class HistoryFragment extends Fragment {
     public void showExchangeCodeDialog(Transaction t, Boolean buyer) {
         String heading = buyer ? "Confirm Return" : "Confirm Exchange";
         ExchangeCodeDialogFragment fragment = ExchangeCodeDialogFragment
-                .newInstance(t.getId(), heading);
+                .newInstance(t.getId(), heading, !buyer);
         fragment.setTargetFragment(this, 0);
         fragment.show(getFragmentManager(), "dialog");
     }
@@ -219,9 +219,10 @@ public class HistoryFragment extends Fragment {
         newFragment.show(getFragmentManager(), "dialog");
     }
 
-    public void showExchangeOverrideDialog(String transactionId, String header, String description) {
+    public void showExchangeOverrideDialog(String transactionId, String header, String description,
+                                           boolean initialExchange) {
         ExchangeOverrideDialogFragment f = ExchangeOverrideDialogFragment
-                .newInstance(transactionId, header, description);
+                .newInstance(transactionId, header, description, initialExchange);
         f.show(getFragmentManager(), "dialog");
     }
 

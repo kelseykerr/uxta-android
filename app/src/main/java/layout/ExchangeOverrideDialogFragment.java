@@ -67,12 +67,13 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
 
 
     public static ExchangeOverrideDialogFragment newInstance(String transactionId, String heading,
-                                                             String description) {
+                                                             String description, boolean initialExchange) {
         ExchangeOverrideDialogFragment fragment = new ExchangeOverrideDialogFragment();
         Bundle args = new Bundle();
         args.putString("TRANSACTION_ID", transactionId);
         args.putString("HEADING", heading);
         args.putString("DESCRIPTION", description);
+        args.putBoolean("INITIAL_EXCHANGE", initialExchange);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,6 +96,7 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
             transactionId = getArguments().getString("TRANSACTION_ID");
             heading = getArguments().getString("HEADING");
             description = getArguments().getString("DESCRIPTION");
+            initialExchangeOverride = getArguments().getBoolean("INITIAL_EXCHANGE");
         }
     }
 
@@ -151,7 +153,6 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-
         exchangeTimeLabel = (TextView) view.findViewById(R.id.exchange_time_label);
         exchangeTime = (TextView) view.findViewById(R.id.exchange_time);
         String htmlString = "Exchange Time";

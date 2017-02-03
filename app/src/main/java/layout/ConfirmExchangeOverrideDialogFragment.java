@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Transaction;
@@ -117,11 +118,13 @@ public class ConfirmExchangeOverrideDialogFragment extends DialogFragment {
                 Transaction t = new Transaction();
                 t.setId(transactionId);
                 Transaction.ExchangeOverride override = new Transaction.ExchangeOverride();
-                override.buyerAccepted = false;
-                override.sellerAccepted = false;
                 if (isSeller) {
+                    override.buyerAccepted = true;
+                    override.sellerAccepted = false;
                     t.setReturnOverride(override);
                 } else {
+                    override.buyerAccepted = false;
+                    override.sellerAccepted = true;
                     t.setExchangeOverride(override);
                 }
                 sendResponse(t);
@@ -197,6 +200,7 @@ public class ConfirmExchangeOverrideDialogFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode != null && responseCode == 200) {
+                    ((MainActivity) getActivity()).goToHistory("submitted response to exchange override");
                     dismiss();
                 }
 

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -181,6 +182,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         if (r.getUser().getPhone() != null) {
             requestViewHolder.showMessageUserIcon = true;
         }
+        requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showEditIcon = false;
@@ -197,7 +199,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vCategoryName.setVisibility(View.GONE);
         requestViewHolder.vDescription.setText("");
         requestViewHolder.vDescription.setVisibility(View.GONE);
-        requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toLowerCase());
+        requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toUpperCase());
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
         if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
             requestViewHolder.showEditIcon = false;
@@ -227,7 +229,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.vDescription.setVisibility(View.GONE);
         }
-        requestViewHolder.vStatus.setText(r.getStatus().toLowerCase());
+        requestViewHolder.vStatus.setText(r.getStatus().toUpperCase());
         setRequestStatusColor(requestViewHolder.vStatus, r.getStatus());
         requestViewHolder.setUpProfileImage(user);
 
@@ -276,6 +278,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
         requestViewHolder.showEditIcon = false;
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
+        requestViewHolder.vStatus.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
         requestViewHolder.vDescription.setVisibility(View.VISIBLE);
         Response resp = null;
@@ -292,8 +295,10 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         String beginning;
         if (complete && r.getRental()) {
             beginning = isBuyer ? "Borrowed a " : "Loaned a ";
+            requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
         } else if (complete) {
             beginning = isBuyer ? "Bought a " : "Sold a ";
+            requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
         } else if (r.getRental()) {
             beginning = isBuyer ? "Borrowing a " : "Loaning a ";
         } else {
@@ -328,13 +333,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.showCancelTransactionIcon = true;
             if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
                 requestViewHolder.showExchangeIcon = false;
-                requestViewHolder.vStatus.setText("Pending exchange override approval");
+                requestViewHolder.vTransactionStatus.setText("Pending exchange override approval");
                 if (isBuyer) {
                     String description = resp.getSeller().getFirstName() +
                             " submitted an exchange override. Did you exchange the " +
                             r.getItemName() + " at the time above?";
                     historyFragment.showConfirmExchangeOverrideDialog(
-                            transaction.getExchangeOverride().time.toString(),
+                            formatter.format(transaction.getExchangeOverride().time),
                             description, transaction.getId(), isSeller);
                 }
             }
@@ -390,7 +395,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
                         description, transaction.getId());
                 requestViewHolder.vTransactionStatus.setText("CONFIRM CHARGE!");
-                requestViewHolder.vTransactionStatus.setTextColor(Color.parseColor("#E52B50"));
+                requestViewHolder.vTransactionStatus.setTextColor(ContextCompat.getColor(context, R.color.redPink));
                 requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
                 requestViewHolder.showEditIcon = false;
                 requestViewHolder.showConfirmChargeIcon = true;
@@ -418,7 +423,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vDescription.setText(Html.fromHtml(price));
             }
             requestViewHolder.vCategoryName.setVisibility(View.GONE);
-            requestViewHolder.vStatus.setText(r.getStatus().toLowerCase());
+            requestViewHolder.vStatus.setVisibility(View.VISIBLE);
+            requestViewHolder.vStatus.setText(r.getStatus().toUpperCase());
             requestViewHolder.vStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
         }
     }
@@ -564,7 +570,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private void setUpProfileImage(final User user) {
             final boolean isGoogle = user.getAuthMethod() != null &&
                     user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
-            Log.i("***", user.getFirstName() + "**" + user.getAuthMethod());
             new AsyncTask<Void, Void, Void>() {
                 Bitmap bitmap;
                 @Override
