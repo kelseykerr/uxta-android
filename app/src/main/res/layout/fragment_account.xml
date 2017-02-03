@@ -17,6 +17,7 @@
         android:focusableInTouchMode="true">
 
         <RelativeLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -285,5 +286,23 @@
                 android:visibility="gone" />
         </RelativeLayout>
     </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/version_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 
 </FrameLayout>

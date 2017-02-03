@@ -4,15 +4,15 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.appcompat.BuildConfig;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,12 +25,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,7 +34,6 @@ import java.net.URL;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.GoogleApiClientSingleton;
 import superstartupteam.nearby.LoginActivity;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -72,6 +67,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     private RelativeLayout logoutLayout;
     private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
+    private TextView versionText;
     private static final String TAG = "AccountFragment";
 
     private boolean updateAccountRequest;
@@ -287,6 +283,15 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             }
         } else {
             noMerchantText.setVisibility(View.GONE);
+        }
+        versionText = (TextView) view.findViewById(R.id.version_text);
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            versionText.setText("version " + versionName);
+        } catch (Exception e) {
+            Log.e(TAG, "error getting version name");
+            versionText.setVisibility(View.GONE);
         }
         this.view = view;
         return view;
