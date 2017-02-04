@@ -70,6 +70,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
         final History h = recentHistory.get(i);
         final Request r = h.getRequest();
+        ViewGroup header = (ViewGroup) mInflater.inflate(R.layout.header_footer, requestViewHolder.responseList, false);
+        requestViewHolder.responseList.addHeaderView(header, null, false);
         if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed")) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
@@ -133,9 +135,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         user = PrefUtils.getCurrentUser(viewGroup.getContext());
         Context context = viewGroup.getContext();
         this.context = context;
-        View view = LayoutInflater.
-                from(viewGroup.getContext()).
-                inflate(R.layout.my_history_card, viewGroup, false);
+        mInflater = LayoutInflater.from(viewGroup.getContext());
+        View view = mInflater.inflate(R.layout.my_history_card, viewGroup, false);
 
         return new HistoryCardViewHolder(context, view);
     }
@@ -259,7 +260,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 public void onClick(View view) {
                     requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
                     if (requestViewHolder.dropdownExpanded) {
-                        requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);
+                        /*requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);*/
                         requestViewHolder.responseList.setVisibility(View.VISIBLE);
                         justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
                     } else {
