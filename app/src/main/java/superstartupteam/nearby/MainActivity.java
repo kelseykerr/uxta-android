@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -36,14 +35,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
-import com.braintreepayments.api.BraintreeFragment;
-import com.braintreepayments.api.BraintreePaymentActivity;
-import com.braintreepayments.api.Card;
-import com.braintreepayments.api.exceptions.InvalidArgumentException;
-import com.braintreepayments.api.interfaces.BraintreeListener;
-import com.braintreepayments.api.interfaces.PaymentMethodNonceCreatedListener;
-import com.braintreepayments.api.models.CardBuilder;
-import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -59,8 +50,6 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
@@ -96,7 +85,6 @@ public class MainActivity extends AppCompatActivity
         PaymentDialogFragment.OnFragmentInteractionListener,
         PaymentDestinationDialogFragment.OnFragmentInteractionListener,
         PaymentDetailsDialogFragment.OnFragmentInteractionListener,
-        BraintreeListener,
         GoogleApiClient.OnConnectionFailedListener {
 
     public static User user;
@@ -115,7 +103,6 @@ public class MainActivity extends AppCompatActivity
     private Response response;
     private Request request;
     private boolean readNotification = false;
-    private BraintreeFragment mBraintreeFragment;
     public static GoogleApiClient mGoogleApiClient;
     public static User updatedUser;
     public static ConnectivityManager connMgr;
@@ -238,8 +225,6 @@ public class MainActivity extends AppCompatActivity
         }
         //TODO: if request_notification, the radius should be set to the user's settings
         setmBottomBarListener();
-
-        getBraintreeClientToken(this);
         Log.i("user access token: ", user.getAccessToken() + " ****************");
         Log.i("user name: ", user.getName() + " ****************");
         Log.i("auth method: ", user.getAuthMethod() + "********");
@@ -507,10 +492,6 @@ public class MainActivity extends AppCompatActivity
         if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
             if (updatedUser != null && updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
                 //TODO: in prod, user the real cc number & expiration date
-                CardBuilder cardBuilder = new CardBuilder()
-                        .cardNumber("4111111111111111")
-                        .expirationDate("09/2018");
-                Card.tokenize(mBraintreeFragment, cardBuilder);   // returns NONCE to PaymentMethodNonceCreatedListener above
             } else {
                 SharedAsyncMethods.updateUserPayment(updatedUser, this, this);
             }
@@ -580,57 +561,9 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 404) {
             if (resultCode == Activity.RESULT_OK) {
-                PaymentMethodNonce paymentMethodNonce = data.getParcelableExtra(
-                        BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE
-                );
-                String nonce = paymentMethodNonce.getNonce();
-                user.setPaymentMethodNonce(nonce);
-                SharedAsyncMethods.updateUserPayment(user, this, this);
-                String deviceData = data.getStringExtra(BraintreePaymentActivity.EXTRA_DEVICE_DATA);
+
             }
         }
-    }
-
-    public void getBraintreeClientToken(final Context ctx) {
-        final MainActivity act = this;
-        final User user = PrefUtils.getCurrentUser(ctx);
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/token");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    String token = AppUtils.getResponseContent(conn);
-                    user.setBraintreeClientToken(token);
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get braintree token from server: " + e.getMessage());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                // Create braintree fragment
-                try {
-                    String mAuthorization = user.getBraintreeClientToken();
-                    mBraintreeFragment = BraintreeFragment.newInstance(act, mAuthorization);
-                    mBraintreeFragment.addListener(new PaymentMethodNonceCreatedListener() {
-                        @Override
-                        public void onPaymentMethodNonceCreated(PaymentMethodNonce paymentMethodNonce) {
-                            updatedUser.setPaymentMethodNonce(paymentMethodNonce.getNonce());
-                            SharedAsyncMethods.updateUserPayment(updatedUser, act, act);
-                        }
-                    });
-                } catch (InvalidArgumentException e) {
-                    Log.e("**", "error creating braintree fragment: " + e.getMessage());
-                }
-            }
-        }.execute();
     }
 
     public void scheduleNotificationsAlarm() {

@@ -36,7 +36,7 @@
         <item>best match</item>
     </string-array>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
-    <string name="braintree_tos">Nearby uses Braintree, a division of PayPal, Inc. (Braintree) for payment processing services. By using the Braintree payment processing services you agree to the Braintree Payment Services Agreement available at https://www.braintreepayments.com/legal/gateway-agreement, and the applicable bank agreement available at https://www.braintreepayments.com/legal/cea-wells.</string>
+    <string name="stripe_tos">Payment processing services for sellers on Nearby are provided by Stripe and are subject to the Stripe Connected Account Agreement, which includes the Stripe Terms of Service (collectively, the “Stripe Services Agreement”). By agreeing to these terms or continuing to operate as a user on Nearby, you agree to be bound by the Stripe Services Agreement, as the same may be modified by Stripe from time to time. As a condition of Nearby enabling payment processing services through Stripe, you agree to provide Nearby accurate and complete information about you and your business, and you authorize Nearby to share it and transaction information related to your use of the payment processing services provided by Stripe.</string>
     <string name="dobLabel">date of birth</string>
     <string name="changeButtonLabel">CHANGE</string>
     <string name="noRequestsFound">no requests found</string>

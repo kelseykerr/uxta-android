@@ -99,9 +99,6 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String ccExpirationDate;
 
-    @JsonIgnore
-    private String braintreeClientToken;
-
     private String pictureUrl;
 
     public User() {
@@ -310,14 +307,6 @@ public class User extends BaseEntity {
 
     public void setHomeLocationNotifications(Boolean homeLocationNotifications) {
         this.homeLocationNotifications = homeLocationNotifications;
-    }
-
-    public String getBraintreeClientToken() {
-        return braintreeClientToken;
-    }
-
-    public void setBraintreeClientToken(String braintreeClientToken) {
-        this.braintreeClientToken = braintreeClientToken;
     }
 
     public String getPaymentMethodNonce() {

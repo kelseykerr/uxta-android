@@ -25,8 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -67,6 +65,8 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private Button saveBtn;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/yy", Locale.US);
     private String mLastInput;
+    private TextInputLayout cvcLayout;
+    private EditText cvcNumber;
 
 
     public static PaymentDetailsDialogFragment newInstance(PaymentDetails pymtDetails) {
@@ -112,6 +112,8 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         newCardLayout = (RelativeLayout) view.findViewById(R.id.new_card_layout);
         ccLayout = (TextInputLayout) view.findViewById(R.id.credit_card_layout);
         newCcNumber = (EditText) view.findViewById(R.id.credit_card);
+        cvcLayout = (TextInputLayout) view.findViewById(R.id.credit_card_cvc_layout);
+        cvcNumber = (EditText) view.findViewById(R.id.credit_card_cvc);
         expDateLayout = (TextInputLayout) view.findViewById(R.id.exp_date_layout);
         newExpDate = (EditText) view.findViewById(R.id.new_exp_date);
         saveBtn = (Button) view.findViewById(R.id.save_btn);
