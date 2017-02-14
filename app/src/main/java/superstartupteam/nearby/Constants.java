@@ -24,9 +24,6 @@ public class Constants {
 
     public static final String CODE_FRAGMENT_TAG = "code";
 
-    // Fragment Post-processing requests
-    public static final int FPPR_REGISTER_BRAINTREE_CUSTOMER = 101;
-
     public static final int FPPR_SUBMIT_FILTERS = 102;
 
     public static final String GOOGLE_AUTH_METHOD = "google";
@@ -35,4 +32,5 @@ public class Constants {
 
     public static final String GOOGLE_WEB_CLIENT_ID = "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com";
 
+    public static final String STRIPE_TEST_KEY = "pk_test_XXhtxu1S44u1en0gH6ozoB7t";
 }

@@ -51,28 +51,22 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
     private PaymentDestinationDialogFragment.OnFragmentInteractionListener mListener;
     private User user;
     private static PaymentDetails paymentDetails;
-    private static String destinationText;
     private ImageButton backToPayments;
-    private TextView paymentDestinationText;
     private TextView routingNumber;
     private RelativeLayout removeBtn;
     private ImageButton destinationIcon;
     private EditText bankAcct;
     private EditText bankRoutingNumber;
-    private Spinner paymentDestinationSpinner;
-    private static final String VENMO_EMAIL_STRING = "venmo - link by email";
-    private static final String VENMO_PHONE_STRING = "venmo - link by mobile phone";
-    private static final String BANK_STRING = "deposit directly to bank";
     private TextInputLayout accntNumberLayout;
     private TextInputLayout routingNumberLayout;
     private Button saveBtn;
     private RelativeLayout updatingAccountScreen;
     private RelativeLayout infoScreen;
     private String errorMessage;
+    public static final String TAG = "PaymentDestinationDialo";
 
     public static PaymentDestinationDialogFragment newInstance(PaymentDetails pymtDetails, String destinationTxt) {
         paymentDetails = pymtDetails;
-        destinationText = destinationTxt;
         PaymentDestinationDialogFragment fragment = new PaymentDestinationDialogFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -108,8 +102,6 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-        paymentDestinationText = (TextView) view.findViewById(R.id.payment_destination);
-        paymentDestinationText.setText(destinationText);
         removeBtn = (RelativeLayout) view.findViewById(R.id.remove_destination);
         routingNumber = (TextView) view.findViewById(R.id.routing_number);
         destinationIcon = (ImageButton) view.findViewById(R.id.destination_icon);
@@ -118,7 +110,6 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         routingNumberLayout = (TextInputLayout) view.findViewById(R.id.routing_number_layout);
         bankRoutingNumber = (EditText) view.findViewById(R.id.bank_routing_number);
         saveBtn = (Button) view.findViewById(R.id.save_btn);
-        paymentDestinationSpinner = (Spinner) view.findViewById(R.id.payment_destination_spinner);
         if (paymentDetails != null) {
             if (paymentDetails.getDestination().toLowerCase().equals("bank")) {
                 routingNumber.setText("routing number: " + paymentDetails.getRoutingNumber());
@@ -128,7 +119,6 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
             routingNumberLayout.setVisibility(View.GONE);
             bankRoutingNumber.setVisibility(View.GONE);
             saveBtn.setVisibility(View.GONE);
-            paymentDestinationSpinner.setVisibility(View.GONE);
             removeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -139,7 +129,6 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
             });
         } else {
             destinationIcon.setVisibility(View.GONE);
-            paymentDestinationText.setVisibility(View.GONE);
             routingNumber.setVisibility(View.GONE);
             removeBtn.setVisibility(View.GONE);
             saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -152,83 +141,25 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     saveBtn.setEnabled(true);
                 }
             });
-            configureDestinationSpinner(view);
         }
         return view;
     }
 
-
-    private void configureDestinationSpinner(View v) {
-        List<String> destinations = new ArrayList<>();
-        destinations.add(VENMO_EMAIL_STRING);
-        destinations.add(VENMO_PHONE_STRING);
-        destinations.add(BANK_STRING);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item, destinations);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-        paymentDestinationSpinner.setAdapter(adapter);
-        if (user.getFundDestination() != null) {
-            switch (user.getFundDestination()) {
-                case "email":
-                    paymentDestinationSpinner.setSelection(1);
-                    break;
-                case "mobile_phone":
-                    paymentDestinationSpinner.setSelection(2);
-                    break;
-                case "bank":
-                    routingNumberLayout.setVisibility(View.VISIBLE);
-                    accntNumberLayout.setVisibility(View.VISIBLE);
-                    paymentDestinationSpinner.setSelection(3);
-                    break;
-            }
-        }
-        paymentDestinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
-                String destination = (String) parentView.getItemAtPosition(position);
-                switch (destination) {
-                    case VENMO_EMAIL_STRING:
-                        routingNumberLayout.setVisibility(View.GONE);
-                        accntNumberLayout.setVisibility(View.GONE);
-                        break;
-                    case VENMO_PHONE_STRING:
-                        routingNumberLayout.setVisibility(View.GONE);
-                        accntNumberLayout.setVisibility(View.GONE);
-                        break;
-                    case BANK_STRING:
-                        routingNumberLayout.setVisibility(View.VISIBLE);
-                        accntNumberLayout.setVisibility(View.VISIBLE);
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });
-    }
-
     private boolean validateDestinationInfo() {
         boolean valid = true;
-        String value = paymentDestinationSpinner.getSelectedItem().toString();
-        if (!value.equals(VENMO_EMAIL_STRING) && !value.equals(VENMO_PHONE_STRING) && !value.equals(BANK_STRING)) {
+        String rNumber = bankRoutingNumber.getText().toString();
+        if (rNumber.isEmpty()) {
             valid = false;
+            routingNumberLayout.setError("you must enter the routing number");
+        } else {
+            routingNumberLayout.setError(null);
         }
-        if (value.equals(BANK_STRING)) {
-            String rNumber = bankRoutingNumber.getText().toString();
-            if (rNumber.isEmpty()) {
-                valid = false;
-                routingNumberLayout.setError("you must enter the routing number");
-            } else {
-                routingNumberLayout.setError(null);
-            }
-            String aNumber = bankAcct.getText().toString();
-            if (aNumber.isEmpty()) {
-                valid = false;
-                accntNumberLayout.setError("you must enter an account number");
-            } else {
-                accntNumberLayout.setError(null);
-            }
+        String aNumber = bankAcct.getText().toString();
+        if (aNumber.isEmpty()) {
+            valid = false;
+            accntNumberLayout.setError("you must enter an account number");
+        } else {
+            accntNumberLayout.setError(null);
         }
         return valid;
     }
@@ -236,84 +167,26 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
     private void setRemoveBtnClick() {
         infoScreen.setVisibility(View.GONE);
         updatingAccountScreen.setVisibility(View.VISIBLE);
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                Integer responseCode = null;
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/merchant");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("DELETE");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    //conn.setRequestProperty("Content-Type", "application/json");
-
-                    responseCode = conn.getResponseCode();
-                    Log.i("DELETE /merchant", "Response Code : " + responseCode);
-                    if (responseCode != 200) {
-                        String message = AppUtils.getResponseContent(conn);
-                        throw new IOException(message);
-                    }
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not remove payment destination: " + e.getMessage());
-                    dismiss();
-                    ((MainActivity) getActivity()).goToAccount("Could not remove payment destination: " + e.getMessage());
-                }
-                return responseCode;
-            }
-
-            @Override
-            protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 200) {
-                    user.setRemovedMerchantDestination(true);
-                    PrefUtils.setCurrentUser(user, context);
-                    AccountFragment.dismissPaymentDialog();
-                    dismiss();
-                    ((MainActivity) getActivity()).goToAccount("removed payment destination");
-                }
-            }
-        }.execute();
-
     }
 
     private void setSaveBtnClick() {
         infoScreen.setVisibility(View.GONE);
         updatingAccountScreen.setVisibility(View.VISIBLE);
-        /**
-         * TODO: when switching to production, uncomment the below snippet.
-         * TODO: In sandbox we want to use the test cc so destination will always be bank
-         * */
-                /*String destination = paymentDestinationSpinner.getSelectedItem().toString();
-                switch (destination) {
-                    case VENMO_EMAIL_STRING:
-                        user.setFundDestination("email");
-                        break;
-                    case VENMO_PHONE_STRING:
-                        user.setFundDestination("mobile_phone");
-                        break;
-                    case BANK_STRING:
-                        user.setFundDestination("bank");
-                        break;
-
-                }*/
-        user.setFundDestination("bank");
 
         // TODO: in prod uncomment below. In sandbox use test routing/acct numbers
                 /*String sBank = bank_acct.getText().toString();
                 user.setBankAccountNumber(sBank);
                 String sRouting = routing_number.getText().toString();
                 user.setBankRoutingNumber(sRouting);*/
-        user.setBankAccountNumber("1123581321");
-        user.setBankRoutingNumber("071101307");
+        user.setBankAccountNumber("000123456789");
+        user.setBankRoutingNumber("110000");
 
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/merchant");
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/stripe/bank");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
@@ -331,13 +204,13 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     os.close();
 
                     responseCode = conn.getResponseCode();
-                    Log.i("POST/braintree/merchant", "Response Code : " + responseCode);
+                    Log.i(TAG, "POST /stripe/bank response code : " + responseCode);
                     if (responseCode != 200) {
                         String message = AppUtils.getResponseContent(conn);
                         throw new IOException(message);
                     }
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not update payment destination: " + e.getMessage());
+                    Log.e(TAG, "Could not update bank account: " + e.getMessage());
                     errorMessage = e.getMessage();
                     responseCode = 400;
                 }

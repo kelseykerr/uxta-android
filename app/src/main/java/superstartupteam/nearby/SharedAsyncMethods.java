@@ -76,7 +76,7 @@ public class SharedAsyncMethods {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/customer");
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/stripe/creditcard");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);

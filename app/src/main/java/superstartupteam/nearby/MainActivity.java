@@ -488,14 +488,7 @@ public class MainActivity extends AppCompatActivity
 
         Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
 
-        // We should now have payment information => get nonce from braintree so that we can update customer payment
-        if (fragmentPostProcessingRequest == Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER) {
-            if (updatedUser != null && updatedUser.getCreditCardNumber() != null && updatedUser.getCcExpirationDate() != null) {
-                //TODO: in prod, user the real cc number & expiration date
-            } else {
-                SharedAsyncMethods.updateUserPayment(updatedUser, this, this);
-            }
-        } else if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
+       if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
             HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
             homeFragment.getRequests(null);
         }

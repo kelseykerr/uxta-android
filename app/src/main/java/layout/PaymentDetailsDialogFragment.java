@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -25,14 +24,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.stripe.android.Stripe;
+import com.stripe.android.TokenCallback;
+import com.stripe.android.exception.AuthenticationException;
+import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -67,6 +68,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private String mLastInput;
     private TextInputLayout cvcLayout;
     private EditText cvcNumber;
+    public static final String TAG = "PaymentDetailsDialogFra";
 
 
     public static PaymentDetailsDialogFragment newInstance(PaymentDetails pymtDetails) {
@@ -173,24 +175,45 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         //TODO: uncomment below and remove the manual set of cc number & exp date
         /*user.setCreditCardNumber(newCcNumber.getText().toString());
         user.setCcExpirationDate(newExpDate.getText().toString());*/
-        user.setCreditCardNumber("4111111111111111");
-        user.setCcExpirationDate("05/19");
-        MainActivity.updatedUser = user;
-
-        PrefUtils.setCurrentUser(MainActivity.updatedUser, context);
-        String nextFragment = " ";
-        Uri url = null;
-        infoScreen.setVisibility(View.GONE);
-        updatingPaymentScreen.setVisibility(View.VISIBLE);
-        PaymentDialogFragment.showLoadingScreen();
-        mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_REGISTER_BRAINTREE_CUSTOMER);
-        dismiss();
+        Card card = new Card("4242424242424242", 5, 19, cvcNumber.getText().toString());
+        if (!card.validateCard()) {
+            // Show errors
+            Log.e(TAG, "Card was not valid");
+            saveBtn.setEnabled(true);
+            return;
+        }
+        try {
+            Stripe stripe = new Stripe(Constants.STRIPE_TEST_KEY);
+            stripe.createToken(
+                    card,
+                    new TokenCallback() {
+                        public void onSuccess(Token token) {
+                            // Send token to your server
+                            user.setStripeCCToken(token);
+                            infoScreen.setVisibility(View.GONE);
+                            updatingPaymentScreen.setVisibility(View.VISIBLE);
+                            SharedAsyncMethods.updateUserPayment(user, context, ((MainActivity) getActivity()));
+                            PaymentDialogFragment.showLoadingScreen();
+                            dismiss();
+                        }
+                        public void onError(Exception error) {
+                            // Show localized error message
+                            Toast.makeText(context,
+                                    error.getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                    }
+            );
+        } catch (AuthenticationException e) {
+            Log.e(TAG, "Could not authenticate with Stripe. Is the key valid?");
+        }
     }
 
     private void setRemoveBtnClick() {
         infoScreen.setVisibility(View.GONE);
         updatingPaymentScreen.setVisibility(View.VISIBLE);
-        new AsyncTask<Void, Void, Integer>() {
+        /*new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
@@ -227,7 +250,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
                     ((MainActivity) getActivity()).goToAccount("removed payment info");
                 }
             }
-        }.execute();
+        }.execute();*/
 
     }
 

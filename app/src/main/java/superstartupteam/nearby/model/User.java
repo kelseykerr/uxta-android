@@ -2,6 +2,7 @@ package superstartupteam.nearby.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.stripe.android.model.Token;
 
 import java.util.List;
 
@@ -81,8 +82,6 @@ public class User extends BaseEntity {
 
     private String bankRoutingNumber;
 
-    private String fundDestination;
-
     private Boolean tosAccepted;
 
     private String merchantStatusMessage;
@@ -93,11 +92,7 @@ public class User extends BaseEntity {
 
     private Boolean removedMerchantDestination;
 
-    @JsonIgnore
-    private String creditCardNumber;
-
-    @JsonIgnore
-    private String ccExpirationDate;
+    private Token stripeCCToken;
 
     private String pictureUrl;
 
@@ -365,36 +360,12 @@ public class User extends BaseEntity {
         this.bankRoutingNumber = bankRoutingNumber;
     }
 
-    public String getFundDestination() {
-        return fundDestination;
-    }
-
-    public void setFundDestination(String fundDestination) {
-        this.fundDestination = fundDestination;
-    }
-
     public Boolean getTosAccepted() {
         return tosAccepted;
     }
 
     public void setTosAccepted(Boolean tosAccepted) {
         this.tosAccepted = tosAccepted;
-    }
-
-    public String getCreditCardNumber() {
-        return creditCardNumber;
-    }
-
-    public void setCreditCardNumber(String creditCardNumber) {
-        this.creditCardNumber = creditCardNumber;
-    }
-
-    public String getCcExpirationDate() {
-        return ccExpirationDate;
-    }
-
-    public void setCcExpirationDate(String ccExpirationDate) {
-        this.ccExpirationDate = ccExpirationDate;
     }
 
     public String getMerchantStatusMessage() {
@@ -461,5 +432,12 @@ public class User extends BaseEntity {
         this.authMethod = authMethod;
     }
 
+    public Token getStripeCCToken() {
+        return stripeCCToken;
+    }
+
+    public void setStripeCCToken(Token stripeCCToken) {
+        this.stripeCCToken = stripeCCToken;
+    }
 }
 
