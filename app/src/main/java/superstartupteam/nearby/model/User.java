@@ -68,14 +68,6 @@ public class User extends BaseEntity {
 
     private Boolean homeLocationNotifications;
 
-    private String paymentMethodNonce;
-
-    private String merchantId;
-
-    private String merchantStatus;
-
-    private String customerId;
-
     private String dateOfBirth;
 
     private String bankAccountNumber;
@@ -84,17 +76,29 @@ public class User extends BaseEntity {
 
     private Boolean tosAccepted;
 
-    private String merchantStatusMessage;
-
     public Boolean isPaymentSetup;
 
     public String customerStatus;
 
-    private Boolean removedMerchantDestination;
-
     private Token stripeCCToken;
 
     private String pictureUrl;
+
+    private String tosAcceptIp;
+
+    private Token stripeBankToken;
+
+    private Boolean canRespond;
+
+    private Boolean canRequest;
+
+    private Boolean hasCustomerAccount;
+
+    private Boolean hasManagedAccount;
+
+    private String stripeManagedAccountId;
+
+    private String stripeCustomerId;
 
     public User() {
 
@@ -122,7 +126,12 @@ public class User extends BaseEntity {
         this.tosAccepted = fromServer.tosAccepted;
         this.isPaymentSetup = fromServer.isPaymentSetup;
         this.customerStatus = fromServer.customerStatus;
-        this.removedMerchantDestination = fromServer.removedMerchantDestination;
+        this.canRespond = fromServer.canRespond;
+        this.canRequest = fromServer.canRequest;
+        this.hasCustomerAccount = fromServer.hasCustomerAccount;
+        this.hasManagedAccount = fromServer.hasManagedAccount;
+        this.stripeCustomerId = fromServer.stripeCustomerId;
+        this.stripeManagedAccountId = fromServer.stripeManagedAccountId;
         if (fromServer.authMethod != null) {
             this.authMethod = fromServer.authMethod;
         }
@@ -304,38 +313,6 @@ public class User extends BaseEntity {
         this.homeLocationNotifications = homeLocationNotifications;
     }
 
-    public String getPaymentMethodNonce() {
-        return paymentMethodNonce;
-    }
-
-    public void setPaymentMethodNonce(String paymentMethodNonce) {
-        this.paymentMethodNonce = paymentMethodNonce;
-    }
-
-    public String getMerchantId() {
-        return merchantId;
-    }
-
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
-    }
-
-    public String getMerchantStatus() {
-        return merchantStatus;
-    }
-
-    public void setMerchantStatus(String merchantStatus) {
-        this.merchantStatus = merchantStatus;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
     public String getDateOfBirth() {
         return dateOfBirth;
     }
@@ -368,14 +345,6 @@ public class User extends BaseEntity {
         this.tosAccepted = tosAccepted;
     }
 
-    public String getMerchantStatusMessage() {
-        return merchantStatusMessage;
-    }
-
-    public void setMerchantStatusMessage(String merchantStatusMessage) {
-        this.merchantStatusMessage = merchantStatusMessage;
-    }
-
     public Boolean getIsPaymentSetup() {
         return isPaymentSetup;
     }
@@ -390,14 +359,6 @@ public class User extends BaseEntity {
 
     public void setCustomerStatus(String customerStatus) {
         this.customerStatus = customerStatus;
-    }
-
-    public Boolean getRemovedMerchantDestination() {
-        return removedMerchantDestination;
-    }
-
-    public void setRemovedMerchantDestination(Boolean removedMerchantDestination) {
-        this.removedMerchantDestination = removedMerchantDestination;
     }
 
     public String getGoogleId() {
@@ -438,6 +399,70 @@ public class User extends BaseEntity {
 
     public void setStripeCCToken(Token stripeCCToken) {
         this.stripeCCToken = stripeCCToken;
+    }
+
+    public String getTosAcceptIp() {
+        return tosAcceptIp;
+    }
+
+    public void setTosAcceptIp(String tosAcceptIp) {
+        this.tosAcceptIp = tosAcceptIp;
+    }
+
+    public Token getStripeBankToken() {
+        return stripeBankToken;
+    }
+
+    public void setStripeBankToken(Token stripeBankToken) {
+        this.stripeBankToken = stripeBankToken;
+    }
+
+    public Boolean getCanRespond() {
+        return canRespond;
+    }
+
+    public void setCanRespond(Boolean canRespond) {
+        this.canRespond = canRespond;
+    }
+
+    public Boolean getCanRequest() {
+        return canRequest;
+    }
+
+    public void setCanRequest(Boolean canRequest) {
+        this.canRequest = canRequest;
+    }
+
+    public Boolean getHasCustomerAccount() {
+        return hasCustomerAccount;
+    }
+
+    public void setHasCustomerAccount(Boolean hasCustomerAccount) {
+        this.hasCustomerAccount = hasCustomerAccount;
+    }
+
+    public Boolean getHasManagedAccount() {
+        return hasManagedAccount;
+    }
+
+    public void setHasManagedAccount(Boolean hasManagedAccount) {
+        this.hasManagedAccount = hasManagedAccount;
+    }
+
+    public String getStripeManagedAccountId() {
+        return stripeManagedAccountId;
+    }
+
+    public void setStripeManagedAccountId(String stripeManagedAccountId) {
+        this.stripeManagedAccountId = stripeManagedAccountId;
+    }
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
     }
 }
 

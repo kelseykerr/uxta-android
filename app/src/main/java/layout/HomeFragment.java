@@ -185,10 +185,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                boolean goodMerchantStatus = user.getMerchantStatus() != null &&
-                        user.getMerchantStatus().toString().toLowerCase().equals("active") &&
-                        (user.getRemovedMerchantDestination() == null || !user.getRemovedMerchantDestination());
-                if (user.getMerchantId() != null && goodMerchantStatus) {
+                boolean goodMerchantStatus = user.getCanRespond();
+                if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
                     try {
                         for (Request r : requests) {
                             if (r.getLatitude().equals(marker.getPosition().latitude) &&
@@ -205,17 +203,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 } else {
                     String title;
                     boolean showAction = false;
-                    if (user.getMerchantStatus() != null &&
+                    /*if (user.getStripeManagedAccountId() != null &&
                             user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
                         title = "Your merchant account is pending, please try again later";
-                    } else {
-                        showAction = true;
-                        if (user.getMerchantStatusMessage() != null) {
-                            title = user.getMerchantStatusMessage();
-                        } else {
-                            title = "Please link your bank account or venmo account to your profile";
-                        }
-                    }
+                    }*/
+                    title = "Please link your bank account to your profile";
                     Snackbar snack = Snackbar.make(view.getRootView(), title,
                             Snackbar.LENGTH_LONG);
                     final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)

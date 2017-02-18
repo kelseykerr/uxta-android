@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.appcompat.BuildConfig;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -253,17 +252,11 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         missingUserInfoText = (TextView) view.findViewById(R.id.missing_user_info_text);
         noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
         noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
-        boolean displayCustomerStatus = (user.getCustomerStatus() != null &&
-                !user.getCustomerStatus().toLowerCase().equals("valid")) ||
-                !user.getIsPaymentSetup() || user.getCustomerId() == null;
-        boolean displayMerchantStatus = (user.getMerchantStatus() != null &&
-                !user.getMerchantStatus().toLowerCase().equals("pending") &&
-                !user.getMerchantStatus().toLowerCase().equals("active")) ||
-                user.getMerchantId() == null ||
-                (user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination());
+        boolean displayCustomerStatus = user.getStripeCustomerId() == null || !user.getCanRequest();
+        boolean displayManagedAccountStatus = user.getHasManagedAccount() != null ? user.getHasManagedAccount() : false;
         if (!AppUtils.canAddPayments(user)) {
             displayCustomerStatus = false;
-            displayMerchantStatus = false;
+            displayManagedAccountStatus = false;
             missingUserInfoText.setVisibility(View.VISIBLE);
         } else {
             missingUserInfoText.setVisibility(View.GONE);
@@ -276,11 +269,8 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         } else {
             noCustomerText.setVisibility(View.GONE);
         }
-        if (displayMerchantStatus) {
+        if (displayManagedAccountStatus) {
             noMerchantText.setVisibility(View.VISIBLE);
-            if (user.getMerchantStatusMessage() != null) {
-                noMerchantText.setText(user.getMerchantStatusMessage());
-            }
         } else {
             noMerchantText.setVisibility(View.GONE);
         }

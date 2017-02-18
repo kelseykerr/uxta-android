@@ -9,11 +9,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -46,6 +48,7 @@ import superstartupteam.nearby.R;
 import superstartupteam.nearby.SharedAsyncMethods;
 import superstartupteam.nearby.model.User;
 
+import static android.content.Context.WIFI_SERVICE;
 import static android.support.v7.appcompat.R.styleable.SwitchCompat;
 
 
@@ -236,6 +239,9 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                     if (isChecked) {
                         acceptTos.setError(null);
                         acceptTosError.setVisibility(View.GONE);
+                        WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
+                        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+                        user.setTosAcceptIp(ip);
                     }
                 }
             });

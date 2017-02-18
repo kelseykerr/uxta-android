@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity
      */
     private static final int REQUEST_FINE_LOCATION = 0;
 
+    private static final int REQUEST_WIFI_STATE = 1;
+
     private boolean hasMessage() {
         notificationType = getIntent().getStringExtra("type");
         return notificationType != null;
@@ -186,6 +188,15 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "FINE LOCATION permission has already been granted.");
         }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Fine location permission has not been granted.
+            requestWifiStatePermission();
+        } else {
+            // Fine location is already available, show the camera preview.
+            Log.i(TAG, "WIFI STATE permission has already been granted.");
+        }
+
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
         toolbarLine2 = (RelativeLayout) findViewById(R.id.toolbar_line_2);
         searchBar = (EditText) findViewById(R.id.search_bar);
@@ -207,7 +218,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     boolean goodCustomerStatus = user.getCustomerStatus() != null &&
                             user.getCustomerStatus().equals("valid") && user.isPaymentSetup;
-                    if (user.getCustomerId() != null && goodCustomerStatus) {
+                    if (user.getStripeCustomerId() != null && goodCustomerStatus) {
                         showNewRequestDialog(v);
                     } else {
                         HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
@@ -492,6 +503,36 @@ public class MainActivity extends AppCompatActivity
             HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
             homeFragment.getRequests(null);
         }
+    }
+
+    private void requestWifiStatePermission() {
+        Log.e(TAG, "WIFI STATE permission has NOT been granted. Requesting permission.");
+        Log.e(TAG, ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_WIFI_STATE) + " *should show rationale");
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_WIFI_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            Log.i(TAG,
+                    "Displaying fine wifi state permission rationale to provide additional context.");
+            Snackbar.make(mLayout, R.string.permission_wifi_state_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_WIFI_STATE},
+                                    REQUEST_WIFI_STATE);
+                        }
+                    })
+                    .show();
+        } else {
+            // Wifi state permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE},
+                    REQUEST_WIFI_STATE);
+        }
+        // END_INCLUDE(fine_location_permission_request)
     }
 
     /**

@@ -124,43 +124,15 @@
 
         <!-- *********************if there is NOT payment info *********************************-->
 
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/payment_destination_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/back_to_payments"
-            android:layout_marginBottom="40dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:paddingBottom="0dp"
-            android:paddingStart="0dp"
-            android:textColor="@color/colorAccent"
-            app:ms_alignLabels="true"
-            app:ms_arrowColor="@color/colorAccent"
-            app:ms_arrowSize="16dp"
-            app:ms_baseColor="@color/colorAccent"
-            app:ms_enableErrorLabel="false"
-            app:ms_enableFloatingLabel="false"
-            app:ms_errorColor="@color/redPink"
-            app:ms_floatingLabelColor="@color/colorAccent"
-            app:ms_floatingLabelText="how do you want to get paid?"
-            app:ms_highlightColor="@color/colorPrimary"
-            app:ms_hint="how do you want to get paid?"
-            app:ms_hintColor="@color/colorAccent"
-            app:ms_multiline="false"
-            app:ms_thickness=".5dp" />
-
         <android.support.design.widget.TextInputLayout
             android:id="@+id/bank_acct_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/payment_destination_spinner"
+            android:layout_below="@id/back_to_payments"
             android:layout_marginBottom="15dp"
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="-10dp"
-            android:visibility="gone"
             app:errorEnabled="true"
             app:errorTextAppearance="@style/TextErrorStyle"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
@@ -183,7 +155,6 @@
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="-10dp"
-            android:visibility="gone"
             app:errorEnabled="true"
             app:errorTextAppearance="@style/TextErrorStyle"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">

@@ -280,7 +280,7 @@
                 android:layout_marginTop="5dp"
                 android:paddingEnd="15dp"
                 android:paddingStart="15dp"
-                android:text="Please link your bank account or venmo so you can make offers!"
+                android:text="Please link your bank account so you can make offers!"
                 android:textColor="@color/redPink"
                 android:textSize="14sp"
                 android:visibility="gone" />

@@ -143,12 +143,8 @@ public class PaymentDialogFragment extends DialogFragment {
             protected void onPostExecute(Integer i) {
                 loadingScreen.setVisibility(View.GONE);
                 paymentsScreen.setVisibility(View.VISIBLE);
-                // merchant account is inactive if the status is null or the status is not "pending" or "active"
-                boolean merchantInactive = user.getMerchantStatus() == null || (!user.getMerchantStatus().toLowerCase().equals("pending") &&
-                        !user.getMerchantStatus().toLowerCase().equals("active"));
                 if (i != null && i.equals(200)) {
-                    if ((user.getRemovedMerchantDestination() != null && user.getRemovedMerchantDestination())
-                            || merchantInactive)  {
+                    if (paymentDetails.getBankAccountLast4() == null)  {
                         addAccountText.setVisibility(View.VISIBLE);
                         destinationText.setVisibility(View.GONE);
                         destinationBtn.setVisibility(View.GONE);
@@ -166,16 +162,8 @@ public class PaymentDialogFragment extends DialogFragment {
                         });
                     } else {
                         String destText = "";
-                        if (paymentDetails.getDestination().toLowerCase().equals("bank")) {
-                            destText = "bank account: " + "****" + paymentDetails.getBankAccountLast4();
-                            destinationText.setText(destText);
-                        } else if (paymentDetails.getDestination().toLowerCase().equals("mobile_phone")) {
-                            destText = "Venmo linked by mobile phone: " + paymentDetails.getPhone();
-                            destinationText.setText(destText);
-                        } else if (paymentDetails.getDestination().toLowerCase().equals("email")) {
-                            destText = "Venmo inked by email: " + paymentDetails.getEmail();
-                            destinationText.setText(destText);
-                        }
+                        destText = "bank account: " + "****" + paymentDetails.getBankAccountLast4();
+                        destinationText.setText(destText);
                         destinationBtn.setVisibility(View.VISIBLE);
                         final String dText = destText;
                         getPaidCard.setOnClickListener(new View.OnClickListener() {
@@ -186,7 +174,7 @@ public class PaymentDialogFragment extends DialogFragment {
                         });
                     }
 
-                    if (!user.isPaymentSetup) {
+                    if (paymentDetails.getCcMaskedNumber() == null) {
                         addCCText.setVisibility(View.VISIBLE);
                         creditCardText.setVisibility(View.GONE);
                         ccIcon.setVisibility(View.GONE);

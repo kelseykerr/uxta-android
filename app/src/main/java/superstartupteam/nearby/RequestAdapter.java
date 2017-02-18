@@ -62,9 +62,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         requestViewHolder.vMakeOfferButton.setTag(i);
         requestViewHolder.vMakeOfferButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                boolean goodMerchantStatus = user.getMerchantStatus() != null &&
-                        user.getMerchantStatus().toString().toLowerCase().equals("active") &&
-                        (user.getRemovedMerchantDestination() == null || !user.getRemovedMerchantDestination());
+                boolean goodMerchantStatus = user.getCanRespond();
                 if (!AppUtils.canAddPayments(user)) {
                     Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
                             Snackbar.LENGTH_LONG);
@@ -77,24 +75,19 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                         }
                     });
                     snack.show();
-                } else if (user.getMerchantId() != null && goodMerchantStatus) {
+                } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
                     int position = (Integer) v.getTag();
                     Request r = requests.get(position);
                     homeFragment.showDialog(r.getId());
                 } else {
                     String title;
                     boolean showAction = false;
-                    if (user.getMerchantStatus() != null &&
+                    /*if (user.getMerchantStatus() != null &&
                             user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
                         title = "Your merchant account is pending, please try again later";
-                    } else {
-                        showAction = true;
-                        if (user.getMerchantStatusMessage() != null) {
-                            title = user.getMerchantStatusMessage();
-                        } else {
-                            title = "Please link your bank account or venmo account to your profile";
-                        }
-                    }
+                    }*/
+                    showAction = true;
+                    title = "Please link your bank account to your profile";
                     Snackbar snack = Snackbar.make(view.getRootView(), title,
                             Snackbar.LENGTH_LONG);
                     if (showAction) {

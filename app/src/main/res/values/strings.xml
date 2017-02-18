@@ -7,6 +7,7 @@
     <string name="ok">ok</string>
     <string name="radius_spinner_title">radius</string>
     <string name="permission_fine_location_rationale">Location is used to display requests in your area and find matches for request you make</string>
+    <string name="permission_wifi_state_rationale">Wifi state is used to store your devices ip address when you accept the terms of service</string>
     <string-array name="request_type_array">
         <item>item</item>
         <item>service</item>

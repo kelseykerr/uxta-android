@@ -12,7 +12,7 @@ public class Constants {
 
     public static final String HISTORY_FRAGMENT_TAG = "history";
 
-    public static final String NEARBY_API_PATH = "http://ec2-54-242-185-46.compute-1.amazonaws.com/api";
+    public static final String NEARBY_API_PATH = "https://server.thenearbyapp.com/api";
 
     public static final String SELECT_CATEGORY_STRING = "select a category";
 

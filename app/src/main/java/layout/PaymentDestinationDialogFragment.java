@@ -7,10 +7,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +44,8 @@ import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.PaymentDetails;
 import superstartupteam.nearby.model.User;
 
+import static android.content.Context.WIFI_SERVICE;
+
 /**
  * Created by kerrk on 12/9/16.
  */
@@ -53,6 +57,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
     private static PaymentDetails paymentDetails;
     private ImageButton backToPayments;
     private TextView routingNumber;
+    private TextView paymentDestination;
     private RelativeLayout removeBtn;
     private ImageButton destinationIcon;
     private EditText bankAcct;
@@ -104,6 +109,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         });
         removeBtn = (RelativeLayout) view.findViewById(R.id.remove_destination);
         routingNumber = (TextView) view.findViewById(R.id.routing_number);
+        paymentDestination = (TextView) view.findViewById(R.id.payment_destination);
         destinationIcon = (ImageButton) view.findViewById(R.id.destination_icon);
         bankAcct = (EditText) view.findViewById(R.id.bank_acct);
         accntNumberLayout = (TextInputLayout) view.findViewById(R.id.bank_acct_layout);
@@ -111,11 +117,10 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         bankRoutingNumber = (EditText) view.findViewById(R.id.bank_routing_number);
         saveBtn = (Button) view.findViewById(R.id.save_btn);
         if (paymentDetails != null) {
-            if (paymentDetails.getDestination().toLowerCase().equals("bank")) {
-                routingNumber.setText("routing number: " + paymentDetails.getRoutingNumber());
-            } else {
-                routingNumber.setVisibility(View.GONE);
-            }
+            bankAcct.setVisibility(View.GONE);
+            accntNumberLayout.setVisibility(View.GONE);
+            routingNumber.setText("routing number: " + paymentDetails.getRoutingNumber());
+            paymentDestination.setText("account number: " + paymentDetails.getBankAccountLast4());
             routingNumberLayout.setVisibility(View.GONE);
             bankRoutingNumber.setVisibility(View.GONE);
             saveBtn.setVisibility(View.GONE);
@@ -130,6 +135,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         } else {
             destinationIcon.setVisibility(View.GONE);
             routingNumber.setVisibility(View.GONE);
+            paymentDestination.setVisibility(View.GONE);
             removeBtn.setVisibility(View.GONE);
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -179,7 +185,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                 String sRouting = routing_number.getText().toString();
                 user.setBankRoutingNumber(sRouting);*/
         user.setBankAccountNumber("000123456789");
-        user.setBankRoutingNumber("110000");
+        user.setBankRoutingNumber("110000000");
 
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -224,6 +230,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
                     dismiss();
                     ((MainActivity) getActivity()).goToAccount("updated payment destination");
                 } else {
+                    AccountFragment.dismissPaymentDialog();
                     dismiss();
                     ((MainActivity) getActivity()).goToAccount("Could not update payment destination: " + errorMessage);
                 }
