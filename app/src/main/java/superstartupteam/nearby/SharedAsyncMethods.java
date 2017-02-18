@@ -94,7 +94,7 @@ public class SharedAsyncMethods {
 
                     responseCode = conn.getResponseCode();
 
-                    Log.i("POST /customer", "Response Code : " + responseCode);
+                    Log.i("POST /creditcard", "Response Code : " + responseCode);
                     if (responseCode != 200) {
                         String message = AppUtils.getResponseContent(conn);
                         throw new IOException(message);

@@ -76,11 +76,7 @@ public class User extends BaseEntity {
 
     private Boolean tosAccepted;
 
-    public Boolean isPaymentSetup;
-
-    public String customerStatus;
-
-    private Token stripeCCToken;
+    private String stripeCCToken;
 
     private String pictureUrl;
 
@@ -124,8 +120,6 @@ public class User extends BaseEntity {
         this.currentLocationNotifications = fromServer.currentLocationNotifications;
         this.homeLocationNotifications = fromServer.homeLocationNotifications;
         this.tosAccepted = fromServer.tosAccepted;
-        this.isPaymentSetup = fromServer.isPaymentSetup;
-        this.customerStatus = fromServer.customerStatus;
         this.canRespond = fromServer.canRespond;
         this.canRequest = fromServer.canRequest;
         this.hasCustomerAccount = fromServer.hasCustomerAccount;
@@ -345,22 +339,6 @@ public class User extends BaseEntity {
         this.tosAccepted = tosAccepted;
     }
 
-    public Boolean getIsPaymentSetup() {
-        return isPaymentSetup;
-    }
-
-    public void setIsPaymentSetup(Boolean isPaymentSetup) {
-        this.isPaymentSetup = isPaymentSetup;
-    }
-
-    public String getCustomerStatus() {
-        return customerStatus;
-    }
-
-    public void setCustomerStatus(String customerStatus) {
-        this.customerStatus = customerStatus;
-    }
-
     public String getGoogleId() {
         return googleId;
     }
@@ -393,11 +371,11 @@ public class User extends BaseEntity {
         this.authMethod = authMethod;
     }
 
-    public Token getStripeCCToken() {
+    public String getStripeCCToken() {
         return stripeCCToken;
     }
 
-    public void setStripeCCToken(Token stripeCCToken) {
+    public void setStripeCCToken(String stripeCCToken) {
         this.stripeCCToken = stripeCCToken;
     }
 

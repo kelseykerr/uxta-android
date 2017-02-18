@@ -253,7 +253,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
         noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
         boolean displayCustomerStatus = user.getStripeCustomerId() == null || !user.getCanRequest();
-        boolean displayManagedAccountStatus = user.getHasManagedAccount() != null ? user.getHasManagedAccount() : false;
+        boolean displayManagedAccountStatus = user.getStripeManagedAccountId() == null || !user.getCanRespond();
         if (!AppUtils.canAddPayments(user)) {
             displayCustomerStatus = false;
             displayManagedAccountStatus = false;
@@ -263,9 +263,6 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         }
         if (displayCustomerStatus) {
             noCustomerText.setVisibility(View.VISIBLE);
-            if (displayCustomerStatus) {
-                noCustomerText.setText(user.getCustomerStatus());
-            }
         } else {
             noCustomerText.setVisibility(View.GONE);
         }

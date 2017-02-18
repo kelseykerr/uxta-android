@@ -666,7 +666,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public void displayNoNewRequestSnackbar() {
-        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment destination information to your account",
+        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
                 Snackbar.LENGTH_LONG)
                 .setAction("update account", new View.OnClickListener() {
                     @Override

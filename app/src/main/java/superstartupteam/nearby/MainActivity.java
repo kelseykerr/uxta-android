@@ -216,9 +216,8 @@ public class MainActivity extends AppCompatActivity
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     homeFragment.displayUpdateAccountSnackbar();
                 } else {
-                    boolean goodCustomerStatus = user.getCustomerStatus() != null &&
-                            user.getCustomerStatus().equals("valid") && user.isPaymentSetup;
-                    if (user.getStripeCustomerId() != null && goodCustomerStatus) {
+                    boolean goodCustomerStatus = user.getStripeCustomerId() != null && user.getCanRequest();
+                    if (goodCustomerStatus) {
                         showNewRequestDialog(v);
                     } else {
                         HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);

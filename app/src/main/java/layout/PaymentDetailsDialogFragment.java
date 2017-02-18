@@ -161,6 +161,13 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         } else {
             ccLayout.setError(null);
         }
+        String cvcNum = cvcNumber.getText().toString();
+        if (cvcNum.isEmpty() || cvcNum.length() < 3) {
+            valid = false;
+            cvcLayout.setError("please enter a valid CVV number");
+        } else {
+            cvcLayout.setError(null);
+        }
         String expValue = newExpDate.getText().toString();
         if (expValue.isEmpty()) {
             valid = false;
@@ -189,7 +196,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
                     new TokenCallback() {
                         public void onSuccess(Token token) {
                             // Send token to your server
-                            user.setStripeCCToken(token);
+                            user.setStripeCCToken(token.getId());
                             infoScreen.setVisibility(View.GONE);
                             updatingPaymentScreen.setVisibility(View.VISIBLE);
                             SharedAsyncMethods.updateUserPayment(user, context, ((MainActivity) getActivity()));
