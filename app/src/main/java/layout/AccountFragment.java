@@ -182,7 +182,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
         TextView userName = (TextView) view.findViewById(R.id.user_profile_name);
-        userName.setText(user.getFullName());
+        userName.setText(user.getFirstName() + " " + user.getLastName());
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
 

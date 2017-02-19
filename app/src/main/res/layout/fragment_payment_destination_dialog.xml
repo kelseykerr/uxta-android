@@ -105,7 +105,7 @@
             android:textColor="@color/colorAccent" />
 
         <RelativeLayout
-            android:id="@+id/remove_destination"
+            android:id="@+id/update_destination"
             android:layout_width="wrap_content"
             android:layout_below="@id/routing_number"
             android:layout_centerHorizontal="true"
@@ -116,8 +116,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="REMOVE"
-                android:textColor="@color/redPink" />
+                android:text="UPDATE"
+                android:textColor="@color/colorPrimary" />
 
         </RelativeLayout>
 

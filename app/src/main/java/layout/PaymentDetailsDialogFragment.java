@@ -57,7 +57,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private ImageButton ccIcon;
     private TextView ccNumber;
     private TextView expDate;
-    private RelativeLayout removeBtn;
+    private RelativeLayout updateBtn;
     private RelativeLayout newCardLayout;
     private TextInputLayout ccLayout;
     private EditText newCcNumber;
@@ -110,7 +110,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         ccIcon = (ImageButton) view.findViewById(R.id.cc_icon);
         ccNumber = (TextView) view.findViewById(R.id.cc_number);
         expDate = (TextView) view.findViewById(R.id.exp_date);
-        removeBtn = (RelativeLayout) view.findViewById(R.id.remove_card);
+        updateBtn = (RelativeLayout) view.findViewById(R.id.update_card);
         newCardLayout = (RelativeLayout) view.findViewById(R.id.new_card_layout);
         ccLayout = (TextInputLayout) view.findViewById(R.id.credit_card_layout);
         newCcNumber = (EditText) view.findViewById(R.id.credit_card);
@@ -120,36 +120,44 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         newExpDate = (EditText) view.findViewById(R.id.new_exp_date);
         saveBtn = (Button) view.findViewById(R.id.save_btn);
         if (paymentDetails != null) {
-            newCardLayout.setVisibility(View.GONE);
-            ccNumber.setText(paymentDetails.getCcMaskedNumber());
-            expDate.setText(paymentDetails.getCcExpDate());
-            removeBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    removeBtn.setEnabled(false);
-                    setRemoveBtnClick();
-                    removeBtn.setEnabled(true);
-                }
-            });
+            showPaymentDetails();
         } else {
-            newCardLayout.setVisibility(View.VISIBLE);
-            setExpDateWatcher();
-            ccNumber.setVisibility(View.GONE);
-            expDate.setVisibility(View.GONE);
-            removeBtn.setVisibility(View.GONE);
-            ccIcon.setVisibility(View.GONE);
-            saveBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveBtn.setEnabled(false);
-                    if (validatePaymentInfo()) {
-                        setSaveBtnClick();
-                    }
-                    saveBtn.setEnabled(true);
-                }
-            });
+            showAddPaymentInput();
         }
             return view;
+    }
+
+    private void showPaymentDetails() {
+        newCardLayout.setVisibility(View.GONE);
+        ccNumber.setText(paymentDetails.getCcMaskedNumber());
+        expDate.setText(paymentDetails.getCcExpDate());
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateBtn.setEnabled(false);
+                showAddPaymentInput();
+                updateBtn.setEnabled(true);
+            }
+        });
+    }
+
+    private void showAddPaymentInput() {
+        newCardLayout.setVisibility(View.VISIBLE);
+        setExpDateWatcher();
+        ccNumber.setVisibility(View.GONE);
+        expDate.setVisibility(View.GONE);
+        updateBtn.setVisibility(View.GONE);
+        ccIcon.setVisibility(View.GONE);
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveBtn.setEnabled(false);
+                if (validatePaymentInfo()) {
+                    setSaveBtnClick();
+                }
+                saveBtn.setEnabled(true);
+            }
+        });
     }
 
     private boolean validatePaymentInfo() {
@@ -215,50 +223,6 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         } catch (AuthenticationException e) {
             Log.e(TAG, "Could not authenticate with Stripe. Is the key valid?");
         }
-    }
-
-    private void setRemoveBtnClick() {
-        infoScreen.setVisibility(View.GONE);
-        updatingPaymentScreen.setVisibility(View.VISIBLE);
-        /*new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                Integer responseCode = null;
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/braintree/customer");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("DELETE");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-
-                    responseCode = conn.getResponseCode();
-                    Log.i("DELETE /customer", "Response Code : " + responseCode);
-                    if (responseCode != 200) {
-                        String message = AppUtils.getResponseContent(conn);
-                        throw new IOException(message);
-                    }
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not remove payment info: " + e.getMessage());
-                    dismiss();
-                    ((MainActivity) getActivity()).goToAccount("Could not remove payment info: " + e.getMessage());
-                }
-                return responseCode;
-            }
-
-            @Override
-            protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 200) {
-                    user.setIsPaymentSetup(false);
-                    SharedAsyncMethods.getUserInfoFromServer(user, context);
-                    AccountFragment.dismissPaymentDialog();
-                    dismiss();
-                    ((MainActivity) getActivity()).goToAccount("removed payment info");
-                }
-            }
-        }.execute();*/
-
     }
 
 

@@ -20,6 +20,8 @@ public class PaymentDetails {
 
     private String phone;
 
+    private String ccType;
+
     public PaymentDetails() {
 
     }
@@ -78,5 +80,13 @@ public class PaymentDetails {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCcType() {
+        return ccType;
+    }
+
+    public void setCcType(String ccType) {
+        this.ccType = ccType;
     }
 }
