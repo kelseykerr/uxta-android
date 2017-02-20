@@ -55,6 +55,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     private HistoryFragment historyFragment;
     private Context context;
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+    private static final String TAG = "HistoryCardAdapter";
 
 
     public HistoryCardAdapter(List<History> history, HistoryFragment fragment) {

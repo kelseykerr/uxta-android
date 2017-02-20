@@ -161,6 +161,9 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         if (rNumber.isEmpty()) {
             valid = false;
             routingNumberLayout.setError("you must enter the routing number");
+        } else if (rNumber.length() < 9) {
+            valid = false;
+            routingNumberLayout.setError("routing number must be 9 digits");
         } else {
             routingNumberLayout.setError(null);
         }
@@ -168,6 +171,9 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
         if (aNumber.isEmpty()) {
             valid = false;
             accntNumberLayout.setError("you must enter an account number");
+        } else if (aNumber.length() < 4 && aNumber.length() > 17){
+            valid = false;
+            accntNumberLayout.setError("please enter a valid account number");
         } else {
             accntNumberLayout.setError(null);
         }

@@ -109,6 +109,7 @@ public class RequestDialogFragment extends DialogFragment
     private Marker currLocationMarker;
     private RelativeLayout mapView;
     private ScrollView newRequestSV;
+    private RelativeLayout spinnerScreen;
     private int zoomLevel = 15;
 
 
@@ -186,12 +187,15 @@ public class RequestDialogFragment extends DialogFragment
         rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
         rentalSpinner.setSelection(0);
+        spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
 
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
         requestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 requestBtn.setEnabled(false);
                 if (validateNewRequest()) {
+                    newRequestSV.setVisibility(View.GONE);
+                    spinnerScreen.setVisibility(View.VISIBLE);
                     if (request != null) {
                         updateRequest();
                     } else {
@@ -349,6 +353,11 @@ public class RequestDialogFragment extends DialogFragment
                 }).show();
     }
 
+    private void showErrorSnack() {
+        Snackbar.make(view, "Unable to create request at this time",
+                Snackbar.LENGTH_LONG).show();
+    }
+
     private void updateRequest() {
         if (!MainActivity.isNetworkConnected()) {
             showNoNetworkSnack();
@@ -397,6 +406,9 @@ public class RequestDialogFragment extends DialogFragment
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
                     ((MainActivity) getActivity()).goToHistory("successfully updated request");
+                    dismiss();
+                } else {
+                    ((MainActivity) getActivity()).goToHistory("could not update request at this time");
                     dismiss();
                 }
             }
@@ -452,6 +464,8 @@ public class RequestDialogFragment extends DialogFragment
                 if (responseCode == 200) {
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully created request");
+                } else {
+                    showErrorSnack();
                 }
             }
         }.execute();

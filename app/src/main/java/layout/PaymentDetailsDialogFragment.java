@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.common.StringUtils;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.AuthenticationException;
@@ -57,6 +58,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private ImageButton ccIcon;
     private TextView ccNumber;
     private TextView expDate;
+    private TextView ccType;
     private RelativeLayout updateBtn;
     private RelativeLayout newCardLayout;
     private TextInputLayout ccLayout;
@@ -108,6 +110,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
             }
         });
         ccIcon = (ImageButton) view.findViewById(R.id.cc_icon);
+        ccType = (TextView) view.findViewById(R.id.cc_type);
         ccNumber = (TextView) view.findViewById(R.id.cc_number);
         expDate = (TextView) view.findViewById(R.id.exp_date);
         updateBtn = (RelativeLayout) view.findViewById(R.id.update_card);
@@ -129,8 +132,14 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
 
     private void showPaymentDetails() {
         newCardLayout.setVisibility(View.GONE);
+        ccType.setText(paymentDetails.getCcType());
         ccNumber.setText(paymentDetails.getCcMaskedNumber());
-        expDate.setText(paymentDetails.getCcExpDate());
+        if (paymentDetails.getCcExpDate() != null) {
+            if (paymentDetails.getCcExpDate().indexOf("/") == 1) {
+                paymentDetails.setCcExpDate("0" + paymentDetails.getCcExpDate());
+            }
+            expDate.setText("exp: " + paymentDetails.getCcExpDate());
+        }
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +157,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         expDate.setVisibility(View.GONE);
         updateBtn.setVisibility(View.GONE);
         ccIcon.setVisibility(View.GONE);
+        ccType.setVisibility(View.GONE);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +173,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private boolean validatePaymentInfo() {
         boolean valid = true;
         String ccValue = newCcNumber.getText().toString();
-        if (ccValue.isEmpty()) {
+        if (ccValue.isEmpty() || ccValue.length() < 12 || ccValue.length() > 19) {
             valid = false;
             ccLayout.setError("you must enter a valid credit card number");
         } else {

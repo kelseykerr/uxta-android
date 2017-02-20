@@ -100,10 +100,11 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-        Button submitBtn = (Button) view.findViewById(R.id.submit_charge_button);
+        final Button submitBtn = (Button) view.findViewById(R.id.submit_charge_button);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                confirmCharge();
+                submitBtn.setEnabled(false);
+                confirmCharge(submitBtn);
             }
         });
         this.view = view;
@@ -144,7 +145,7 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     }
 
 
-    private void confirmCharge() {
+    private void confirmCharge(final Button submitBtn) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
@@ -188,8 +189,10 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
                 if (responseCode != null && responseCode == 200) {
                     ((MainActivity) getActivity()).goToHistory("confirmed charge");
                     dismiss();
+                } else {
+                    ((MainActivity) getActivity()).goToHistory("there was a problem creating the charge");
+                    dismiss();
                 }
-
             }
         }.execute();
     }

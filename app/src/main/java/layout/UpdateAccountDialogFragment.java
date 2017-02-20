@@ -389,7 +389,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
     private void showDobPickerDialog() {
         final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
+        int year = 1995;
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
         if (user.getDateOfBirth() != null) {

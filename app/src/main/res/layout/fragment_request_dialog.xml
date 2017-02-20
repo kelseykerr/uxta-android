@@ -196,4 +196,22 @@
 
     </ScrollView>
 
+    <RelativeLayout
+        android:id="@+id/spinner_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/loading_spinner"
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/updating_account_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="125dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop" />
+    </RelativeLayout>
 </LinearLayout>
