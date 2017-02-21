@@ -197,8 +197,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         String diff = AppUtils.getTimeDiffString(h.getResponses().get(0).getResponseTime());
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         requestViewHolder.vPostedDate.setText(diff);
-        requestViewHolder.vCategoryName.setText("");
-        requestViewHolder.vCategoryName.setVisibility(View.GONE);
+        if (h.getResponses().get(0).getSellerStatus().equals(Response.SellerStatus.OFFERED)) {
+            requestViewHolder.vCategoryName.setText("Buyer updated offer, awaiting your approval");
+            requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
+        } else {
+            requestViewHolder.vCategoryName.setText("");
+            requestViewHolder.vCategoryName.setVisibility(View.GONE);
+        }
         requestViewHolder.vDescription.setText("");
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toUpperCase());

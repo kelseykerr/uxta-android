@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -78,6 +80,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private EditText returnTime;
     private Date exchangeDate;
     private Date returnDate;
+    private ScrollView scrollView;
+    private RelativeLayout spinnerScreen;
 
 
     public NewOfferDialogFragment() {
@@ -124,12 +128,15 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         offerTypeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, offerTypes);
         offerTypeSpinner.setAdapter(offerTypeAdapter);
         offerTypeSpinner.setOnItemSelectedListener(this);*/
-
+        scrollView = (ScrollView) view.findViewById(R.id.scrollview);
+        spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
         submitOfferBtn = (Button) view.findViewById(R.id.submit_offer_button);
         submitOfferBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 submitOfferBtn.setEnabled(false);
                 if (validateForm()) {
+                    scrollView.setVisibility(View.GONE);
+                    spinnerScreen.setVisibility(View.VISIBLE);
                     createOffer(v);
                 } else {
                     submitOfferBtn.setEnabled(true);
@@ -267,6 +274,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully created offer");
                 } else if (responseCode == 406) {
+                    scrollView.setVisibility(View.VISIBLE);
+                    spinnerScreen.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar
                             .make(view, "You already created an offer for this request.", Snackbar.LENGTH_LONG)
                             .setAction("SHOW OFFERS", new View.OnClickListener() {

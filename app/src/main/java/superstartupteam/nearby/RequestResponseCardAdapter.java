@@ -67,7 +67,13 @@ public class RequestResponseCardAdapter extends ArrayAdapter<Response> {
                 " made an offer for $" + price + "</font>";
         offerText.setText(Html.fromHtml(htmlString));
         TextView responseStatus = (TextView) v.findViewById(R.id.response_status);
-        responseStatus.setText(response.getResponseStatus().toString());
+        if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
+            responseStatus.setText("OPEN");
+        } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
+            responseStatus.setText("PENDING SELLER ACCEPTANCE");
+        } else {
+            responseStatus.setText(response.getResponseStatus().toString());
+        }
         ImageButton msgUser = (ImageButton) v.findViewById(R.id.message_user_button);
         final String phone = response.getSeller().getPhone();
         if (phone == null || phone.isEmpty() || response.getResponseStatus().toString().equalsIgnoreCase("closed")) {
