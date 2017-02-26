@@ -2,6 +2,7 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
@@ -13,7 +14,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import layout.AccountFragment;
+import layout.HistoryFragment;
 import layout.HomeFragment;
+import superstartupteam.nearby.model.Request;
+import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 
 public class SharedAsyncMethods {

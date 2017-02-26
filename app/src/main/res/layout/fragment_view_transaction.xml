@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view_request_cl"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/transaction_info"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent70">
+
+        <ImageButton
+            android:id="@+id/close_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="start"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:paddingBottom="8dp"
+            android:paddingEnd="25dp"
+            android:paddingStart="8dp"
+            android:paddingTop="20dp"
+            android:src="@drawable/x_svg"
+            android:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/profile_image"
+            android:layout_width="90dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:background="#ffffff" />
+
+        <TextView
+            android:id="@+id/transaction_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_image"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/transaction_status"
+            android:layout_below="@id/transaction_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/transaction_body"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/transaction_info">
+        <TextView
+            android:id="@+id/exchange_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="6dp"
+            android:text=""
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/exchange_location"
+            android:layout_below="@id/exchange_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="6dp"
+            android:text=""
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/return_time"
+            android:layout_below="@id/exchange_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="6dp"
+            android:text=""
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/return_location"
+            android:layout_below="@id/return_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="6dp"
+            android:text=""
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/exchange_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/return_location"
+            android:clickable="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_swap_horiz_black_24dp"
+            android:tint="@color/white"/>
+
+        <TextView
+            android:id="@+id/exchange_text"
+            android:layout_below="@id/return_location"
+            android:layout_toEndOf="@id/exchange_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:layout_marginStart="15dp"
+            android:text="exchange"
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/message_user_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/exchange_fab"
+            android:layout_marginBottom="13dp"
+            android:layout_marginTop="13dp"
+            android:clickable="true"
+            android:layout_marginStart="15dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_textsms_black_24dp"
+            android:tint="@color/white"/>
+
+        <TextView
+            android:id="@+id/message_user_text"
+            android:layout_below="@id/exchange_fab"
+            android:layout_toEndOf="@id/message_user_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:layout_marginStart="15dp"
+            android:text="message user"
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/close_transaction_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_user_fab"
+            android:layout_marginBottom="13dp"
+            android:layout_marginTop="13dp"
+            android:clickable="true"
+            android:layout_marginStart="15dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_close_black_24dp"
+            android:tint="@color/white"/>
+
+        <TextView
+            android:id="@+id/close_transaction_text"
+            android:layout_below="@id/message_user_fab"
+            android:layout_toEndOf="@id/close_transaction_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:layout_marginStart="15dp"
+            android:text="close transaction"
+            android:textColor="@color/colorAccent"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

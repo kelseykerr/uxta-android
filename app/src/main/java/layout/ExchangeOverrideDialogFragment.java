@@ -287,7 +287,7 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
                             .make(view, "could not submit exchange override", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
-
+                HistoryFragment.dismissViewTransactionFragment();
             }
 
         }.execute();

@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import layout.EnterCodeFragment;
+import layout.HistoryFragment;
 import layout.SimpleScannerFragment;
 import superstartupteam.nearby.model.User;
 
@@ -125,6 +126,7 @@ public class ScannerActivity extends AppCompatActivity implements
 
     public void verifyCode(final String code) {
         // AsyncTask<Params, Progress, Result>
+        HistoryFragment.dismissViewTransactionFragment();
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {

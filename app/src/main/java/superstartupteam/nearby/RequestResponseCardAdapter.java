@@ -1,15 +1,18 @@
 package superstartupteam.nearby;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -23,7 +26,6 @@ import java.util.List;
 import layout.HistoryFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.Transaction;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -58,7 +60,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         if (response == null || response.getSeller() == null) {
             return;
         }
-        BigDecimal price = AppUtils.formatCurrency(response.getOfferPrice());
+        final BigDecimal price = AppUtils.formatCurrency(response.getOfferPrice());
         String htmlString = "<font color='#767474'>" + response.getSeller().getFirstName() +
                 " made an offer for $" + price + "</font>";
         rvh.offerText.setText(Html.fromHtml(htmlString));
@@ -77,7 +79,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             String exchangeTime = "exchange time: " + formatedExchangeTime;
             rvh.exchangeTime.setText(Html.fromHtml(exchangeTime));
             rvh.exchangeTime.setVisibility(View.VISIBLE);
-        }  else {
+        } else {
             rvh.exchangeTime.setVisibility(View.GONE);
         }
         if (response.getReturnLocation() != null && response.getReturnLocation().length() > 0) {
@@ -102,22 +104,28 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         } else {
             rvh.returnLocation.setVisibility(View.GONE);
         }
-        final String phone = response.getSeller().getPhone();
-        /*if (!response.getResponseStatus().toString().toLowerCase().equals("closed")
-                && !request.getStatus().toLowerCase().equals("closed")) {
-            layout.setOnClickListener(new View.OnClickListener() {
+        if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
+            rvh.editBtn.setEnabled(false);
+            rvh.rejectBtn.setEnabled(false);
+            rvh.acceptBtn.setEnabled(false);
+        } else {
+            rvh.editBtn.setEnabled(true);
+            rvh.editBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     historyFragment.showResponseDialog(response);
                 }
             });
-        }*/
-        rvh.editBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                historyFragment.showResponseDialog(response);
-            }
-        });
+            rvh.rejectBtn.setEnabled(true);
+            setUpRejectBtn(rvh, response, price);
+            rvh.acceptBtn.setEnabled(true);
+            setUpAcceptBtn(rvh, response, price);
+        }
+        setUpMessageBtn(rvh, response);
+    }
+
+    private void setUpMessageBtn(final RequestResponseCardAdapter.ResponseCardViewHolder rvh,
+                                 final Response response) {
         rvh.messageUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,10 +134,79 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                 String phone;
                 phone = response.getSeller().getPhone().replace("-", "");
                 smsIntent.putExtra("address", phone);
-                smsIntent.putExtra("sms_body","");
+                smsIntent.putExtra("sms_body", "");
                 context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
             }
         });
+    }
+
+    private void setUpRejectBtn(final RequestResponseCardAdapter.ResponseCardViewHolder rvh,
+                                final Response response, final BigDecimal price) {
+        rvh.rejectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                String message = "Are you sure you want to reject " +
+                        response.getSeller().getFirstName() + "'s offer for $" + price + "?";
+                AlertDialog ad = dialog.setMessage(message)
+                        .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialoginterface, int i) {
+                                dialoginterface.cancel();
+                            }
+                        })
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialoginterface, int i) {
+                                response.setBuyerStatus(Response.BuyerStatus.DECLINED);
+                                historyFragment.updateOffer(response, request, dialoginterface);
+                            }
+                        })
+                        .create();
+                ad.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                ad.show();
+
+            }
+        });
+    }
+
+    private void setUpAcceptBtn(final RequestResponseCardAdapter.ResponseCardViewHolder rvh,
+                                final Response response, final BigDecimal price) {
+        rvh.acceptBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
+                    String message = "You already accepted " +
+                            response.getSeller().getFirstName() + "'s offer for $" + price + ".";
+                    AlertDialog ad = dialog.setMessage(message)
+                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialoginterface, int i) {
+                                    dialoginterface.cancel();
+                                }
+                            })
+                            .create();
+                    ad.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                    ad.show();
+                } else {
+                    String message = "Are you sure you want to accept " +
+                            response.getSeller().getFirstName() + "'s offer for $" + price + "?";
+                    AlertDialog ad = dialog.setMessage(message)
+                            .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialoginterface, int i) {
+                                    dialoginterface.cancel();
+                                }
+                            })
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialoginterface, int i) {
+                                    historyFragment.updateOffer(response, request, dialoginterface);
+                                }
+                            })
+                            .create();
+                    ad.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                    ad.show();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -143,7 +220,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         return new RequestResponseCardAdapter.ResponseCardViewHolder(context, view);
     }
 
-    private void setUpProfileImage(final User user, final ImageButton imageBtn) {
+    public static void setUpProfileImage(final User user, final ImageButton imageBtn) {
         final boolean isGoogle = user.getAuthMethod() != null &&
                 user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
         new AsyncTask<Void, Void, Bitmap>() {
@@ -172,11 +249,12 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
 
     }
 
-    public void processBitmap(Bitmap bitmap, ImageButton imageButton) {
+    public static void processBitmap(Bitmap bitmap, ImageButton imageButton) {
         imageButton.setImageBitmap(bitmap);
     }
 
-    public static class ResponseCardViewHolder extends RecyclerView.ViewHolder{
+
+    public static class ResponseCardViewHolder extends RecyclerView.ViewHolder {
         private ImageButton profilePic;
         private TextView offerText;
         private TextView responseStatus;

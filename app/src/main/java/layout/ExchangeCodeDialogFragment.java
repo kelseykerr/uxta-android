@@ -277,7 +277,6 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
                 }
                 loadingSpinner.setVisibility(View.GONE);
                 refreshCodeBtn.setEnabled(true);
-
             }
         }.execute();
     }

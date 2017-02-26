@@ -76,19 +76,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else { //this is an offer the user made
             setUpOfferCard(requestViewHolder, r, h);
         }
-        /*if (!requestViewHolder.showConfirmChargeIcon && !requestViewHolder.showEditIcon &&
-                !requestViewHolder.showCancelTransactionIcon && !requestViewHolder.showExchangeIcon
-                && !requestViewHolder.showMessageUserIcon && !requestViewHolder.showViewRequestIcon) {
-            requestViewHolder.menuBtn.setVisibility(View.GONE);
-        } else {
-            requestViewHolder.menuBtn.setVisibility(View.VISIBLE);
-        }
-        requestViewHolder.menuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(requestViewHolder.menuBtn, h, requestViewHolder);
-            }
-        });*/
         List<String> values = new ArrayList();
         for (Response resp:h.getResponses()) {
             if (resp == null || resp.getSeller() == null) {
@@ -207,6 +194,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.showEditIcon = true;
         }
+        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showResponseDialog(resp);
+            }
+        });
     }
 
     private void setUpRequestCard(final HistoryCardViewHolder requestViewHolder, Request r, final History h) {
@@ -255,22 +248,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vOpenOffers.setText(Html.fromHtml(ooString));
             }
         }
-        /*if (h.getResponses() != null && h.getResponses().size() > 0 &&
-                !r.getStatus().toString().equalsIgnoreCase("closed")) {
-            requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
-                    if (requestViewHolder.dropdownExpanded) {
-                        requestViewHolder.responseList.setVisibility(View.VISIBLE);
-                        justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
-                    } else {
-                        requestViewHolder.responseSeparator.setVisibility(View.GONE);
-                        requestViewHolder.responseList.setVisibility(View.GONE);
-                    }
-                }
-            });
-        }*/
         requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -331,7 +308,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (isBuyer && resp.getSeller().getPhone() != null) {
                 requestViewHolder.showMessageUserIcon = true;
             }
-            String formattedDate = resp.getExchangeTime() != null ? formatter.format(resp.getExchangeTime()) : null;
+            String formattedDate = resp.getExchangeTime() != null ? formatter.format(resp.getExchangeTime()) : "";
             String exchangeTime = "<b>exchange time:</b> " + formattedDate;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
@@ -360,7 +337,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (isBuyer && resp.getSeller().getPhone() != null) {
                 requestViewHolder.showMessageUserIcon = true;
             }
-            String formatedDate = resp.getReturnTime() != null ? formatter.format(resp.getReturnTime()) : null;
+            String formatedDate = resp.getReturnTime() != null ? formatter.format(resp.getReturnTime()) : "";
             String returnTime = "<b>return time:</b> " + formatedDate;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
@@ -436,35 +413,14 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vStatus.setText(r.getStatus().toUpperCase());
             requestViewHolder.vStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
         }
+        final Response response = resp;
+        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showTransactionDialog(h, response);
+            }
+        });
     }
-
-    /*private void showPopupMenu(View view, History h, HistoryCardViewHolder rvh) {
-        // inflate menu
-        PopupMenu popup = new PopupMenu(context, view);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.history_card_menu, popup.getMenu());
-        Menu popupMenu = popup.getMenu();
-        if (!rvh.showExchangeIcon) {
-            popupMenu.removeItem(R.id.exchange_icon);
-        }
-        if (!rvh.showCancelTransactionIcon) {
-            popupMenu.removeItem(R.id.cancel_transaction_button);
-        }
-        if (!rvh.showEditIcon) {
-            popupMenu.removeItem(R.id.edit_button);
-        }
-        if (!rvh.showConfirmChargeIcon) {
-            popupMenu.removeItem(R.id.confirm_charge);
-        }
-        if (!rvh.showMessageUserIcon) {
-            popupMenu.removeItem(R.id.message_user);
-        }
-        if (!rvh.showViewRequestIcon) {
-            popupMenu.removeItem(R.id.view_request);
-        }
-        popup.setOnMenuItemClickListener(new MenuClickListener(h));
-        popup.show();
-    }*/
 
     class MenuClickListener implements PopupMenu.OnMenuItemClickListener {
         private History history;

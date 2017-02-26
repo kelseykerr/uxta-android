@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,8 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,6 +64,7 @@ public class HistoryFragment extends Fragment {
     private RelativeLayout noHistoryLayout;
     public static String snackbarMessage = null;
     private static ViewRequestFragment viewRequestFragment;
+    private static ViewTransactionFragment viewTransactionFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -166,9 +170,20 @@ public class HistoryFragment extends Fragment {
         viewRequestFragment.show(getFragmentManager(), "dialog");
     }
 
+    public void showTransactionDialog(History h, Response response) {
+        viewTransactionFragment = ViewTransactionFragment.newInstance(h, this, response);
+        viewTransactionFragment.show(getFragmentManager(), "dialog");
+    }
+
     public static void dismissViewRequestFragment() {
         if (viewRequestFragment != null) {
             viewRequestFragment.dismiss();
+        }
+    }
+
+    public static void dismissViewTransactionFragment() {
+        if (viewTransactionFragment != null) {
+            viewTransactionFragment.dismiss();
         }
     }
 
@@ -310,5 +325,65 @@ public class HistoryFragment extends Fragment {
                 requestHistoryList.setLayoutManager(llm);
             }
         }.execute();
+    }
+
+    public void updateOffer(final Response response, final Request request, final DialogInterface dialog) {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId() + "/responses/" + response.getId());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    conn.setRequestProperty("Content-Type", "application/json");
+
+                    if (request.getUser().getId().equals(user.getId())) {
+                        response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                    } else {
+                        response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                    }
+                    ObjectMapper mapper = new ObjectMapper();
+                    User seller = response.getSeller();
+                    response.setSeller(null);
+                    String responseJson = mapper.writeValueAsString(response);
+                    Log.i("updated response: ", responseJson);
+                    response.setSeller(seller);
+                    byte[] outputInBytes = responseJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+                    Log.i("PUT /responses", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update offer: " + e.getMessage());
+                }
+                return responseCode;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                HistoryFragment.dismissViewRequestFragment();
+                if (responseCode == 200) {
+                    dialog.dismiss();
+                    dismissViewRequestFragment();
+                    ((MainActivity) getActivity()).goToHistory("successfully updated offer");
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "could not update offer", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    dialog.dismiss();
+                }
+            }
+        }.execute();
+
     }
 }
