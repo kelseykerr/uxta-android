@@ -64,6 +64,7 @@ import layout.PaymentDialogFragment;
 import layout.RequestDialogFragment;
 import layout.UpdateAccountDialogFragment;
 import layout.ViewOfferDialogFragment;
+import layout.ViewRequestFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
@@ -85,7 +86,8 @@ public class MainActivity extends AppCompatActivity
         PaymentDialogFragment.OnFragmentInteractionListener,
         PaymentDestinationDialogFragment.OnFragmentInteractionListener,
         PaymentDetailsDialogFragment.OnFragmentInteractionListener,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        ViewRequestFragment.OnFragmentInteractionListener {
 
     public static User user;
     private Toolbar toolbar;

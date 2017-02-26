@@ -10,6 +10,8 @@
     <color name="white">#ffffff</color>
     <color name="offWhite">#fafafa</color>
     <color name="colorPrimary80">#CA4EE2EC</color>
+    <color name="colorPrimary60">#994EE2EC</color>
+    <color name="colorAccent70">#B3767474</color>
     <color name="white75">#BFFFFFFF</color>
     <color name="primary_dark_material_dark">#767474</color>
     <color name="primary_material_dark">#767474</color>

@@ -1,55 +1,159 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:id="@+id/my_history_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="15dp"
+    android:clickable="true"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:id="@+id/response_card"
-    android:weightSum="30">
-
-    <ImageButton
-        android:id="@+id/profileImage"
-        android:layout_weight="5"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:background="#00000000" />
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true"
+    card_view:cardElevation="5dp">
 
     <RelativeLayout
-        android:id="@+id/info_layout"
-        android:layout_weight="25"
-        android:layout_width="0dp"
-        android:layout_gravity="center_vertical"
+        android:id="@+id/response_card_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/offer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""/>
 
-    <TextView
-        android:id="@+id/response_status"
-        android:layout_width="wrap_content"
-        android:textStyle="bold"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/offer_text"
-        android:layout_marginEnd="44dp"
-        android:textSize="12dp"
-        android:text=" " />
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/response_info_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-1dp"
+            android:orientation="horizontal"
+            android:weightSum="30">
 
-    <ImageButton
-        android:id="@+id/message_user_button"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:padding="10dp"
-        android:background="@color/white"
-        android:tint="@color/colorAccent"
-        android:src="@drawable/ic_textsms_black_24dp" />
+            <ImageButton
+                android:id="@+id/profile_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="6"
+                android:background="#00000000"
+                android:maxHeight="600dp" />
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/info_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="24">
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/offer_text"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/posted_date"
+                    android:layout_below="@id/offer_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp" />
+
+
+                <TextView
+                    android:id="@+id/exchange_time"
+                    android:layout_below="@+id/posted_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/exchange_location"
+                    android:layout_below="@+id/exchange_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/return_time"
+                    android:layout_below="@+id/exchange_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/return_location"
+                    android:layout_below="@+id/return_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/response_status"
+                    android:layout_below="@+id/return_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/btn_bar"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/response_status"
+                    android:layout_marginStart="-20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="4">
+
+                    <ImageButton
+                        android:id="@+id/edit_btn"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_mode_edit_black_24dp"
+                        android:tint="@color/colorAccent" />
+
+                    <ImageButton
+                        android:id="@+id/message_user_btn"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_textsms_black_24dp"
+                        android:tint="@color/colorAccent" />
+
+                    <ImageButton
+                        android:id="@+id/accept_btn"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_check_black_24dp"
+                        android:tint="@color/colorAccent" />
+
+                    <ImageButton
+                        android:id="@+id/reject_btn"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_close_black_24dp"
+                        android:tint="@color/colorAccent" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

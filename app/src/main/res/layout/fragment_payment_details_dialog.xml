@@ -204,7 +204,7 @@
                     android:id="@+id/new_exp_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="expiration date"
+                    android:hint="expiration date - MM/YY"
                     android:inputType="number"
                     android:maxLength="5"
                     android:textColor="@color/colorAccent"

@@ -60,6 +60,7 @@ public class HistoryFragment extends Fragment {
     private View view;
     private RelativeLayout noHistoryLayout;
     public static String snackbarMessage = null;
+    private static ViewRequestFragment viewRequestFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -161,6 +162,17 @@ public class HistoryFragment extends Fragment {
     }
 
     public void showRequestDialog(History h) {
+        viewRequestFragment = ViewRequestFragment.newInstance(h, this);
+        viewRequestFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public static void dismissViewRequestFragment() {
+        if (viewRequestFragment != null) {
+            viewRequestFragment.dismiss();
+        }
+    }
+
+    public void showEditRequestDialog(History h) {
         DialogFragment newFragment = RequestDialogFragment
                 .newInstance(h.getRequest());
         newFragment.show(getFragmentManager(), "dialog");

@@ -404,6 +404,7 @@ public class RequestDialogFragment extends DialogFragment
 
             @Override
             protected void onPostExecute(Integer responseCode) {
+                HistoryFragment.dismissViewRequestFragment();
                 if (responseCode == 200) {
                     ((MainActivity) getActivity()).goToHistory("successfully updated request");
                     dismiss();

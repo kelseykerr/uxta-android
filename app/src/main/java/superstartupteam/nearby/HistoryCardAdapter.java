@@ -4,17 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,9 +76,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else { //this is an offer the user made
             setUpOfferCard(requestViewHolder, r, h);
         }
-        if (!requestViewHolder.showConfirmChargeIcon && !requestViewHolder.showEditIcon &&
+        /*if (!requestViewHolder.showConfirmChargeIcon && !requestViewHolder.showEditIcon &&
                 !requestViewHolder.showCancelTransactionIcon && !requestViewHolder.showExchangeIcon
-                && !requestViewHolder.showMessageUserIcon) {
+                && !requestViewHolder.showMessageUserIcon && !requestViewHolder.showViewRequestIcon) {
             requestViewHolder.menuBtn.setVisibility(View.GONE);
         } else {
             requestViewHolder.menuBtn.setVisibility(View.VISIBLE);
@@ -92,7 +88,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             public void onClick(View view) {
                 showPopupMenu(requestViewHolder.menuBtn, h, requestViewHolder);
             }
-        });
+        });*/
         List<String> values = new ArrayList();
         for (Response resp:h.getResponses()) {
             if (resp == null || resp.getSeller() == null) {
@@ -104,9 +100,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     "<br/>" + resp.getResponseStatus().toString() + "</font>";
             values.add(htmlString);
         }
-        RequestResponseCardAdapter adapter = new RequestResponseCardAdapter(context, 0,
-                h.getResponses(), r, historyFragment);
-        requestViewHolder.responseList.setAdapter(adapter);
     }
 
 
@@ -181,6 +174,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         requestViewHolder.showExchangeIcon = false;
+        requestViewHolder.showViewRequestIcon = false;
         if (r.getUser().getPhone() != null) {
             requestViewHolder.showMessageUserIcon = true;
         }
@@ -220,6 +214,8 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         requestViewHolder.showExchangeIcon = false;
         requestViewHolder.showMessageUserIcon = false;
+        requestViewHolder.showViewRequestIcon = true;
+        requestViewHolder.showEditIcon = false;
         String htmlString = "Requested a " +
                 r.getItemName();
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -245,9 +241,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
              * closed requests
              */
         if (!r.getStatus().equals("OPEN")) {
-            requestViewHolder.showEditIcon = false;
+            requestViewHolder.showViewRequestIcon = false;
         } else {
-            requestViewHolder.showEditIcon = true;
+            requestViewHolder.showViewRequestIcon = true;
             int count = 0;
             for (Response resp: h.getResponses()) {
                 if (resp.getResponseStatus().toString().toLowerCase().equals("pending")) {
@@ -259,14 +255,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vOpenOffers.setText(Html.fromHtml(ooString));
             }
         }
-        if (h.getResponses() != null && h.getResponses().size() > 0 &&
+        /*if (h.getResponses() != null && h.getResponses().size() > 0 &&
                 !r.getStatus().toString().equalsIgnoreCase("closed")) {
             requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     requestViewHolder.dropdownExpanded = !requestViewHolder.dropdownExpanded;
                     if (requestViewHolder.dropdownExpanded) {
-                        /*requestViewHolder.responseSeparator.setVisibility(View.VISIBLE);*/
                         requestViewHolder.responseList.setVisibility(View.VISIBLE);
                         justifyListViewHeightBasedOnChildren(requestViewHolder.responseList);
                     } else {
@@ -275,7 +270,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     }
                 }
             });
-        }
+        }*/
+        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showRequestDialog(h);
+            }
+        });
     }
 
 
@@ -284,6 +285,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         final boolean isSeller = !isBuyer;
         requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
         requestViewHolder.showEditIcon = false;
+        requestViewHolder.showViewRequestIcon = false;
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
         requestViewHolder.vStatus.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
@@ -436,7 +438,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
     }
 
-    private void showPopupMenu(View view, History h, HistoryCardViewHolder rvh) {
+    /*private void showPopupMenu(View view, History h, HistoryCardViewHolder rvh) {
         // inflate menu
         PopupMenu popup = new PopupMenu(context, view);
         MenuInflater inflater = popup.getMenuInflater();
@@ -457,9 +459,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         if (!rvh.showMessageUserIcon) {
             popupMenu.removeItem(R.id.message_user);
         }
+        if (!rvh.showViewRequestIcon) {
+            popupMenu.removeItem(R.id.view_request);
+        }
         popup.setOnMenuItemClickListener(new MenuClickListener(h));
         popup.show();
-    }
+    }*/
 
     class MenuClickListener implements PopupMenu.OnMenuItemClickListener {
         private History history;
@@ -476,11 +481,14 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 case R.id.cancel_transaction_button:
                     historyFragment.showCancelTransactionDialog(transaction.getId());
                     return true;
+                case R.id.view_request:
+                    historyFragment.showEditRequestDialog(history);
+                    return true;
                 case R.id.edit_button:
                     if (isSeller) {
                         historyFragment.showResponseDialog(history.getResponses().get(0));
                     } else {
-                        historyFragment.showRequestDialog(history);
+                        historyFragment.showEditRequestDialog(history);
                     }
                     return true;
                 case R.id.exchange_icon:
@@ -548,6 +556,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private boolean showConfirmChargeIcon = false;
         private boolean dropdownExpanded = false;
         private boolean showMessageUserIcon = false;
+        private boolean showViewRequestIcon = false;
         private ListView responseList;
         private FrameLayout cardView;
         private LinearLayout responseSeparator;
@@ -567,7 +576,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
             historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
             historyCard.setMaxCardElevation(7);
-            menuBtn = (ImageView) v.findViewById(R.id.card_menu);
+            //menuBtn = (ImageView) v.findViewById(R.id.card_menu);
             responseList = (ListView) v.findViewById(R.id.response_list);
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);

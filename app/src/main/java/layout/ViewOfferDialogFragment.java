@@ -235,6 +235,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             @Override
             protected void onPostExecute(Integer responseCode) {
                 rejectRequestBtn.setEnabled(true);
+                HistoryFragment.dismissViewRequestFragment();
                 if (responseCode == 200) {
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully declined offer");
@@ -294,6 +295,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             @Override
             protected void onPostExecute(Integer responseCode) {
                 updateRequestBtn.setEnabled(true);
+                HistoryFragment.dismissViewRequestFragment();
                 if (responseCode == 200) {
                     ((MainActivity) getActivity()).goToHistory("successfully updated offer");
                     dismiss();

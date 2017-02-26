@@ -190,6 +190,9 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         if (expValue.isEmpty()) {
             valid = false;
             expDateLayout.setError("you must enter the credit card's expiration date");
+        } else if (expValue.length() < 5) {
+            valid = false;
+            expDateLayout.setError("please enter a valid expiration date");
         } else {
             expDateLayout.setError(null);
         }
