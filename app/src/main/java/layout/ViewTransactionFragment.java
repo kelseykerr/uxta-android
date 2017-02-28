@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,8 +13,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,6 @@ import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
-import superstartupteam.nearby.RequestResponseCardAdapter;
 import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
@@ -149,6 +147,8 @@ public class ViewTransactionFragment extends DialogFragment {
             } else {
                 exchangeLocation.setVisibility(View.GONE);
             }
+            returnTime.setVisibility(View.GONE);
+            returnLocation.setVisibility(View.GONE);
         } else if (!transaction.getReturned() && request.getRental()) {
             transactionStatus.setText("Awaiting return");
             String formattedDate = transaction.getExchangeTime() != null ? formatter.format(transaction.getExchangeTime()) : null;
@@ -165,7 +165,7 @@ public class ViewTransactionFragment extends DialogFragment {
             }
             if (response.getReturnLocation() != null && response.getReturnLocation().length() > 0) {
                 String returnLocationText = "<b>return location:</b> " + response.getReturnLocation();
-                returnLocation.setText(returnLocationText);
+                returnLocation.setText(Html.fromHtml(returnLocationText));
             } else {
                 returnLocation.setVisibility(View.GONE);
             }
@@ -213,14 +213,18 @@ public class ViewTransactionFragment extends DialogFragment {
                     if (isSeller) {
                         if (!transaction.getExchanged()) {
                             historyFragment.showExchangeCodeDialog(history.getTransaction(), false);
+                            dismiss();
                         } else {
                             historyFragment.showScanner(history.getTransaction().getId(), false);
+                            dismiss();
                         }
                     } else {
                         if (!transaction.getExchanged()) {
                             historyFragment.showScanner(history.getTransaction().getId(), true);
+                            dismiss();
                         } else {
                             historyFragment.showExchangeCodeDialog(history.getTransaction(), true);
+                            dismiss();
                         }
                     }
                 }
@@ -231,6 +235,29 @@ public class ViewTransactionFragment extends DialogFragment {
                 }
             });
         }
+        messageUserBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                smsIntent.setType("vnd.android-dir/mms-sms");
+                String phone;
+                if (isSeller) {
+                    phone = history.getRequest().getUser().getPhone().replace("-", "");
+                } else {
+                    Response resp = null;
+                    final Transaction transaction = history.getTransaction();
+                    for (Response res : history.getResponses()) {
+                        if (res.getId().equals(transaction.getResponseId())) {
+                            resp = res;
+                            break;
+                        }
+                    }
+                    phone = resp.getSeller().getPhone().replace("-", "");
+                }
+                smsIntent.putExtra("address", phone);
+                smsIntent.putExtra("sms_body","");
+                context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+            }
+        });
     }
 
     @Override

@@ -126,7 +126,6 @@ public class ScannerActivity extends AppCompatActivity implements
 
     public void verifyCode(final String code) {
         // AsyncTask<Params, Progress, Result>
-        HistoryFragment.dismissViewTransactionFragment();
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {

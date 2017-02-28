@@ -31,7 +31,6 @@ import superstartupteam.nearby.model.User;
 /**
  * Created by kerrk on 11/8/16.
  */
-
 public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResponseCardAdapter.ResponseCardViewHolder> {
 
     private List<Response> responses;
@@ -76,14 +75,14 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
 
         String formatedExchangeTime = response.getExchangeTime() != null ? formatter.format(response.getExchangeTime()) : null;
         if (formatedExchangeTime != null) {
-            String exchangeTime = "exchange time: " + formatedExchangeTime;
+            String exchangeTime = "<b>exchange time:</b> " + formatedExchangeTime;
             rvh.exchangeTime.setText(Html.fromHtml(exchangeTime));
             rvh.exchangeTime.setVisibility(View.VISIBLE);
         } else {
             rvh.exchangeTime.setVisibility(View.GONE);
         }
         if (response.getReturnLocation() != null && response.getReturnLocation().length() > 0) {
-            String exchangeLocation = "exchange location: " + response.getReturnLocation();
+            String exchangeLocation = "<b>exchange location:</b> " + response.getReturnLocation();
             rvh.exchangeLocation.setText(Html.fromHtml(exchangeLocation));
             rvh.exchangeLocation.setVisibility(View.VISIBLE);
         } else {
@@ -91,14 +90,14 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         }
         String formatedReturnTime = response.getReturnTime() != null ? formatter.format(response.getReturnTime()) : null;
         if (formatedReturnTime != null) {
-            String returnTime = "return time: " + formatedReturnTime;
+            String returnTime = "<b>return time:</b> " + formatedReturnTime;
             rvh.returnTime.setText(Html.fromHtml(returnTime));
             rvh.returnTime.setVisibility(View.VISIBLE);
         } else {
             rvh.returnTime.setVisibility(View.GONE);
         }
         if (response.getReturnLocation() != null && response.getReturnLocation().length() > 0) {
-            String returnLocation = "return location: " + response.getReturnLocation();
+            String returnLocation = "<b>return location:</b> " + response.getReturnLocation();
             rvh.returnLocation.setText(Html.fromHtml(returnLocation));
             rvh.returnLocation.setVisibility(View.VISIBLE);
         } else {
@@ -246,7 +245,6 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                 super.onPostExecute(bitmap);
             }
         }.execute();
-
     }
 
     public static void processBitmap(Bitmap bitmap, ImageButton imageButton) {
