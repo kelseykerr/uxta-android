@@ -194,7 +194,24 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
             valid = false;
             expDateLayout.setError("please enter a valid expiration date");
         } else {
-            expDateLayout.setError(null);
+            Integer currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            currentYear = currentYear % 100;
+            Integer toTest = Integer.parseInt(expValue.substring(expValue.length()-2, expValue.length()));
+            if (toTest < currentYear) {
+                valid = false;
+                expDateLayout.setError("your credit card has expired, please enter a valid credit card");
+            } else if (toTest == currentYear) {
+                toTest = Integer.parseInt(expValue.substring(0, expValue.length()-3));
+                Integer currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+                if (toTest <= currentMonth) {
+                    valid = false;
+                    expDateLayout.setError("your credit card has expired, please enter a valid credit card");
+                } else {
+                    expDateLayout.setError(null);
+                }
+            } else {
+                expDateLayout.setError(null);
+            }
         }
         return valid;
     }

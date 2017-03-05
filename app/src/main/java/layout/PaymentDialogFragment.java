@@ -172,6 +172,12 @@ public class PaymentDialogFragment extends DialogFragment {
                                 pddf.show(getFragmentManager(), "dialog");
                             }
                         });
+                        chevronRight.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                PaymentDestinationDialogFragment pddf = PaymentDestinationDialogFragment.newInstance(paymentDetails, dText);
+                                pddf.show(getFragmentManager(), "dialog");
+                            }
+                        });
                     }
 
                     if (paymentDetails.getCcMaskedNumber() == null) {
