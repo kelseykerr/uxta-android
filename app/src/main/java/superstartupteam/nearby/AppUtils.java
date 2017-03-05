@@ -76,6 +76,9 @@ public class AppUtils {
     }
 
     public static String getTimeDiffString(Date start) {
+        if (start == null) {
+            return "";
+        }
         long diff = new Date().getTime() - start.getTime();
         long diffMinutes = diff / (60 * 1000) % 60;
         long diffHours = diff / (60 * 60 * 1000);

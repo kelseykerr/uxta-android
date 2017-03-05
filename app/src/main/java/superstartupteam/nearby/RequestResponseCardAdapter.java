@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,8 @@ import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.io.IOException;
+import com.bumptech.glide.Glide;
+
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,6 +40,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
     private Context context;
     private LayoutInflater mInflater;
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+    private static final String TAG = "RequestResponseCardAdap";
 
     public RequestResponseCardAdapter(Context context, List<Response> responses, Request request, HistoryFragment hf) {
         this.historyFragment = hf;
@@ -219,32 +220,19 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         return new RequestResponseCardAdapter.ResponseCardViewHolder(context, view);
     }
 
-    public static void setUpProfileImage(final User user, final ImageButton imageBtn) {
+    public void setUpProfileImage(final User user, final ImageButton imageBtn) {
         final boolean isGoogle = user.getAuthMethod() != null &&
                 user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
-        new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                URL imageURL = null;
-                try {
-                    imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=100" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=100");
-                    Bitmap bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-                    return bitmap;
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                processBitmap(bitmap, imageBtn);
-                super.onPostExecute(bitmap);
-            }
-        }.execute();
+        try {
+            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+            Glide.with(context)
+                    .load(imageURL)
+                    .asBitmap()
+                    .transform(new CropCircleTransform(context))
+                    .into(imageBtn);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "malformed url: " + e.getMessage());
+        }
     }
 
     public static void processBitmap(Bitmap bitmap, ImageButton imageButton) {

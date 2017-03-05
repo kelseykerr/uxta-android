@@ -110,7 +110,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private View view;
     private LocalBroadcastManager mLocalBroadcastManager;
     public static Boolean homeLocation = false;
-    public static Double currentRadius;
+    public static Double currentRadius = 1.0;
     public static String sortBy;
     private Location currentLocation;
     public static String searchTerm;
@@ -362,7 +362,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     private void updateZoom(Marker marker, LatLng latLng) {
         if (currentRadius == null) {
-            currentRadius = .1;
+            currentRadius = 1.0;
         }
         CircleOptions options = new CircleOptions();
         options.center(marker != null ? marker.getPosition() : latLng);
@@ -450,7 +450,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
-            getRequests(.1);
+            getRequests(1.0);
             if (recList != null) {
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
@@ -461,7 +461,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         mLocationRequest.setInterval(5000); //5 seconds
         mLocationRequest.setFastestInterval(3000); //3 seconds
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
 
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -496,7 +495,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        getRequests(.1);
+        getRequests(1.0);
         requestAdapter.swap(requests);
         //ft.show(mapFragment).commit();
 

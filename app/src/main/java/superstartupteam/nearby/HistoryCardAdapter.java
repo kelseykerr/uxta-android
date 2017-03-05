@@ -2,14 +2,12 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +22,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
+import com.bumptech.glide.Glide;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -310,9 +308,19 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
             String formattedDate = resp.getExchangeTime() != null ? formatter.format(resp.getExchangeTime()) : "";
             String exchangeTime = "<b>exchange time:</b> " + formattedDate;
-            requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
+            if (resp.getExchangeTime() != null) {
+                requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
+                requestViewHolder.vCategoryName.setText(Html.fromHtml(exchangeTime));
+            } else {
+                requestViewHolder.vCategoryName.setVisibility(View.GONE);
+            }
             String exchangeLocation = "<b>exchange location:</b> " + resp.getExchangeLocation();
-            requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
+            if (resp.getExchangeLocation() != null && resp.getExchangeLocation().length() > 0) {
+                requestViewHolder.vDescription.setVisibility(View.VISIBLE);
+                requestViewHolder.vDescription.setText(Html.fromHtml(exchangeLocation));
+            } else {
+                requestViewHolder.vDescription.setVisibility(View.GONE);
+            }
             requestViewHolder.vTransactionStatus.setText("Awaiting initial exchange");
             requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
@@ -339,9 +347,19 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             }
             String formatedDate = resp.getReturnTime() != null ? formatter.format(resp.getReturnTime()) : "";
             String returnTime = "<b>return time:</b> " + formatedDate;
-            requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
+            if (resp.getReturnTime() != null) {
+                requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
+                requestViewHolder.vCategoryName.setText(Html.fromHtml(returnTime));
+            } else {
+                requestViewHolder.vCategoryName.setVisibility(View.GONE);
+            }
             String returnLocation = "<b>return location:</b> " + resp.getReturnLocation();
-            requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));
+            if (resp.getReturnLocation() != null && resp.getReturnLocation().length() > 0) {
+                requestViewHolder.vDescription.setVisibility(View.VISIBLE);
+                requestViewHolder.vDescription.setText(Html.fromHtml(returnLocation));
+            } else {
+                requestViewHolder.vDescription.setVisibility(View.GONE);
+            }
             requestViewHolder.vTransactionStatus.setText("Awaiting return");
             requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride returnOverride = transaction.getReturnOverride();
@@ -542,30 +560,16 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private void setUpProfileImage(final User user) {
             final boolean isGoogle = user.getAuthMethod() != null &&
                     user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
-            new AsyncTask<Void, Void, Void>() {
-                Bitmap bitmap;
-                @Override
-                protected Void doInBackground(Void... params) {
-                    URL imageURL = null;
-                    try {
-                        imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=100" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=100");
-                        bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                    profileImage.setImageBitmap(bitmap);
-                }
-            }.execute();
-
+            try {
+                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+                Glide.with(context)
+                        .load(imageURL)
+                        .asBitmap()
+                        .transform(new CropCircleTransform(context))
+                        .into(profileImage);
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "malformed url: " + e.getMessage());
+            }
         }
     }
 }
