@@ -62,6 +62,9 @@ public class ViewTransactionFragment extends DialogFragment {
     private FloatingActionButton messageUserBtn;
     private FloatingActionButton exchangeBtn;
     private FloatingActionButton closeTransactionBtn;
+    private TextView exchangeFabText;
+    private TextView messageUserFabText;
+    private TextView closeTransactionFabText;
 
     public ViewTransactionFragment() {}
 
@@ -199,34 +202,23 @@ public class ViewTransactionFragment extends DialogFragment {
     }
 
     private void setUpFabBtns(Request request, final boolean isSeller) {
+        exchangeFabText = (TextView) view.findViewById(R.id.exchange_text);
+        closeTransactionFabText = (TextView) view.findViewById(R.id.close_transaction_text);
         if ((transaction.getExchanged() && !request.getRental()) || transaction.getReturned() ||
                 (!request.getStatus().equals("OPEN") && !request.getStatus().equals("TRANSACTION_PENDING"))) {
             exchangeBtn.setVisibility(View.GONE);
-            TextView exchangeBtnText = (TextView) view.findViewById(R.id.exchange_text);
-            exchangeBtnText.setVisibility(View.GONE);
+            exchangeFabText.setVisibility(View.GONE);
             closeTransactionBtn.setVisibility(View.GONE);
-            TextView closeTransactionText = (TextView) view.findViewById(R.id.close_transaction_text);
-            closeTransactionText.setVisibility(View.GONE);
+            closeTransactionFabText.setVisibility(View.GONE);
         } else {
             exchangeBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    if (isSeller) {
-                        if (!transaction.getExchanged()) {
-                            historyFragment.showExchangeCodeDialog(history.getTransaction(), false);
-                            dismiss();
-                        } else {
-                            historyFragment.showScanner(history.getTransaction().getId(), false);
-                            dismiss();
-                        }
-                    } else {
-                        if (!transaction.getExchanged()) {
-                            historyFragment.showScanner(history.getTransaction().getId(), true);
-                            dismiss();
-                        } else {
-                            historyFragment.showExchangeCodeDialog(history.getTransaction(), true);
-                            dismiss();
-                        }
-                    }
+                    exchangeBtnClick(isSeller);
+                }
+            });
+            exchangeFabText.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    exchangeBtnClick(isSeller);
                 }
             });
             closeTransactionBtn.setOnClickListener(new View.OnClickListener() {
@@ -234,30 +226,65 @@ public class ViewTransactionFragment extends DialogFragment {
                     historyFragment.showCancelTransactionDialog(transaction.getId());
                 }
             });
-        }
-        messageUserBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                smsIntent.setType("vnd.android-dir/mms-sms");
-                String phone;
-                if (isSeller) {
-                    phone = history.getRequest().getUser().getPhone().replace("-", "");
-                } else {
-                    Response resp = null;
-                    final Transaction transaction = history.getTransaction();
-                    for (Response res : history.getResponses()) {
-                        if (res.getId().equals(transaction.getResponseId())) {
-                            resp = res;
-                            break;
-                        }
-                    }
-                    phone = resp.getSeller().getPhone().replace("-", "");
+            closeTransactionFabText.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    historyFragment.showCancelTransactionDialog(transaction.getId());
                 }
-                smsIntent.putExtra("address", phone);
-                smsIntent.putExtra("sms_body","");
-                context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+            });
+        }
+        messageUserFabText = (TextView) view.findViewById(R.id.message_user_text);
+        messageUserFabText.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                messageUserClick(isSeller);
             }
         });
+        messageUserBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                messageUserClick(isSeller);
+            }
+        });
+    }
+
+    private void messageUserClick(boolean isSeller) {
+        Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+        smsIntent.setType("vnd.android-dir/mms-sms");
+        String phone;
+        if (isSeller) {
+            phone = history.getRequest().getUser().getPhone().replace("-", "");
+        } else {
+            Response resp = null;
+            final Transaction transaction = history.getTransaction();
+            for (Response res : history.getResponses()) {
+                if (res.getId().equals(transaction.getResponseId())) {
+                    resp = res;
+                    break;
+                }
+            }
+            phone = resp.getSeller().getPhone().replace("-", "");
+        }
+        smsIntent.putExtra("address", phone);
+        smsIntent.putExtra("sms_body","");
+        context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+    }
+
+    private void exchangeBtnClick(boolean isSeller) {
+        if (isSeller) {
+            if (!transaction.getExchanged()) {
+                historyFragment.showExchangeCodeDialog(history.getTransaction(), false);
+                dismiss();
+            } else {
+                historyFragment.showScanner(history.getTransaction().getId(), false);
+                dismiss();
+            }
+        } else {
+            if (!transaction.getExchanged()) {
+                historyFragment.showScanner(history.getTransaction().getId(), true);
+                dismiss();
+            } else {
+                historyFragment.showExchangeCodeDialog(history.getTransaction(), true);
+                dismiss();
+            }
+        }
     }
 
     @Override
