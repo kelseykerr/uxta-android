@@ -338,9 +338,19 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
     private boolean validateForm() {
         boolean good = true;
-        if (offerPrice.getText().toString().isEmpty()) {
+        String offer = offerPrice.getText().toString();
+        if (offer.isEmpty()) {
             offerPriceLayout.setError("price cannot be empty");
             good = false;
+        } else {
+            offer = offer.substring(1);
+            double price = Double.parseDouble(offer);
+            if (price != 0 && price < Constants.MINIMUM_OFFER_PRICE) {
+                good = false;
+                offerPriceLayout.setError("price can only be $0.00 or greater than $0.50");
+            } else {
+                offerPriceLayout.setError(null);
+            }
         }
         if (exchangeDate != null && exchangeDate.before(new Date())) {
             pickupTimeLayout.setError("this must be a date in the future");
