@@ -234,6 +234,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public void showDialog(String itemId) {
+        if (!MainActivity.areLocationServicesOn()) {
+            ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
+            return;
+        }
         DialogFragment newFragment = NewOfferDialogFragment.newInstance(itemId);
         newFragment.show(getFragmentManager(), "dialog");
     }

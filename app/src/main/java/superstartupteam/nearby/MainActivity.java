@@ -12,11 +12,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,11 +31,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -112,6 +116,7 @@ public class MainActivity extends AppCompatActivity
     public static GoogleApiClient mGoogleApiClient;
     public static User updatedUser;
     public static ConnectivityManager connMgr;
+    public static LocationManager locationMgr;
     private FloatingActionButton fab;
     private ProgressDialog mProgressDialog;
 
@@ -161,6 +166,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
+        locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         user = PrefUtils.getCurrentUser(MainActivity.this);
         if (user == null || user.getAccessToken() == null) {
             if (user != null && user.getAccessToken() != null) {
@@ -221,6 +227,9 @@ public class MainActivity extends AppCompatActivity
                 if (!AppUtils.canAddPayments(user)) {
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     homeFragment.displayUpdateAccountSnackbar();
+                } else if (!areLocationServicesOn()) {
+                    final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+                    showNoLocationServicesSnack(viewGroup);
                 } else {
                     boolean goodCustomerStatus = user.getStripeCustomerId() != null && user.getCanRequest();
                     if (goodCustomerStatus) {
@@ -252,6 +261,27 @@ public class MainActivity extends AppCompatActivity
             AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
             AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
         }
+    }
+
+    public void showNoLocationServicesSnack(View view) {
+        Snackbar snack = Snackbar.make(view.getRootView(), R.string.noLocationServices,
+                Snackbar.LENGTH_LONG)
+                .setAction("open settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                });
+
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snack.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+        snack.getView().getRootView().setLayoutParams(params);
+        snack.show();
     }
 
     @Override
@@ -621,6 +651,24 @@ public class MainActivity extends AppCompatActivity
     public static boolean isNetworkConnected() {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    public static boolean areLocationServicesOn() {
+        boolean gpsEnabled = false;
+        boolean networkEnabled = false;
+
+        try {
+            gpsEnabled = locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {
+            Log.e(TAG, "couldn't check if gps is enabled, go error: " + ex.getMessage());
+        }
+
+        try {
+            networkEnabled = locationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {
+            Log.e(TAG, "couldn't check if network location is enabled, go error: " + ex.getMessage());
+        }
+        return gpsEnabled || networkEnabled;
     }
 
     @Override

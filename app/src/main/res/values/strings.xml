@@ -42,4 +42,5 @@
     <string name="changeButtonLabel">CHANGE</string>
     <string name="noRequestsFound">no requests found</string>
     <string name="noNetworkConnection">you aren\'t connected to the network</string>
+    <string name="noLocationServices">location services must be turned on</string>
 </resources>
