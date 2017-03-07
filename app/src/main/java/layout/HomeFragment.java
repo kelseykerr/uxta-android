@@ -496,9 +496,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
         getRequests(1.0);
-        requestAdapter.swap(requests);
-        //ft.show(mapFragment).commit();
-
+        if (requestAdapter != null) {
+            requestAdapter.swap(requests);
+        }
     }
 
     private void updateMapFocus(LatLng ll) {
