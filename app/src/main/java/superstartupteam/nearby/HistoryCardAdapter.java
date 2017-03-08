@@ -195,7 +195,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                historyFragment.showResponseDialog(resp);
+                if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
+                    historyFragment.showResponseDialog(resp);
+                }
             }
         });
     }

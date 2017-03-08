@@ -8,8 +8,10 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.LocationManager;
@@ -25,6 +27,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -77,6 +80,7 @@ import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
 import superstartupteam.nearby.service.NearbyInstanceIdService;
+import superstartupteam.nearby.service.NearbyMessagingService;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -119,6 +123,7 @@ public class MainActivity extends AppCompatActivity
     public static LocationManager locationMgr;
     private FloatingActionButton fab;
     private ProgressDialog mProgressDialog;
+    private LocalBroadcastManager mLocalBroadcastManager;
 
 
     /**
@@ -287,6 +292,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
+        registerBroadcastReceiver();
         if (user != null && user.getAuthMethod() != null && user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD)) {
             OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
             if (opr.isDone()) {
@@ -309,8 +315,14 @@ public class MainActivity extends AppCompatActivity
                 });
             }
         }
-    } // Always call the superclass method first
+    }
 
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        unregisterBroadcastReceiver();
+    }
 
     private void setSearchBtnClick() {
         searchBtn.setOnClickListener(new View.OnClickListener() {
@@ -751,6 +763,77 @@ public class MainActivity extends AppCompatActivity
             window.setStatusBarColor(color);
         }
     }
+
+    private void registerBroadcastReceiver() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("NOTIFICATION_MESSAGE");
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (currentMenuItem == R.id.bottomBarHistoryItem) {
+                selectHistoryFragment(1);
+            }
+            String message = intent.getStringExtra("message");
+            final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+            Snackbar snackbar = Snackbar.make(viewGroup.getRootView(), message, Snackbar.LENGTH_LONG);
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                    snackbar.getView().getRootView().getLayoutParams();
+
+            params.setMargins(params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    params.bottomMargin + 150);
+            String type = intent.getStringExtra("type");
+            View.OnClickListener mOnClickListener;
+            Response response = null;
+            Request request = null;
+            boolean hasRequestResponseParams = type != null &&
+                    (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
+                            || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));
+            if (hasRequestResponseParams) {
+                String responseJson = intent.getStringExtra("response");
+                String requestJson = intent.getStringExtra("request");
+                try {
+                    response = new ObjectMapper().readValue(responseJson, Response.class);
+                    request = new ObjectMapper().readValue(requestJson, Request.class);
+                } catch (IOException e) {
+                    Log.e("JSON ERROR", "**" + e.getMessage());
+                }
+            }
+
+            if (type != null) {
+                switch (type) {
+                    case "response_update":
+                        if (response.getId() != null) {
+                            DialogFragment newFragment = null;
+                            newFragment = ViewOfferDialogFragment.newInstance(response, request);
+                            final DialogFragment frag = newFragment;
+                            mOnClickListener = new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    frag.show(getFragmentManager(), "dialog");
+                                }
+                            };
+                            snackbar.setAction("view", mOnClickListener);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            snackbar.getView().getRootView().setLayoutParams(params);
+            snackbar.show();
+        }
+    };
 
 
 }

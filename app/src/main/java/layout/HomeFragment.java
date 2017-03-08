@@ -5,10 +5,8 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -16,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,7 +27,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -65,9 +61,7 @@ import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.RequestAdapter;
 import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
-import superstartupteam.nearby.service.NearbyMessagingService;
 import superstartupteam.nearby.service.RequestNotificationService;
 
 
@@ -108,7 +102,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private CameraUpdate cu;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
     private View view;
-    private LocalBroadcastManager mLocalBroadcastManager;
     public static Boolean homeLocation = false;
     public static Double currentRadius = 1.0;
     public static String sortBy;
@@ -135,13 +128,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onStart() {
         super.onStart();
-        registerBroadcastReceiver();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        unregisterBroadcastReceiver();
     }
 
     @Override
@@ -578,73 +569,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             listView.setVisibility(View.GONE);
         }
     }
-
-    private void registerBroadcastReceiver() {
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("NOTIFICATION_MESSAGE");
-        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
-    }
-
-    private void unregisterBroadcastReceiver() {
-        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
-    }
-
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("message");
-            Snackbar snackbar = Snackbar.make(view.getRootView(), message, Snackbar.LENGTH_LONG);
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                    snackbar.getView().getRootView().getLayoutParams();
-
-            params.setMargins(params.leftMargin,
-                    params.topMargin,
-                    params.rightMargin,
-                    params.bottomMargin + 150);
-            String type = intent.getStringExtra("type");
-            View.OnClickListener mOnClickListener;
-            Response response = null;
-            Request request = null;
-            boolean hasRequestResponseParams = type != null &&
-                    (type.equals(NearbyMessagingService.NotificationType.response_update.toString())
-                            || type.equals(NearbyMessagingService.NotificationType.offer_accepted.toString())
-                            || type.equals(NearbyMessagingService.NotificationType.offer_closed.toString()));
-            if (hasRequestResponseParams) {
-                String responseJson = intent.getStringExtra("response");
-                String requestJson = intent.getStringExtra("request");
-                try {
-                    response = new ObjectMapper().readValue(responseJson, Response.class);
-                    request = new ObjectMapper().readValue(requestJson, Request.class);
-                } catch (IOException e) {
-                    Log.e("JSON ERROR", "**" + e.getMessage());
-                }
-            }
-
-            if (type != null) {
-                switch (type) {
-                    case "response_update":
-                        if (response.getId() != null) {
-                            DialogFragment newFragment = null;
-                            newFragment = ViewOfferDialogFragment.newInstance(response, request);
-                            final DialogFragment frag = newFragment;
-                            mOnClickListener = new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    frag.show(getFragmentManager(), "dialog");
-                                }
-                            };
-                            snackbar.setAction("view", mOnClickListener);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            snackbar.getView().getRootView().setLayoutParams(params);
-            snackbar.show();
-        }
-    };
 
     public void displayUpdateAccountSnackbar() {
         Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",

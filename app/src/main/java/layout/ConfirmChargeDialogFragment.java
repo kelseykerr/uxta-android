@@ -18,6 +18,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,10 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     private Context context;
     private View view;
     private String transactionId;
+    private RelativeLayout confirmChargeScreen;
+    private RelativeLayout spinnerScreen;
+    private EditText price;
+
 
     public static ConfirmChargeDialogFragment newInstance(Double calculatedPrice, String description,
                                                           String transactionId) {
@@ -87,9 +92,13 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_confirm_charge_dialog, container, false);
+        confirmChargeScreen = (RelativeLayout) view.findViewById(R.id.confirm_charge_screen);
+        confirmChargeScreen.setVisibility(View.VISIBLE);
+        spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
+        spinnerScreen.setVisibility(View.GONE);
         TextView chargeDescription = (TextView) view.findViewById(R.id.charge_description);
         chargeDescription.setText(description);
-        EditText price = (EditText) view.findViewById(R.id.final_price);
+        price = (EditText) view.findViewById(R.id.final_price);
         BigDecimal formattedValue = AppUtils.formatCurrency(calculatedPrice);
 
         price.setText(formattedValue.toString());
@@ -104,11 +113,30 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 submitBtn.setEnabled(false);
-                confirmCharge(submitBtn);
+                if (validateForm()) {
+                    confirmChargeScreen.setVisibility(View.GONE);
+                    spinnerScreen.setVisibility(View.VISIBLE);
+                    String offer = price.getText().toString();
+                    confirmCharge(submitBtn, offer);
+                } else {
+                    submitBtn.setEnabled(true);
+                }
             }
         });
         this.view = view;
         return view;
+
+    }
+
+    private boolean validateForm() {
+        String p = price.getText().toString();
+        if (p.isEmpty()) {
+            price.setError("price cannot be empty");
+            return false;
+        } else {
+            return true;
+        }
+
 
     }
 
@@ -145,7 +173,7 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     }
 
 
-    private void confirmCharge(final Button submitBtn) {
+    private void confirmCharge(final Button submitBtn, final String offer) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
@@ -162,8 +190,9 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
                     conn.setRequestProperty("Content-Type", "application/json");
 
                     Transaction t = new Transaction();
-                    if (calculatedPrice != originalPrice) {
-                        t.setPriceOverride(calculatedPrice);
+                    double p = Double.parseDouble(offer);
+                    if (p != originalPrice) {
+                        t.setPriceOverride(p);
                     }
                     ObjectMapper mapper = new ObjectMapper();
                     String responseJson = mapper.writeValueAsString(t);

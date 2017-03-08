@@ -5,70 +5,89 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/cancel_transaction_screen"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/cancel_transaction_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="Cancel Transaction"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/cancel_transaction_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="start"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:paddingBottom="8dp"
+            android:paddingEnd="25dp"
+            android:paddingStart="8dp"
+            android:paddingTop="20dp"
+            android:src="@drawable/x_svg"
+            android:tint="@color/colorAccent" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/cancel_reason_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="20dp">
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cancel_transaction_text"
+            android:layout_marginTop="60dp"
+            app:errorEnabled="true"
+            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
-            <TextView
-                android:id="@+id/cancel_transaction_text"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/cancel_reason"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_horizontal"
-                android:text="Cancel Transaction"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/cancel_transaction_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_gravity="start"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:paddingBottom="8dp"
-                android:paddingEnd="25dp"
-                android:paddingStart="8dp"
-                android:paddingTop="20dp"
-                android:src="@drawable/x_svg"
-                android:tint="@color/colorAccent" />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/cancel_reason_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cancel_transaction_text"
-                android:layout_marginTop="60dp"
-                app:errorEnabled="true"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/cancel_reason"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:hint="Reason"
-                    android:inputType="text"
-                    android:maxLines="2"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
+                android:layout_marginStart="15dp"
+                android:hint="Reason"
+                android:inputType="text"
+                android:maxLines="2"
+                android:textColor="@color/colorAccent"
+                android:theme="@style/EditTextTheme" />
+        </android.support.design.widget.TextInputLayout>
 
 
-            <Button
-                android:id="@+id/submit_transaction_cancellation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="20dp"
-                android:background="@color/colorAccent"
-                android:text="cancel transaction"
-                android:textColor="#ffffff" />
-        </RelativeLayout>
+        <Button
+            android:id="@+id/submit_transaction_cancellation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorAccent"
+            android:text="cancel transaction"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/spinner_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/loading_spinner"
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="125dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.R;
 import superstartupteam.nearby.model.Transaction;
@@ -37,6 +40,9 @@ public class CancelTransactionDialogFragment extends DialogFragment {
     private View view;
     private String transactionId;
     private EditText cancelReason;
+    private RelativeLayout spinnerScreen;
+    private RelativeLayout cancelTransactionScreen;
+    private Button submitBtn;
 
     public static CancelTransactionDialogFragment newInstance(String transactionId) {
         CancelTransactionDialogFragment fragment = new CancelTransactionDialogFragment();
@@ -70,6 +76,8 @@ public class CancelTransactionDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cancel_transaction_dialog, container, false);
+        cancelTransactionScreen = (RelativeLayout) view.findViewById(R.id.cancel_transaction_screen);
+        cancelTransactionScreen.setVisibility(View.VISIBLE);
         cancelReason = (EditText) view.findViewById(R.id.cancel_reason);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_transaction_cancel);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -77,10 +85,19 @@ public class CancelTransactionDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-        Button submitBtn = (Button) view.findViewById(R.id.submit_transaction_cancellation);
+        submitBtn = (Button) view.findViewById(R.id.submit_transaction_cancellation);
+        spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
+        spinnerScreen.setVisibility(View.GONE);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                cancelTransaction();
+                submitBtn.setEnabled(false);
+                if (validateForm()) {
+                    cancelTransactionScreen.setVisibility(View.GONE);
+                    spinnerScreen.setVisibility(View.VISIBLE);
+                    cancelTransaction();
+                } else {
+                    submitBtn.setEnabled(true);
+                }
             }
         });
         this.view = view;
@@ -120,6 +137,16 @@ public class CancelTransactionDialogFragment extends DialogFragment {
         this.context = context;
     }
 
+    private boolean validateForm() {
+        final String cancelText = cancelReason.getText().toString();
+        if (cancelText == null || cancelText.length() < 3) {
+            cancelReason.setError("please explain why you are canceling the transaction");
+            return false;
+        } else {
+            cancelReason.setError(null);
+            return true;
+        }
+    }
 
     private void cancelTransaction() {
         new AsyncTask<Void, Void, Integer>() {
@@ -165,6 +192,14 @@ public class CancelTransactionDialogFragment extends DialogFragment {
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode != null && responseCode == 200) {
                     dismiss();
+                    ((MainActivity) getActivity()).goToHistory("successfully canceled transaction");
+                } else {
+                    cancelTransactionScreen.setVisibility(View.VISIBLE);
+                    spinnerScreen.setVisibility(View.GONE);
+                    submitBtn.setEnabled(true);
+                    Snackbar snackbar = Snackbar
+                            .make(view, "Could not cancel transaction, contact support for more details.", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
 
             }
