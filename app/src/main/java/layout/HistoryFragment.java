@@ -65,6 +65,8 @@ public class HistoryFragment extends Fragment {
     public static String snackbarMessage = null;
     private static ViewRequestFragment viewRequestFragment;
     private static ViewTransactionFragment viewTransactionFragment;
+    public static ExchangeCodeDialogFragment exchangeCodeDialogFragment;
+    public static ConfirmChargeDialogFragment confirmChargeDialogFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -187,6 +189,18 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+    public static void dismissExchangeCodeDialogFragment() {
+        if (exchangeCodeDialogFragment != null) {
+            exchangeCodeDialogFragment.dismiss();
+        }
+    }
+
+    public static void dismissConfirmChargeDialog() {
+        if (confirmChargeDialogFragment != null) {
+            confirmChargeDialogFragment.dismiss();
+        }
+    }
+
     public void showEditRequestDialog(History h) {
         DialogFragment newFragment = RequestDialogFragment
                 .newInstance(h.getRequest());
@@ -195,10 +209,10 @@ public class HistoryFragment extends Fragment {
 
     public void showExchangeCodeDialog(Transaction t, Boolean buyer) {
         String heading = buyer ? "Confirm Return" : "Confirm Exchange";
-        ExchangeCodeDialogFragment fragment = ExchangeCodeDialogFragment
+        exchangeCodeDialogFragment = ExchangeCodeDialogFragment
                 .newInstance(t.getId(), heading, !buyer);
-        fragment.setTargetFragment(this, 0);
-        fragment.show(getFragmentManager(), "dialog");
+        exchangeCodeDialogFragment.setTargetFragment(this, 0);
+        exchangeCodeDialogFragment.show(getFragmentManager(), "dialog");
     }
 
     public void showScanner(String transactionId, Boolean buyer) {
@@ -220,10 +234,13 @@ public class HistoryFragment extends Fragment {
         getHistory(this);
     }
 
+
+
     public void showConfirmChargeDialog(Double calculatedPrice, String description, String transactionId) {
-        ConfirmChargeDialogFragment frag = ConfirmChargeDialogFragment
+        dismissConfirmChargeDialog();
+        confirmChargeDialogFragment = ConfirmChargeDialogFragment
                 .newInstance(calculatedPrice, description, transactionId);
-        frag.show(getFragmentManager(), "dialog");
+        confirmChargeDialogFragment.show(getFragmentManager(), "dialog");
     }
 
     public void showConfirmExchangeOverrideDialog(String exchangeTime, String description,

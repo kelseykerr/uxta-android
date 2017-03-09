@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private int selectHistoryFragment(int menuItemId) {
-        toolbarLine2.setVisibility(View.GONE);
+        //toolbarLine2.setVisibility(View.GONE);
         int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
         int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
         HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
@@ -779,7 +779,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (currentMenuItem == R.id.bottomBarHistoryItem) {
-                selectHistoryFragment(1);
+                selectHistoryFragment(currentMenuItem);
             }
             String message = intent.getStringExtra("message");
             final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
@@ -826,6 +826,8 @@ public class MainActivity extends AppCompatActivity
                             snackbar.setAction("view", mOnClickListener);
                         }
                         break;
+                    case "exchange_confirmed":
+                        HistoryFragment.dismissExchangeCodeDialogFragment();
                     default:
                         break;
                 }

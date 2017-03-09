@@ -64,7 +64,9 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         String htmlString = "<font color='#767474'>" + response.getSeller().getFirstName() +
                 " made an offer for $" + price + "</font>";
         rvh.offerText.setText(Html.fromHtml(htmlString));
-        if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
+        if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
+            rvh.responseStatus.setText("CLOSED");
+        } else if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
             rvh.responseStatus.setText("OPEN");
         } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
             rvh.responseStatus.setText("PENDING SELLER ACCEPTANCE");

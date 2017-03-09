@@ -124,7 +124,9 @@ public class ViewRequestFragment extends DialogFragment {
         editFab = (FloatingActionButton) view.findViewById(R.id.edit_fab);
         editFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                historyFragment.showEditRequestDialog(history);
+                if (!request.getStatus().toLowerCase().equals("closed")) {
+                    historyFragment.showEditRequestDialog(history);
+                }
             }
         });
         this.view = view;
