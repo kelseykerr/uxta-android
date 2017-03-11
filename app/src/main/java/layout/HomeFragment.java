@@ -198,7 +198,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     }*/
                     title = "Please link your bank account to your profile";
                     Snackbar snack = Snackbar.make(view.getRootView(), title,
-                            Snackbar.LENGTH_LONG);
+                            Constants.LONG_SNACK);
                     final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
                             snack.getView().getRootView().getLayoutParams();
                     params.setMargins(params.leftMargin,
@@ -233,7 +233,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     private void showNoConnectionSnackbar() {
         Snackbar snackbar = Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("open settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -569,7 +569,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     public void displayUpdateAccountSnackbar() {
         Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("update account", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -591,7 +591,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     public void displayNoNewRequestSnackbar() {
         Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("update account", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

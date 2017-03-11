@@ -198,7 +198,7 @@ public class CancelTransactionDialogFragment extends DialogFragment {
                     spinnerScreen.setVisibility(View.GONE);
                     submitBtn.setEnabled(true);
                     Snackbar snackbar = Snackbar
-                            .make(view, "Could not cancel transaction, contact support for more details.", Snackbar.LENGTH_LONG);
+                            .make(view, "Could not cancel transaction, contact support for more details.", Constants.LONG_SNACK);
                     snackbar.show();
                 }
 

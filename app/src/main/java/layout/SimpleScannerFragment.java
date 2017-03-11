@@ -3,12 +3,10 @@ package layout;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.zxing.Result;
 
@@ -58,6 +56,7 @@ public class SimpleScannerFragment extends Fragment implements ZXingScannerView.
     @Override
     public void onPause() {
         super.onPause();
+        mScannerView.stopCameraPreview();
         mScannerView.stopCamera();
     }
 

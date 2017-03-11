@@ -277,7 +277,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                     scrollView.setVisibility(View.VISIBLE);
                     spinnerScreen.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar
-                            .make(view, "You already created an offer for this request.", Snackbar.LENGTH_LONG)
+                            .make(view, "You already created an offer for this request.", Constants.LONG_SNACK)
                             .setAction("SHOW OFFERS", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {

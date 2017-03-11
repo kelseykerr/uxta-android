@@ -149,7 +149,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                     showNoConnectionSnackbar();
                 } else if (!AppUtils.canAddPayments(user)) {
                     Snackbar snackbar = Snackbar
-                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Snackbar.LENGTH_LONG);
+                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Constants.LONG_SNACK);
                     final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
                             snackbar.getView().getRootView().getLayoutParams();
 
@@ -246,7 +246,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         }
         if (snackbarMessage != null) {
             Snackbar snackbar = Snackbar
-                    .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
+                    .make(view, snackbarMessage, Constants.LONG_SNACK);
             snackbar.show();
         }
         missingUserInfoText = (TextView) view.findViewById(R.id.missing_user_info_text);
@@ -333,7 +333,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
 
     private void showNoConnectionSnackbar() {
         Snackbar snackbar = Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("open settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

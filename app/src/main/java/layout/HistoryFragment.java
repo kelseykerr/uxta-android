@@ -100,10 +100,6 @@ public class HistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         requestHistoryList = (RecyclerView) view.findViewById(R.id.request_history_list);
         historyCardAdapter = new HistoryCardAdapter(recentHistory, this);
-        //historyCardAdapter = new HistoryCardAdapter(context, parentObjs, this);
-        //historyCardAdapter.setCustomParentAnimationViewId(R.id.parent_list_item_expand_arrow);
-        //historyCardAdapter.setParentClickableViewAnimationDuration(0);
-        //historyCardAdapter.setParentAndIconExpandOnClick(false);
         requestHistoryList.setAdapter(historyCardAdapter);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -114,7 +110,7 @@ public class HistoryFragment extends Fragment {
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
         if (snackbarMessage != null) {
             Snackbar snackbar = Snackbar
-                    .make(view, snackbarMessage, Snackbar.LENGTH_LONG);
+                    .make(view, snackbarMessage, Constants.LONG_SNACK);
             snackbar.show();
         }
         return view;
@@ -228,7 +224,7 @@ public class HistoryFragment extends Fragment {
         if (requestCode == 2 && data != null && data.getExtras() != null) {
             String message = (String) data.getExtras().get("MESSAGE");
             Snackbar snackbar = Snackbar
-                    .make(view, message, Snackbar.LENGTH_LONG);
+                    .make(view, message, Constants.LONG_SNACK);
             snackbar.show();
         }
         getHistory(this);
@@ -278,7 +274,7 @@ public class HistoryFragment extends Fragment {
 
     private void showNoNetworkSnack() {
         Snackbar.make(view.getRootView(), R.string.noNetworkConnection,
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("open settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -395,7 +391,7 @@ public class HistoryFragment extends Fragment {
                     ((MainActivity) getActivity()).goToHistory("successfully updated offer");
                 } else {
                     Snackbar snackbar = Snackbar
-                            .make(view, "could not update offer", Snackbar.LENGTH_LONG);
+                            .make(view, "could not update offer", Constants.LONG_SNACK);
                     snackbar.show();
                     dialog.dismiss();
                 }

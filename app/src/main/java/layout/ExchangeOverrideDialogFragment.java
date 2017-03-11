@@ -237,13 +237,13 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
 
     private void nullExchangeTimeSnack() {
         Snackbar snackbar = Snackbar
-                .make(view, "You must enter an exchange time", Snackbar.LENGTH_LONG);
+                .make(view, "You must enter an exchange time", Constants.LONG_SNACK);
         snackbar.show();
     }
 
     private void badExchangeTimeSnack(String text) {
         Snackbar snackbar = Snackbar
-                .make(view, "Could not extract exchange date from [" + text + "]", Snackbar.LENGTH_LONG);
+                .make(view, "Could not extract exchange date from [" + text + "]", Constants.LONG_SNACK);
         snackbar.show();
     }
 
@@ -284,7 +284,7 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
                     dismiss();
                 } else {
                     Snackbar snackbar = Snackbar
-                            .make(view, "could not submit exchange override", Snackbar.LENGTH_LONG);
+                            .make(view, "could not submit exchange override", Constants.LONG_SNACK);
                     snackbar.show();
                 }
                 HistoryFragment.dismissViewTransactionFragment();

@@ -344,7 +344,7 @@ public class RequestDialogFragment extends DialogFragment
 
     private void showNoNetworkSnack() {
         Snackbar.make(view, R.string.noNetworkConnection,
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("open settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -355,7 +355,7 @@ public class RequestDialogFragment extends DialogFragment
 
     private void showErrorSnack() {
         Snackbar.make(view, "Unable to create request at this time",
-                Snackbar.LENGTH_LONG).show();
+                Constants.LONG_SNACK).show();
     }
 
     private void updateRequest() {

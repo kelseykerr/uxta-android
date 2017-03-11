@@ -307,7 +307,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                     dismiss();
                 } else {
                     Snackbar snackbar = Snackbar
-                            .make(view, "could not update offer", Snackbar.LENGTH_LONG);
+                            .make(view, "could not update offer", Constants.LONG_SNACK);
                     snackbar.show();
                 }
             }

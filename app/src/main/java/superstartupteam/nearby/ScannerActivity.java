@@ -21,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import layout.EnterCodeFragment;
-import layout.HistoryFragment;
 import layout.SimpleScannerFragment;
 import superstartupteam.nearby.model.User;
 
@@ -160,7 +159,7 @@ public class ScannerActivity extends AppCompatActivity implements
                     finish();
                 } else {
                     Snackbar snackbar = Snackbar
-                            .make(findViewById(R.id.scanner_layout), "Code did not match or is expired.", Snackbar.LENGTH_LONG);
+                            .make(findViewById(R.id.scanner_layout), "Code did not match or is expired.", Constants.LONG_SNACK);
                     snackbar.show();
                 }
             }

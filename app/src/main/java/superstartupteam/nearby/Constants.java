@@ -35,4 +35,6 @@ public class Constants {
     public static final String STRIPE_TEST_KEY = "pk_test_XXhtxu1S44u1en0gH6ozoB7t";
 
     public static final Double MINIMUM_OFFER_PRICE = 0.50;
+
+    public static final int LONG_SNACK = 6000;
 }

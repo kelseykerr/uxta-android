@@ -65,8 +65,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
         final History h = recentHistory.get(i);
         final Request r = h.getRequest();
-        ViewGroup header = (ViewGroup) mInflater.inflate(R.layout.header_footer, requestViewHolder.responseList, false);
-        requestViewHolder.responseList.addHeaderView(header, null, false);
+        requestViewHolder.hideSwipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeItem(requestViewHolder.getAdapterPosition());
+            }
+        });
+        requestViewHolder.exchangeSwipe.setVisibility(View.GONE);
         if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed")) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
@@ -158,15 +163,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     }
 
     private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
-        requestViewHolder.showExchangeIcon = false;
-        requestViewHolder.showViewRequestIcon = false;
-        if (r.getUser().getPhone() != null) {
-            requestViewHolder.showMessageUserIcon = true;
-        }
         requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
-        requestViewHolder.showEditIcon = false;
+        requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         final Response resp = h.getResponses().get(0);
         String buyerName = r.getUser().getFirstName() != null ?
                 r.getUser().getFirstName() : r.getUser().getFullName();
@@ -186,13 +185,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vDescription.setText("");
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toUpperCase());
-        setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
-        if (resp.getResponseStatus().equals(Response.Status.CLOSED)) {
-            requestViewHolder.showEditIcon = false;
+        if (resp.getResponseStatus().toString().toLowerCase().equals("closed")) {
+            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
         } else {
-            requestViewHolder.showEditIcon = true;
+            requestViewHolder.hideSwipe.setVisibility(View.GONE);
         }
-        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+        setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
+        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
@@ -200,15 +199,23 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             }
         });
+        if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
+            requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            });
+        } else {
+            requestViewHolder.moreSwipe.setVisibility(View.GONE);
+        }
+
     }
 
     private void setUpRequestCard(final HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
-        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
-        requestViewHolder.showExchangeIcon = false;
-        requestViewHolder.showMessageUserIcon = false;
-        requestViewHolder.showViewRequestIcon = true;
-        requestViewHolder.showEditIcon = false;
+        requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         String htmlString = "Requested a " +
                 r.getItemName();
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -234,9 +241,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
              * closed requests
              */
         if (!r.getStatus().equals("OPEN")) {
-            requestViewHolder.showViewRequestIcon = false;
+            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
         } else {
-            requestViewHolder.showViewRequestIcon = true;
+            requestViewHolder.hideSwipe.setVisibility(View.GONE);
             int count = 0;
             for (Response resp: h.getResponses()) {
                 if (resp.getResponseStatus().toString().toLowerCase().equals("pending")) {
@@ -248,21 +255,27 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vOpenOffers.setText(Html.fromHtml(ooString));
             }
         }
-        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 historyFragment.showRequestDialog(h);
             }
         });
+        requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
+        requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showRequestDialog(h);
+            }
+        });
+
     }
 
 
     private void setUpTransactionCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
         boolean isBuyer = user.getId().equals(r.getUser().getId());
         final boolean isSeller = !isBuyer;
-        requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
-        requestViewHolder.showEditIcon = false;
-        requestViewHolder.showViewRequestIcon = false;
+        requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
         requestViewHolder.vStatus.setVisibility(View.GONE);
         requestViewHolder.vCategoryName.setVisibility(View.VISIBLE);
@@ -279,6 +292,31 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         Boolean complete = r.getRental() ? transaction.getExchanged() && transaction.getReturned() :
                 transaction.getExchanged();
         String beginning;
+        if (complete) {
+            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.exchangeSwipe.setVisibility(View.GONE);
+        } else {
+            requestViewHolder.exchangeSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.exchangeSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (isSeller) {
+                        if (!transaction.getExchanged()) {
+                            historyFragment.showExchangeCodeDialog(transaction, false);
+                        } else {
+                            historyFragment.showScanner(transaction.getId(), false);
+                        }
+                    } else {
+                        if (!transaction.getExchanged()) {
+                            historyFragment.showScanner(transaction.getId(), true);
+                        } else {
+                            historyFragment.showExchangeCodeDialog(transaction, true);
+                        }
+                    }
+                }
+            });
+            requestViewHolder.hideSwipe.setVisibility(View.GONE);
+        }
         if (complete && r.getRental()) {
             beginning = isBuyer ? "Borrowed a " : "Loaned a ";
             requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
@@ -301,13 +339,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.setUpProfileImage(isSeller ? r.getUser() : resp.getSeller());
         requestViewHolder.vItemName.setText(topDescription);
         if (!transaction.getExchanged()) {
-            requestViewHolder.showExchangeIcon = true;
-            if (isSeller && r.getUser().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
-            if (isBuyer && resp.getSeller().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
             String formattedDate = resp.getExchangeTime() != null ? formatter.format(resp.getExchangeTime()) : "";
             String exchangeTime = "<b>exchange time:</b> " + formattedDate;
             if (resp.getExchangeTime() != null) {
@@ -326,9 +357,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vTransactionStatus.setText("Awaiting initial exchange");
             requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride exchangeOverride = transaction.getExchangeOverride();
-            requestViewHolder.showCancelTransactionIcon = true;
             if (exchangeOverride != null && !exchangeOverride.buyerAccepted && !exchangeOverride.declined) {
-                requestViewHolder.showExchangeIcon = false;
                 requestViewHolder.vTransactionStatus.setText("Pending exchange override approval");
                 if (isBuyer) {
                     String description = resp.getSeller().getFirstName() +
@@ -340,13 +369,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             }
         } else if (!transaction.getReturned() && r.getRental()) {
-            requestViewHolder.showExchangeIcon = true;
-            if (isSeller && r.getUser().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
-            if (isBuyer && resp.getSeller().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
             String formatedDate = resp.getReturnTime() != null ? formatter.format(resp.getReturnTime()) : "";
             String returnTime = "<b>return time:</b> " + formatedDate;
             if (resp.getReturnTime() != null) {
@@ -366,7 +388,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             Transaction.ExchangeOverride returnOverride = transaction.getReturnOverride();
             if (returnOverride != null && !returnOverride.sellerAccepted && !returnOverride.declined) {
-                requestViewHolder.showExchangeIcon = false;
                 requestViewHolder.vTransactionStatus.setText("Pending return override approval");
                 if (isSeller) {
                     String description = r.getUser().getFirstName() +
@@ -380,12 +401,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             }
         } else if (r.getStatus().equals("TRANSACTION_PENDING")) {
-            if (isSeller && r.getUser().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
-            if (isBuyer && resp.getSeller().getPhone() != null) {
-                requestViewHolder.showMessageUserIcon = true;
-            }
             BigDecimal formattedValue = AppUtils.formatCurrency(transaction.getCalculatedPrice());
             String calculatedPrice = "<b>calculated price:</b> " + formattedValue;
             requestViewHolder.vCategoryName.setText(Html.fromHtml(calculatedPrice));
@@ -393,9 +408,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             if (isBuyer) {
                 requestViewHolder.vTransactionStatus.setText("Processing Payment");
                 requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
-                requestViewHolder.showExchangeIcon = false;
             } else {
-                requestViewHolder.showExchangeIcon = false;
                 final String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
                         r.getItemName() + " to " + r.getUser().getFirstName();
                 historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
@@ -403,12 +416,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vTransactionStatus.setText("CONFIRM CHARGE!");
                 requestViewHolder.vTransactionStatus.setTextColor(ContextCompat.getColor(context, R.color.redPink));
                 requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
-                requestViewHolder.showEditIcon = false;
-                requestViewHolder.showConfirmChargeIcon = true;
             }
         } else {
-            requestViewHolder.mCardBackground.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
-            requestViewHolder.showExchangeIcon = false;
+            requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
             requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
             Date completedDate;
             if (r.getRental()) {
@@ -434,7 +444,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
         }
         final Response response = resp;
-        requestViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showTransactionDialog(h, response);
+            }
+        });
+        requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 historyFragment.showTransactionDialog(h, response);
@@ -442,80 +458,14 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         });
     }
 
-    class MenuClickListener implements PopupMenu.OnMenuItemClickListener {
-        private History history;
-        private Transaction transaction;
-        public MenuClickListener(History h) {
-            history = h;
-            transaction = h.getTransaction();
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            boolean isSeller = !user.getId().equals(history.getRequest().getUser().getId());
-            switch (menuItem.getItemId()) {
-                case R.id.cancel_transaction_button:
-                    historyFragment.showCancelTransactionDialog(transaction.getId());
-                    return true;
-                case R.id.view_request:
-                    historyFragment.showEditRequestDialog(history);
-                    return true;
-                case R.id.edit_button:
-                    if (isSeller) {
-                        historyFragment.showResponseDialog(history.getResponses().get(0));
-                    } else {
-                        historyFragment.showEditRequestDialog(history);
-                    }
-                    return true;
-                case R.id.exchange_icon:
-                    if (isSeller) {
-                        if (!transaction.getExchanged()) {
-                            historyFragment.showExchangeCodeDialog(history.getTransaction(), false);
-                        } else {
-                            historyFragment.showScanner(history.getTransaction().getId(), false);
-                        }
-                    } else {
-                        if (!transaction.getExchanged()) {
-                            historyFragment.showScanner(history.getTransaction().getId(), true);
-                        } else {
-                            historyFragment.showExchangeCodeDialog(history.getTransaction(), true);
-                        }
-                    }
-                    return true;
-                case R.id.confirm_charge:
-                    Request r = history.getRequest();
-                    String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
-                            r.getItemName() + " to " + r.getUser().getFirstName();
-                    historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
-                            description, transaction.getId());
-                case R.id.message_user:
-                    Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                    smsIntent.setType("vnd.android-dir/mms-sms");
-                    String phone;
-                    if (isSeller) {
-                        phone = history.getRequest().getUser().getPhone().replace("-", "");
-                    } else {
-                        Response resp = null;
-                        final Transaction transaction = history.getTransaction();
-                        for (Response res : history.getResponses()) {
-                            if (res.getId().equals(transaction.getResponseId())) {
-                                resp = res;
-                                break;
-                            }
-                        }
-                        phone = resp.getSeller().getPhone().replace("-", "");
-                    }
-                    smsIntent.putExtra("address", phone);
-                    smsIntent.putExtra("sms_body","");
-                    context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
-                default:
-            }
-            return false;
-        }
+    public void removeItem(int position) {
+        recentHistory.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, recentHistory.size());
     }
 
 
-    public static class HistoryCardViewHolder extends ParentViewHolder {
+    public static class HistoryCardViewHolder extends RecyclerView.ViewHolder {
         private TextView vItemName;
         private TextView vCategoryName;
         private TextView vPostedDate;
@@ -523,21 +473,14 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private Context context;
         private TextView vStatus;
         private TextView vOpenOffers;
-        private RelativeLayout mCardBackground;
-        private CardView historyCard;
-        private ImageView menuBtn;
-        private boolean showExchangeIcon = false;
-        private boolean showCancelTransactionIcon = false;
-        private boolean showEditIcon = true;
-        private boolean showConfirmChargeIcon = false;
-        private boolean dropdownExpanded = false;
-        private boolean showMessageUserIcon = false;
-        private boolean showViewRequestIcon = false;
-        private ListView responseList;
-        private FrameLayout cardView;
+        private RelativeLayout historyCard;
+        private CardView cardView;
         private LinearLayout responseSeparator;
         private TextView vTransactionStatus;
         private ImageButton profileImage;
+        private TextView moreSwipe;
+        private TextView hideSwipe;
+        private TextView exchangeSwipe;
 
         public HistoryCardViewHolder(Context context, View v) {
             super(v);
@@ -545,18 +488,18 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             vCategoryName = (TextView) v.findViewById(R.id.category_name);
             vPostedDate = (TextView) v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            cardView = (FrameLayout) itemView.findViewById(R.id.my_history_card_view);
+            cardView = (CardView) itemView.findViewById(R.id.my_history_card_view);
+            cardView.setMaxCardElevation(7);
             vStatus = (TextView) v.findViewById(R.id.history_card_status);
             vOpenOffers = (TextView) v.findViewById(R.id.open_offers);
             this.context = context;
-            mCardBackground = (RelativeLayout) itemView.findViewById(R.id.card_layout);
-            historyCard = (CardView) v.findViewById(R.id.my_history_card_view);
-            historyCard.setMaxCardElevation(7);
-            //menuBtn = (ImageView) v.findViewById(R.id.card_menu);
-            responseList = (ListView) v.findViewById(R.id.response_list);
+            historyCard = (RelativeLayout) v.findViewById(R.id.history_card);
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
             profileImage = (ImageButton) v.findViewById(R.id.profileImage);
+            moreSwipe =  (TextView) v.findViewById(R.id.more_swipe);
+            hideSwipe = (TextView) v.findViewById(R.id.hide_swipe);
+            exchangeSwipe = (TextView) v.findViewById(R.id.exchange_swipe);
         }
 
         private void setUpProfileImage(final User user) {

@@ -4,14 +4,21 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import layout.AccountFragment;
@@ -27,6 +34,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public static User user;
     private View view;
     private HomeFragment homeFragment;
+    private static final String TAG = "RequestAdapter";
 
     public RequestAdapter(List<Request> requests, HomeFragment homeFragment) {
         this.requests = requests;
@@ -41,7 +49,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(final RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
-
+        requestViewHolder.setUpProfileImage(r.getUser());
         String htmlString = r.getUser().getFirstName() + " would like to " +
                 (r.getRental() ? " borrow a " : " buy a ") + "<b>" +
                 r.getItemName() + "</b>";
@@ -59,52 +67,58 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         } else {
             requestViewHolder.vDescription.setText(r.getDescription());
         }
-        requestViewHolder.vMakeOfferButton.setTag(i);
-        requestViewHolder.vMakeOfferButton.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.card.setTag(i);
+        requestViewHolder.card.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                boolean goodMerchantStatus = user.getCanRespond();
-                if (!AppUtils.canAddPayments(user)) {
-                    Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
-                            Snackbar.LENGTH_LONG);
-                    snack.setAction("update account", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                            FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
-                            AccountFragment.updateAccountDialog.show(fm, "dialog");
-                        }
-                    });
-                    snack.show();
-                } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-                    int position = (Integer) v.getTag();
-                    Request r = requests.get(position);
-                    homeFragment.showDialog(r.getId());
-                } else {
-                    String title;
-                    boolean showAction = false;
-                    /*if (user.getMerchantStatus() != null &&
-                            user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
-                        title = "Your merchant account is pending, please try again later";
-                    }*/
-                    showAction = true;
-                    title = "Please link your bank account to your profile";
-                    Snackbar snack = Snackbar.make(view.getRootView(), title,
-                            Snackbar.LENGTH_LONG);
-                    if (showAction) {
-                        snack.setAction("update account", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                                FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
-                                AccountFragment.paymentDialogFragment.show(fm, "dialog");
-                            }
-                        });
-                    }
-                    snack.show();
-                }
-
+                makeOffer(v, requestViewHolder);
             }
         });
+        requestViewHolder.offerSwipe.setTag(i);
+        requestViewHolder.offerSwipe.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                makeOffer(v, requestViewHolder);
+            }
+        });
+    }
+
+    public void makeOffer(View v, final RequestViewHolder requestViewHolder) {
+        boolean goodMerchantStatus = user.getCanRespond();
+        if (!AppUtils.canAddPayments(user)) {
+            Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
+                    Constants.LONG_SNACK);
+            snack.setAction("update account", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                    FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
+                    AccountFragment.updateAccountDialog.show(fm, "dialog");
+                }
+            });
+            snack.show();
+        } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
+            int position = (Integer) v.getTag();
+            Request r = requests.get(position);
+            homeFragment.showDialog(r.getId());
+        } else {
+            String title;
+            boolean showAction = false;
+            showAction = true;
+            title = "Please link your bank account to your profile";
+            Snackbar snack = Snackbar.make(view.getRootView(), title,
+                    Constants.LONG_SNACK);
+            if (showAction) {
+                snack.setAction("update account", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+                        FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
+                        AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                    }
+                });
+            }
+            snack.show();
+        }
+
     }
 
 
@@ -126,12 +140,14 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     }
 
     public static class RequestViewHolder extends RecyclerView.ViewHolder {
-        protected TextView vItemName;
-        protected TextView vCategoryName;
-        protected TextView vPostedDate;
-        protected TextView vDescription;
+        private TextView vItemName;
+        private TextView vCategoryName;
+        private TextView vPostedDate;
+        private TextView vDescription;
         protected Context context;
-        protected ImageButton vMakeOfferButton;
+        private ImageButton profileImage;
+        private FrameLayout card;
+        private FrameLayout offerSwipe;
 
         public RequestViewHolder(Context context, View v) {
             super(v);
@@ -139,8 +155,25 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView) v.findViewById(R.id.category_name);
             vPostedDate = (TextView) v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            vMakeOfferButton = (ImageButton) v.findViewById(R.id.make_offer_button);
+            profileImage = (ImageButton) v.findViewById(R.id.profile_image);
+            card = (FrameLayout) v.findViewById(R.id.request_card);
+            offerSwipe = (FrameLayout) v.findViewById(R.id.offer_layout);
             this.context = context;
+        }
+
+        private void setUpProfileImage(final User user) {
+            final boolean isGoogle = user.getAuthMethod() != null &&
+                    user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
+            try {
+                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+                Glide.with(context)
+                        .load(imageURL)
+                        .asBitmap()
+                        .transform(new CropCircleTransform(context))
+                        .into(profileImage);
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "malformed url: " + e.getMessage());
+            }
         }
     }
 }

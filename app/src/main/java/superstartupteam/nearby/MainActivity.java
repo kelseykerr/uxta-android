@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity
 
     public void showNoLocationServicesSnack(View view) {
         Snackbar snack = Snackbar.make(view.getRootView(), R.string.noLocationServices,
-                Snackbar.LENGTH_LONG)
+                Constants.LONG_SNACK)
                 .setAction("open settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -783,7 +783,7 @@ public class MainActivity extends AppCompatActivity
             }
             String message = intent.getStringExtra("message");
             final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-            Snackbar snackbar = Snackbar.make(viewGroup.getRootView(), message, Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(viewGroup.getRootView(), message, Constants.LONG_SNACK);
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
                     snackbar.getView().getRootView().getLayoutParams();
 

@@ -10,31 +10,33 @@
     android:paddingBottom="15dp"
     card_view:cardElevation="0dp">
 
-
-   <!-- <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         app:dragEdge="right"
         app:mode="normal">
 
         <FrameLayout
-            android:id="@+id/delete_layout"
-            android:layout_width="90dp"
+            android:id="@+id/offer_layout"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
-            android:background="#ffcc0000">
+            android:background="@color/colorPrimary">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@android:color/holo_red_dark"
+                android:background="@color/colorPrimary"
+                android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Delete"
+                android:textAlignment="center"
+                android:text="offer"
                 android:textColor="@android:color/white" />
-        </FrameLayout> -->
+        </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/request_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white">
@@ -45,63 +47,87 @@
                 android:paddingBottom="6dp"
                 android:background="@drawable/request_card_background">
 
-                <ImageButton
-                    android:id="@+id/make_offer_button"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/request_info_layout"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:padding="10dp"
-                    android:tint="@color/colorPrimary"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_rate_review_black_24dp" />
+                    android:layout_marginEnd="-1dp"
+                    android:orientation="horizontal"
+                    android:weightSum="30">
 
-                <TextView
-                    android:id="@+id/item_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="30dp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center_vertical"
-                    android:textSize="18sp" />
+                    <ImageButton
+                        android:id="@+id/profile_image"
+                        android:layout_weight="6"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_height="wrap_content"
+                        android:maxHeight="300dp"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:background="#00000000" />
 
-                <TextView
-                    android:id="@+id/category_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/item_name"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:gravity="center_vertical"
-                    android:textSize="14sp" />
+                    <RelativeLayout
+                        android:id="@+id/info_layout"
+                        android:layout_weight="24"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/posted_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/category_name"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:gravity="center_vertical"
-                    android:textSize="14sp" />
+                        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:id="@+id/title_bar"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="-1dp"
+                            android:orientation="horizontal"
+                            android:weightSum="20">
 
-                <TextView
-                    android:id="@+id/description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/posted_date"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:textSize="14sp" />
+                            <TextView
+                                android:id="@+id/item_name"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="6dp"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="19"
+                                android:text=""
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
+                        <TextView
+                            android:id="@+id/category_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/title_bar"
+                            android:layout_marginBottom="6dp"
+                            android:layout_marginStart="0dp"
+                            android:text=""
+                            android:textSize="12sp" />
 
+                        <TextView
+                            android:id="@+id/description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/category_name"
+                            android:layout_marginStart="0dp"
+                            android:text=""
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/posted_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:layout_below="@id/description"
+                            android:gravity="center_horizontal"
+                            android:text=""
+                            android:textSize="12sp" />
+
+                    </RelativeLayout>
+                </LinearLayout>
             </RelativeLayout>
-
         </FrameLayout>
-    <!--</com.chauthai.swipereveallayout.SwipeRevealLayout> -->
-
+    </com.chauthai.swipereveallayout.SwipeRevealLayout>
 </android.support.v7.widget.CardView>
