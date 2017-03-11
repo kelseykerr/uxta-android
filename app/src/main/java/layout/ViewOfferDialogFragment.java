@@ -240,7 +240,11 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 HistoryFragment.dismissViewRequestFragment();
                 if (responseCode == 200) {
                     dismiss();
-                    ((MainActivity) getActivity()).goToHistory("successfully declined offer");
+                    if (user.getId().equals(request.getUser().getId())) {
+                        ((MainActivity) getActivity()).goToHistory("successfully declined offer");
+                    } else {
+                        ((MainActivity) getActivity()).goToHistory("successfully withdrew offer");
+                    }
                 }
             }
         }.execute();

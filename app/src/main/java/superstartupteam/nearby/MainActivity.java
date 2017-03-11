@@ -806,7 +806,7 @@ public class MainActivity extends AppCompatActivity
                     response = new ObjectMapper().readValue(responseJson, Response.class);
                     request = new ObjectMapper().readValue(requestJson, Request.class);
                 } catch (IOException e) {
-                    Log.e("JSON ERROR", "**" + e.getMessage());
+                    Log.e(TAG, "JSON error when getting request/response objects from notification: " + e.getMessage());
                 }
             }
 

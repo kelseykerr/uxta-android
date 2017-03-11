@@ -107,9 +107,9 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             rvh.returnLocation.setVisibility(View.GONE);
         }
         if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
-            rvh.editBtn.setEnabled(false);
-            rvh.rejectBtn.setEnabled(false);
-            rvh.acceptBtn.setEnabled(false);
+            rvh.editBtn.setVisibility(View.GONE);
+            rvh.rejectBtn.setVisibility(View.GONE);
+            rvh.acceptBtn.setVisibility(View.GONE);
         } else {
             rvh.editBtn.setEnabled(true);
             rvh.editBtn.setOnClickListener(new View.OnClickListener() {

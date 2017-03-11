@@ -116,8 +116,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
-        return fragment;
+        return new HomeFragment();
     }
 
     @Override
@@ -162,7 +161,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResultsList = (TextView) v.findViewById(R.id.no_results_list);
         noResultsList.setVisibility(View.GONE);
-        //getRequests(currentRadius);
         return v;
     }
 
@@ -366,7 +364,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         options.strokeWidth(10);
 
         double radius = options.getRadius();
-        //radius = 300 * 1609.344; /*for Ken's testing */
         double scale = radius / 500;
         int zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
 

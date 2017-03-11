@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import superstartupteam.nearby.model.History;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
 import superstartupteam.nearby.model.User;
+
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 /**
  * Created by kerrk on 2/25/17.
@@ -51,6 +54,7 @@ public class ViewRequestFragment extends DialogFragment {
     private RequestResponseCardAdapter requestResponseCardAdapter;
     private FloatingActionButton editFab;
     private static HistoryFragment historyFragment;
+    private static final String TAG = "ViewRequestFragment";
 
     public ViewRequestFragment() {
     }
@@ -91,8 +95,6 @@ public class ViewRequestFragment extends DialogFragment {
         requestDescription = (TextView) view.findViewById(R.id.request_description_text);
         if (request.getDescription() != null && request.getDescription().length() > 0) {
             requestDescription.setText(request.getDescription());
-        } else {
-            requestText.setVisibility(View.GONE);
         }
         requestStatus = (TextView) view.findViewById(R.id.view_request_status);
         requestStatus.setText(request.getStatus().toUpperCase());
