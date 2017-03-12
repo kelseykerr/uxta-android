@@ -427,6 +427,8 @@ public class RequestDialogFragment extends DialogFragment
                 ? currLocationMarker.getPosition().longitude : PrefUtils.latLng.longitude;
         // AsyncTask<Params, Progress, Result>
         new AsyncTask<Void, Void, Integer>() {
+            String errorMessage;
+
             @Override
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
@@ -452,6 +454,7 @@ public class RequestDialogFragment extends DialogFragment
                     Log.i("POST /api/requests", "Response Code : " + responseCode);
                     if (responseCode != 200) {
                         String output = AppUtils.getResponseContent(conn);
+                        errorMessage = output;
                         throw new IOException(output);
                     }
                 } catch (IOException e) {
@@ -466,7 +469,9 @@ public class RequestDialogFragment extends DialogFragment
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully created request");
                 } else {
-                    showErrorSnack();
+                    dismiss();
+                    ((MainActivity) getActivity()).goToHistory(errorMessage != null ?
+                            errorMessage : "Could not create request at this time");
                 }
             }
         }.execute();

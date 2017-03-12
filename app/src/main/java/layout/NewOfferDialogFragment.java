@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
 import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
@@ -234,6 +235,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private void createOffer(View v) {
         // AsyncTask<Params, Progress, Result>
         new AsyncTask<Void, Void, Integer>() {
+            String errorMessage;
             @Override
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
@@ -259,7 +261,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                     responseCode = conn.getResponseCode();
                     Log.i("POST /responses", "Response Code : " + responseCode);
                     if (responseCode != 200) {
-                        throw new IOException(conn.getResponseMessage());
+                        String output = AppUtils.getResponseContent(conn);
+                        errorMessage = output;
+                        throw new IOException(errorMessage);
                     }
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not create offer: " + e.getMessage());
@@ -277,7 +281,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                     scrollView.setVisibility(View.VISIBLE);
                     spinnerScreen.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar
-                            .make(view, "You already created an offer for this request.", Constants.LONG_SNACK)
+                            .make(view, errorMessage != null ? errorMessage : "Could not create offer.", Constants.LONG_SNACK)
                             .setAction("SHOW OFFERS", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -285,6 +289,12 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                                     ((MainActivity) getActivity()).goToHistory(null);
                                 }
                             });
+                    snackbar.show();
+                } else {
+                    scrollView.setVisibility(View.VISIBLE);
+                    spinnerScreen.setVisibility(View.GONE);
+                    Snackbar snackbar = Snackbar
+                            .make(view, errorMessage != null ? errorMessage : "Could not create offer.", Constants.LONG_SNACK);
                     snackbar.show();
                 }
             }

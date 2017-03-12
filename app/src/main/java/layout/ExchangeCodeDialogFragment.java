@@ -117,6 +117,9 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
         refreshCodeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (!loading) {
+                    if (exchangeCodeView.getVisibility() == View.VISIBLE) {
+                        switchCodeView();
+                    }
                     getExchangeCode(transactionId);
                 }
             }

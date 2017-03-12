@@ -127,6 +127,8 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/category_name"
                         android:layout_marginStart="0dp"
+                        android:maxLines="2"
+                        android:ellipsize="end"
                         android:text=""
                         android:textSize="12sp" />
 

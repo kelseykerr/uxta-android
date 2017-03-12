@@ -103,7 +103,7 @@
                     android:layout_gravity="left"
                     android:layout_marginBottom="10dp"
                     android:hint="name"
-                    android:maxLength="100"
+                    android:maxLength="40"
                     android:maxLines="1"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />
@@ -126,7 +126,7 @@
                     android:layout_gravity="left"
                     android:layout_marginBottom="10dp"
                     android:hint="description"
-                    android:maxLength="200"
+                    android:maxLength="100"
                     android:maxLines="3"
                     android:paddingBottom="16dp"
                     android:textColor="@color/colorAccent"
