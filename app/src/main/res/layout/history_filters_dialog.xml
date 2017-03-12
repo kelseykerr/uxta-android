@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/filters_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="History Filters"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/close_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="start"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingBottom="8dp"
+                android:paddingEnd="25dp"
+                android:paddingStart="8dp"
+                android:paddingTop="20dp"
+                android:src="@drawable/x_svg"
+                android:tint="@color/colorAccent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/close_filters"
+                android:id="@+id/type_label"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="20sp"
+                android:text="Type:"/>
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/transactions_box"
+                android:layout_below="@id/type_label"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="70dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                app:buttonTint="@color/colorPrimary"
+                android:text="transactions"/>
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/requests_box"
+                android:layout_marginStart="70dp"
+                android:layout_below="@id/transactions_box"
+                android:layout_width="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:layout_height="wrap_content"
+                app:buttonTint="@color/colorPrimary"
+                android:text="requests"/>
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/offers_box"
+                android:layout_marginStart="70dp"
+                android:layout_below="@id/requests_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                app:buttonTint="@color/colorPrimary"
+                android:text="offers"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/offers_box"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="20sp"
+                android:id="@+id/status_label"
+                android:text="Status:"/>
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/open_box"
+                android:layout_marginStart="70dp"
+                android:layout_below="@id/status_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:buttonTint="@color/colorPrimary"
+                android:textColor="@color/colorAccent"
+                android:text="open/pending"/>
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/closed_box"
+                android:layout_marginStart="70dp"
+                android:layout_below="@id/open_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                app:buttonTint="@color/colorPrimary"
+                android:text="closed/fulfilled"/>
+
+
+            <Button
+                android:id="@+id/filter_button"
+                android:layout_below="@id/closed_box"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/primary_btn"
+                android:text="filter"
+                android:textColor="#ffffff" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

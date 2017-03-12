@@ -201,6 +201,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         });
         if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
             requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.moreSwipe.setText("edit");
             requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

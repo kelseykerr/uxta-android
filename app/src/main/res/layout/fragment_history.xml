@@ -8,8 +8,27 @@
     tools:context="layout.AccountFragment">
 
     <RelativeLayout
+        android:id="@+id/spinner_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/loading_spinner"
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="125dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/no_history_layout"
         android:visibility="gone"
+        android:layout_marginTop="55dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -40,6 +59,7 @@
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:focusable="true"
+        android:layout_marginTop="55dp"
         android:id="@+id/history_parent_scrollview"
         android:focusableInTouchMode="true"
         android:descendantFocusability="beforeDescendants"

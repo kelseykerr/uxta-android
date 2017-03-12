@@ -114,8 +114,6 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        ((MainActivity) getActivity()).updateStatusBarColor(getResources().getColor(R.color.colorPrimary));
-
         View view = inflater.inflate(R.layout.fragment_view_offer_dialog, container, false);
         pickupTimeLayout = (TextInputLayout) view.findViewById(R.id.pickup_time_layout);
         pickupTimeLayout.setErrorEnabled(true);

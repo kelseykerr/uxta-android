@@ -62,11 +62,17 @@ public class HistoryFragment extends Fragment {
     public ScrollView parentScroll;
     private View view;
     private RelativeLayout noHistoryLayout;
+    private RelativeLayout spinnerScreen;
     public static String snackbarMessage = null;
     private static ViewRequestFragment viewRequestFragment;
     private static ViewTransactionFragment viewTransactionFragment;
     public static ExchangeCodeDialogFragment exchangeCodeDialogFragment;
     public static ConfirmChargeDialogFragment confirmChargeDialogFragment;
+    public static Boolean showTransactions = true;
+    public static Boolean showRequests = true;
+    public static Boolean showOffers = true;
+    public static Boolean showStatusOpen = true;
+    public static Boolean showStatusClosed = true;
 
     private OnFragmentInteractionListener mListener;
 
@@ -106,8 +112,9 @@ public class HistoryFragment extends Fragment {
         requestHistoryList.setLayoutManager(llm);
         this.view = view;
         noHistoryLayout = (RelativeLayout) view.findViewById(R.id.no_history_layout);
-        getHistory(this);
+        spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
         parentScroll = (ScrollView) view.findViewById(R.id.history_parent_scrollview);
+        getHistory(this);
         if (snackbarMessage != null) {
             Snackbar snackbar = Snackbar
                     .make(view, snackbarMessage, Constants.LONG_SNACK);
@@ -284,7 +291,11 @@ public class HistoryFragment extends Fragment {
     }
 
     public void getHistory(final HistoryFragment thisFragment) {
+        parentScroll.setVisibility(View.GONE);
+        noHistoryLayout.setVisibility(View.GONE);
+        spinnerScreen.setVisibility(View.VISIBLE);
         if (!MainActivity.isNetworkConnected()) {
+            parentScroll.setVisibility(View.VISIBLE);
             showNoNetworkSnack();
             return;
         }
@@ -292,7 +303,44 @@ public class HistoryFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history");
+                    String typesQuery = null;
+                    if (HistoryFragment.showTransactions) {
+                        typesQuery = "types=transactions";
+                    }
+                    if (HistoryFragment.showOffers) {
+                        if (typesQuery == null) {
+                            typesQuery = "types=offers";
+                        } else {
+                            typesQuery += "&types=offers";
+                        }
+                    }
+                    if (HistoryFragment.showRequests) {
+                        if (typesQuery == null) {
+                            typesQuery = "types=requests";
+                        } else {
+                            typesQuery += "&types=requests";
+                        }
+                    }
+                    String statusQuery = null;
+                    if (HistoryFragment.showStatusClosed) {
+                        statusQuery = "status=closed";
+                    }
+                    if (HistoryFragment.showStatusOpen) {
+                        if (statusQuery == null) {
+                            statusQuery = "status=open";
+                        } else {
+                            statusQuery += "&status=open";
+                        }
+                    }
+                    String queryString = "";
+                    if (typesQuery != null && statusQuery != null) {
+                        queryString = "?" + typesQuery + "&" + statusQuery;
+                    } else if (typesQuery != null) {
+                        queryString = "?" + typesQuery;
+                    } else if (statusQuery != null) {
+                        queryString = "?" + statusQuery;
+                    }
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history" + queryString);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
@@ -322,9 +370,12 @@ public class HistoryFragment extends Fragment {
             @Override
             protected void onPostExecute(Void result) {
                 parentObjs = new ArrayList<>();
+                spinnerScreen.setVisibility(View.GONE);
                 if (recentHistory == null || recentHistory.size() == 0) {
                     noHistoryLayout.setVisibility(View.VISIBLE);
+                    parentScroll.setVisibility(View.GONE);
                 } else {
+                    parentScroll.setVisibility(View.VISIBLE);
                     noHistoryLayout.setVisibility(View.GONE);
                 }
                 for (History h : recentHistory) {

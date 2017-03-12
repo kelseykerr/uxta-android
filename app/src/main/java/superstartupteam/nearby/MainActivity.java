@@ -66,6 +66,7 @@ import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
 import layout.ExchangeOverrideDialogFragment;
 import layout.FiltersDialogFragment;
+import layout.HistoryFiltersDialogFragment;
 import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.NewOfferDialogFragment;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         ExchangeCodeDialogFragment.OnFragmentInteractionListener,
         ExchangeOverrideDialogFragment.OnFragmentInteractionListener,
         FiltersDialogFragment.OnFragmentInteractionListener,
+        HistoryFiltersDialogFragment.OnFragmentInteractionListener,
         PaymentDialogFragment.OnFragmentInteractionListener,
         PaymentDestinationDialogFragment.OnFragmentInteractionListener,
         PaymentDetailsDialogFragment.OnFragmentInteractionListener,
@@ -106,8 +108,8 @@ public class MainActivity extends AppCompatActivity
     private BottomBar mBottomBar;
     private Integer currentMenuItem;
     private TextView listMapText;
-    //private RelativeLayout toolbarLine1;
     private RelativeLayout toolbarLine2;
+    private RelativeLayout toolbarHistory;
     private EditText searchBar;
     private ImageButton searchBtn;
     private String snackbarMessage;
@@ -216,6 +218,7 @@ public class MainActivity extends AppCompatActivity
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
         toolbarLine2 = (RelativeLayout) findViewById(R.id.toolbar_line_2);
+        toolbarHistory = (RelativeLayout) findViewById(R.id.toolbar_history_filter);
         searchBar = (EditText) findViewById(R.id.search_bar);
         setSearchBarDone();
         searchBtn = (ImageButton) findViewById(R.id.search_button);
@@ -379,12 +382,20 @@ public class MainActivity extends AppCompatActivity
         newFragment.show(getFragmentManager(), "dialog");
     }
 
+    public void filterHistory(View view) {
+        DialogFragment newFragment = HistoryFiltersDialogFragment
+                .newInstance();
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
     public void setmBottomBarListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarHomeItem) {
                     toolbar.setVisibility(View.VISIBLE);
+                    toolbarLine2.setVisibility(View.VISIBLE);
+                    toolbarHistory.setVisibility(View.GONE);
                     HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                     if (homeFragment != null) {
                         homeFragment.getRequests(null);
@@ -414,7 +425,9 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
-                    toolbar.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    toolbarLine2.setVisibility(View.GONE);
+                    toolbarHistory.setVisibility(View.VISIBLE);
                     reselectHistory(menuItemId);
                     int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
                     hideOtherFragments(Constants.HISTORY_FRAGMENT_TAG, secondAnim);
@@ -504,7 +517,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private int selectHistoryFragment(int menuItemId) {
-        //toolbarLine2.setVisibility(View.GONE);
         int firstAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.enter_from_left : R.animator.enter_from_right;
         int secondAnim = currentMenuItem != null && currentMenuItem < menuItemId ? R.animator.exit_to_right : R.animator.exit_to_left;
         HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
@@ -545,10 +557,12 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest) {
 
         Log.i("MainActivity", "onFragmentInteraction> arg = " + nextFragment);
-
-       if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
+        if (fragmentPostProcessingRequest == Constants.FPPR_SUBMIT_FILTERS) {
             HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
             homeFragment.getRequests(null);
+        } else if (fragmentPostProcessingRequest == Constants.FPPR_HISTORY_FILTERS) {
+            HistoryFragment historyFragment = (HistoryFragment) fragmentManager.findFragmentByTag(Constants.HISTORY_FRAGMENT_TAG);
+            historyFragment.getHistory(historyFragment);
         }
     }
 
@@ -671,13 +685,13 @@ public class MainActivity extends AppCompatActivity
 
         try {
             gpsEnabled = locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, "couldn't check if gps is enabled, go error: " + ex.getMessage());
         }
 
         try {
             networkEnabled = locationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, "couldn't check if network location is enabled, go error: " + ex.getMessage());
         }
         return gpsEnabled || networkEnabled;
@@ -756,7 +770,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void updateStatusBarColor(int color){
+    public void updateStatusBarColor(int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

@@ -26,6 +26,8 @@ public class Constants {
 
     public static final int FPPR_SUBMIT_FILTERS = 102;
 
+    public static final int FPPR_HISTORY_FILTERS = 103;
+
     public static final String GOOGLE_AUTH_METHOD = "google";
 
     public static final String FB_AUTH_METHOD = "facebook";

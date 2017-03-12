@@ -80,6 +80,40 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/toolbar_history_filter"
+            android:layout_below="@id/toolbar_line_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true">
+
+            <ImageButton
+                android:id="@+id/filter_image"
+                android:layout_width="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
+                android:tint="@color/white"
+                android:onClick="filterHistory"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_filter_list_black_24dp"
+                android:layout_centerVertical="true"
+                android:layout_margin="2dp"/>
+
+            <TextView
+                android:id="@+id/filter_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="filterHistory"
+                android:text="filter history"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/filter_image" />
+
+        </RelativeLayout>
+
 
     </RelativeLayout>
 

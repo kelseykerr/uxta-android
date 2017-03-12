@@ -44,7 +44,7 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
     private Spinner radiusSpinner;
     private Spinner locationSpinner;
     private Spinner sortBySpinner;
-    private UpdateAccountDialogFragment.OnFragmentInteractionListener mListener;
+    private FiltersDialogFragment.OnFragmentInteractionListener mListener;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
 
 
@@ -211,8 +211,8 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
     public void onAttach(Context context) {
         this.context = context;
         super.onAttach(context);
-        if (context instanceof UpdateAccountDialogFragment.OnFragmentInteractionListener) {
-            mListener = (UpdateAccountDialogFragment.OnFragmentInteractionListener) context;
+        if (context instanceof FiltersDialogFragment.OnFragmentInteractionListener) {
+            mListener = (FiltersDialogFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -226,7 +226,7 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             onAttachToContext(activity);
         }
-        mListener = (UpdateAccountDialogFragment.OnFragmentInteractionListener) activity;
+        mListener = (FiltersDialogFragment.OnFragmentInteractionListener) activity;
 
     }
 
