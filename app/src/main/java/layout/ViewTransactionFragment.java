@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class ViewTransactionFragment extends DialogFragment {
     private static Transaction transaction;
     private static Response response;
     private Context context;
-    private ImageButton profileImage;
+    private ImageView profileImage;
     private TextView transactionText;
     private ImageButton closeBtn;
     private TextView transactionStatus;
@@ -101,7 +102,7 @@ public class ViewTransactionFragment extends DialogFragment {
         user = PrefUtils.getCurrentUser(context);
         Request request = history.getRequest();
         View view = inflater.inflate(R.layout.fragment_view_transaction, container, false);
-        profileImage = (ImageButton) view.findViewById(R.id.profile_image);
+        profileImage = (ImageView) view.findViewById(R.id.profile_image);
         final boolean isSeller = !user.getId().equals(history.getRequest().getUser().getId());
         setProfilePic(isSeller ? history.getRequest().getUser() : response.getSeller(), profileImage);
         transactionText = (TextView) view.findViewById(R.id.transaction_text);
@@ -322,7 +323,7 @@ public class ViewTransactionFragment extends DialogFragment {
         this.context = context;
     }
 
-    public void setProfilePic(final User user, final ImageButton imageBtn) {
+    public void setProfilePic(final User user, final ImageView imageBtn) {
         final boolean googlePic = user.getAuthMethod() != null &&
                 user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD) &&
                 user.getPictureUrl() != null;
@@ -334,7 +335,7 @@ public class ViewTransactionFragment extends DialogFragment {
                 protected Bitmap doInBackground(Void... params) {
                     URL imageURL = null;
                     try {
-                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=200" : "https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
+                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=400" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=400");
                         Bitmap bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
                         return bitmap;
                     } catch (MalformedURLException e) {

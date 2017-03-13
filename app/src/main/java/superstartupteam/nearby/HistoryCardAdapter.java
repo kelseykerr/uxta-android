@@ -1,19 +1,18 @@
 package superstartupteam.nearby;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -21,10 +20,13 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.bumptech.glide.Glide;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -65,14 +67,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     public void onBindViewHolder(final HistoryCardViewHolder requestViewHolder, int i) {
         final History h = recentHistory.get(i);
         final Request r = h.getRequest();
-        requestViewHolder.hideSwipe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeItem(requestViewHolder.getAdapterPosition());
-            }
-        });
         requestViewHolder.exchangeSwipe.setVisibility(View.GONE);
-        if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed")) {
+        if (h.getTransaction() != null && !r.getStatus().toLowerCase().equals("closed") &&
+                (h.getTransaction().getCanceled() != null && !h.getTransaction().getCanceled())) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
            setUpRequestCard(requestViewHolder, r, h);
@@ -162,7 +159,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         }
     }
 
-    private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+    private void setUpOfferCard(HistoryCardViewHolder requestViewHolder, final Request r, final History h) {
         requestViewHolder.vTransactionStatus.setVisibility(View.GONE);
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
@@ -186,9 +183,15 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.vDescription.setVisibility(View.GONE);
         requestViewHolder.vStatus.setText(resp.getResponseStatus().toString().toUpperCase());
         if (resp.getResponseStatus().toString().toLowerCase().equals("closed")) {
-            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.closeSwipe.setVisibility(View.GONE);
         } else {
-            requestViewHolder.hideSwipe.setVisibility(View.GONE);
+            requestViewHolder.closeSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.closeSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    closeOffer(resp, r);
+                }
+            });
         }
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
         requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
@@ -214,7 +217,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     }
 
-    private void setUpRequestCard(final HistoryCardViewHolder requestViewHolder, Request r, final History h) {
+    private void setUpRequestCard(final HistoryCardViewHolder requestViewHolder, final Request r, final History h) {
         requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
         requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         String htmlString = "Requested a " +
@@ -242,9 +245,15 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
              * closed requests
              */
         if (!r.getStatus().equals("OPEN")) {
-            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.closeSwipe.setVisibility(View.GONE);
         } else {
-            requestViewHolder.hideSwipe.setVisibility(View.GONE);
+            requestViewHolder.closeSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.closeSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    closeRequest(r);
+                }
+            });
             int count = 0;
             for (Response resp: h.getResponses()) {
                 if (resp.getResponseStatus().toString().toLowerCase().equals("pending")) {
@@ -294,9 +303,10 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 transaction.getExchanged();
         String beginning;
         if (complete) {
-            requestViewHolder.hideSwipe.setVisibility(View.VISIBLE);
+            requestViewHolder.closeSwipe.setVisibility(View.GONE);
             requestViewHolder.exchangeSwipe.setVisibility(View.GONE);
         } else {
+            requestViewHolder.closeSwipe.setVisibility(View.GONE);
             requestViewHolder.exchangeSwipe.setVisibility(View.VISIBLE);
             requestViewHolder.exchangeSwipe.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -316,7 +326,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     }
                 }
             });
-            requestViewHolder.hideSwipe.setVisibility(View.GONE);
+            requestViewHolder.closeSwipe.setVisibility(View.GONE);
         }
         if (complete && r.getRental()) {
             beginning = isBuyer ? "Borrowed a " : "Loaned a ";
@@ -459,10 +469,45 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         });
     }
 
-    public void removeItem(int position) {
-        recentHistory.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, recentHistory.size());
+    public void closeRequest(final Request request) {
+        request.setExpireDate(new Date(new Date().getTime() - 60000));
+        String message = "Are you sure you want to close this request?";
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        AlertDialog ad = dialog.setMessage(message)
+                .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        dialoginterface.cancel();
+                    }
+                })
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        request.setExpireDate(new Date(new Date().getTime() - 60000));
+                        historyFragment.updateRequest(request);
+                    }
+                })
+                .create();
+        ad.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        ad.show();
+    }
+
+    public void closeOffer(final Response response, final Request request) {
+        String message = "Are you sure you want to close your offer?";
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        AlertDialog ad = dialog.setMessage(message)
+                .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        dialoginterface.cancel();
+                    }
+                })
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        response.setSellerStatus(Response.SellerStatus.WITHDRAWN);
+                        historyFragment.updateOffer(response, request, null);
+                    }
+                })
+                .create();
+        ad.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        ad.show();
     }
 
 
@@ -478,9 +523,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private CardView cardView;
         private LinearLayout responseSeparator;
         private TextView vTransactionStatus;
-        private ImageButton profileImage;
+        private ImageView profileImage;
         private TextView moreSwipe;
-        private TextView hideSwipe;
+        private TextView closeSwipe;
         private TextView exchangeSwipe;
 
         public HistoryCardViewHolder(Context context, View v) {
@@ -497,9 +542,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             historyCard = (RelativeLayout) v.findViewById(R.id.history_card);
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
-            profileImage = (ImageButton) v.findViewById(R.id.profileImage);
+            profileImage = (ImageView) v.findViewById(R.id.profileImage);
             moreSwipe =  (TextView) v.findViewById(R.id.more_swipe);
-            hideSwipe = (TextView) v.findViewById(R.id.hide_swipe);
+            closeSwipe = (TextView) v.findViewById(R.id.close_swipe);
             exchangeSwipe = (TextView) v.findViewById(R.id.exchange_swipe);
         }
 
@@ -507,7 +552,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             final boolean isGoogle = user.getAuthMethod() != null &&
                     user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
             try {
-                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=250" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=250");
                 Glide.with(context)
                         .load(imageURL)
                         .asBitmap()

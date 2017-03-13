@@ -56,6 +56,8 @@ public class Response {
 
     private User seller;
 
+    private String canceledReason;
+
     public static enum PriceType {
         FLAT, PER_HOUR, PER_DAY
     }
@@ -208,5 +210,13 @@ public class Response {
 
     public void setSeller(User seller) {
         this.seller = seller;
+    }
+
+    public String getCanceledReason() {
+        return canceledReason;
+    }
+
+    public void setCanceledReason(String canceledReason) {
+        this.canceledReason = canceledReason;
     }
 }

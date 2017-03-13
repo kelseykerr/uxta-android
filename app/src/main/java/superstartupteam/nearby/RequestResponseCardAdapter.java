@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.zxing.common.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -26,6 +28,7 @@ import java.util.List;
 import layout.HistoryFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
+import superstartupteam.nearby.model.Transaction;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -65,7 +68,11 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                 " made an offer for $" + price + "</font>";
         rvh.offerText.setText(Html.fromHtml(htmlString));
         if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
-            rvh.responseStatus.setText("CLOSED");
+            String statusString = "CLOSED";
+            if (response.getCanceledReason() != null && response.getCanceledReason().length() > 0) {
+                statusString += (" - " + response.getCanceledReason());
+            }
+            rvh.responseStatus.setText(statusString);
         } else if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
             rvh.responseStatus.setText("OPEN");
         } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
@@ -222,11 +229,11 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         return new RequestResponseCardAdapter.ResponseCardViewHolder(context, view);
     }
 
-    public void setUpProfileImage(final User user, final ImageButton imageBtn) {
+    public void setUpProfileImage(final User user, final ImageView imageBtn) {
         final boolean isGoogle = user.getAuthMethod() != null &&
                 user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
         try {
-            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=250" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=250");
             Glide.with(context)
                     .load(imageURL)
                     .asBitmap()
@@ -243,7 +250,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
 
 
     public static class ResponseCardViewHolder extends RecyclerView.ViewHolder {
-        private ImageButton profilePic;
+        private ImageView profilePic;
         private TextView offerText;
         private TextView responseStatus;
         private TextView postedDate;
@@ -260,7 +267,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         public ResponseCardViewHolder(Context context, View v) {
             super(v);
             this.context = context;
-            profilePic = (ImageButton) v.findViewById(R.id.profile_image);
+            profilePic = (ImageView) v.findViewById(R.id.profile_image);
             offerText = (TextView) v.findViewById(R.id.offer_text);
             responseStatus = (TextView) v.findViewById(R.id.response_status);
             postedDate = (TextView) v.findViewById(R.id.posted_date);

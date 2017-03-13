@@ -8,8 +8,8 @@ android {
         applicationId "superstartupteam.nearby"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 19
-        versionName "0.19"
+        versionCode 21
+        versionName "0.21"
     }
     buildTypes {
         debug {
@@ -23,6 +23,9 @@ android {
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
+    }
+    dexOptions {
+        jumboMode true
     }
 }
 

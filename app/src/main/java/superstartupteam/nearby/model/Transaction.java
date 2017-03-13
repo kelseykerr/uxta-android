@@ -75,6 +75,8 @@ public class Transaction {
 
     private String canceledReason;
 
+    private Boolean canceled;
+
     public String getId() {
         return id;
     }
@@ -233,6 +235,14 @@ public class Transaction {
 
     public void setCanceledReason(String canceledReason) {
         this.canceledReason = canceledReason;
+    }
+
+    public Boolean getCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(Boolean canceled) {
+        this.canceled = canceled;
     }
 
     /**

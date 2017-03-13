@@ -392,6 +392,10 @@ public class HistoryFragment extends Fragment {
     }
 
     public void updateOffer(final Response response, final Request request, final DialogInterface dialog) {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoNetworkSnack();
+            return;
+        }
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
@@ -406,9 +410,9 @@ public class HistoryFragment extends Fragment {
                     conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     conn.setRequestProperty("Content-Type", "application/json");
 
-                    if (request.getUser().getId().equals(user.getId())) {
+                    if (request.getUser().getId().equals(user.getId()) && dialog != null) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
-                    } else {
+                    } else if (dialog != null){
                         response.setSellerStatus(Response.SellerStatus.ACCEPTED);
                     }
                     ObjectMapper mapper = new ObjectMapper();
@@ -437,17 +441,75 @@ public class HistoryFragment extends Fragment {
             protected void onPostExecute(Integer responseCode) {
                 HistoryFragment.dismissViewRequestFragment();
                 if (responseCode == 200) {
-                    dialog.dismiss();
-                    dismissViewRequestFragment();
+                    if (dialog != null) {
+                        dialog.dismiss();
+                        dismissViewRequestFragment();
+                    }
                     ((MainActivity) getActivity()).goToHistory("successfully updated offer");
                 } else {
-                    Snackbar snackbar = Snackbar
-                            .make(view, "could not update offer", Constants.LONG_SNACK);
-                    snackbar.show();
-                    dialog.dismiss();
+                    if (dialog != null) {
+                        dialog.dismiss();
+                        dismissViewRequestFragment();
+                    }
+                    ((MainActivity) getActivity()).goToHistory("could not update offer");
                 }
             }
         }.execute();
 
+    }
+
+    public void updateRequest(final Request request) {
+        if (!MainActivity.isNetworkConnected()) {
+            showNoNetworkSnack();
+            return;
+        }
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                Integer responseCode = null;
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("PUT");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    conn.setRequestProperty("Content-Type", "application/json");
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    // we don't need to update the location or user info
+                    Request r = request;
+                    r.setUser(null);
+                    r.setLocation(null);
+                    String requestJson = mapper.writeValueAsString(r);
+                    Log.i("updated request: ", requestJson);
+                    byte[] outputInBytes = requestJson.getBytes("UTF-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(outputInBytes);
+                    os.close();
+
+                    responseCode = conn.getResponseCode();
+                    Log.i("PUT /api/requests", "Response Code : " + responseCode);
+                    if (responseCode != 200) {
+                        String output = AppUtils.getResponseContent(conn);
+                        throw new IOException(output);
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not update request: " + e.getMessage());
+                }
+                return responseCode;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                HistoryFragment.dismissViewRequestFragment();
+                if (responseCode == 200) {
+                    ((MainActivity) getActivity()).goToHistory("successfully updated request");
+                } else {
+                    ((MainActivity) getActivity()).goToHistory("could not update request at this time");
+                }
+            }
+        }.execute();
     }
 }

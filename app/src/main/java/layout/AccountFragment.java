@@ -384,7 +384,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                 protected Void doInBackground(Void... params) {
                     URL imageURL = null;
                     try {
-                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=200" : "https://graph.facebook.com/" + user.getUserId() + "/picture?type=large");
+                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=400" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=400");
                         bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
                     } catch (MalformedURLException e) {
                         e.printStackTrace();

@@ -35,12 +35,12 @@
                 android:textColor="@android:color/white" />
 
             <TextView
-                android:id="@+id/hide_swipe"
+                android:id="@+id/close_swipe"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:background="@color/redPink"
                 android:gravity="center"
-                android:text="hide"
+                android:text="close"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
 
@@ -70,18 +70,18 @@
                 android:orientation="horizontal"
                 android:weightSum="30">
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/profileImage"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginBottom="5dp"
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_weight="6"
-                    android:background="#00000000"
-                    android:maxHeight="300dp" />
+                    android:background="#00000000" />
 
                 <RelativeLayout
                     android:id="@+id/info_layout"
@@ -94,9 +94,7 @@
                         android:id="@+id/title_bar"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="-1dp"
-                        android:orientation="horizontal"
-                        android:weightSum="20">
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/item_name"
