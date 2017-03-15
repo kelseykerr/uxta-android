@@ -4,9 +4,11 @@
     xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/request_card_view"
     android:layout_width="match_parent"
-    android:layout_height="114dp"
+    android:layout_height="116dp"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
     android:paddingBottom="15dp"
     card_view:cardElevation="0dp">
 
