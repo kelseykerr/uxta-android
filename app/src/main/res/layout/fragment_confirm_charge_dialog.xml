@@ -71,7 +71,8 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:text="For loaning your bike to Kelsey for 3 hours"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:textSize="20sp" />
 
         <Button

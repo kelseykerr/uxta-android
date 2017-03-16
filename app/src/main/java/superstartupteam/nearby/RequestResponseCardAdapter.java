@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.zxing.common.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -28,7 +27,6 @@ import java.util.List;
 import layout.HistoryFragment;
 import superstartupteam.nearby.model.Request;
 import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.Transaction;
 import superstartupteam.nearby.model.User;
 
 /**
@@ -166,7 +164,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int i) {
                                 response.setBuyerStatus(Response.BuyerStatus.DECLINED);
-                                historyFragment.updateOffer(response, request, dialoginterface);
+                                historyFragment.updateOffer(response, request, null, "view_request", historyFragment);
                             }
                         })
                         .create();
@@ -206,7 +204,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                             })
                             .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialoginterface, int i) {
-                                    historyFragment.updateOffer(response, request, dialoginterface);
+                                    historyFragment.updateOffer(response, request, dialoginterface, "view_transaction", historyFragment);
                                 }
                             })
                             .create();

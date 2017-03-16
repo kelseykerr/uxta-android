@@ -174,7 +174,8 @@ public class ViewTransactionFragment extends DialogFragment {
                 returnLocation.setVisibility(View.GONE);
             }
         } else {
-            transactionStatus.setText(request.getStatus());
+            String statusText = request.getStatus().toLowerCase().equals("transaction_pending") ? "Transaction Pending" : request.getStatus();
+            transactionStatus.setText(statusText);
             exchangeLocation.setVisibility(View.GONE);
             returnLocation.setVisibility(View.GONE);
             String formattedDate = transaction.getExchangeTime() != null ? formatter.format(transaction.getExchangeTime()) : null;

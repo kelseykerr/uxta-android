@@ -2,7 +2,6 @@ package superstartupteam.nearby;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -21,12 +20,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -72,12 +67,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 (h.getTransaction().getCanceled() != null && !h.getTransaction().getCanceled())) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (user.getId().equals(r.getUser().getId())) { // this is a request the user made
-           setUpRequestCard(requestViewHolder, r, h);
+            setUpRequestCard(requestViewHolder, r, h);
         } else { //this is an offer the user made
             setUpOfferCard(requestViewHolder, r, h);
         }
         List<String> values = new ArrayList();
-        for (Response resp:h.getResponses()) {
+        for (Response resp : h.getResponses()) {
             if (resp == null || resp.getSeller() == null) {
                 return;
             }
@@ -255,13 +250,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 }
             });
             int count = 0;
-            for (Response resp: h.getResponses()) {
+            for (Response resp : h.getResponses()) {
                 if (resp.getResponseStatus().toString().toLowerCase().equals("pending")) {
                     count++;
                 }
             }
             if (count > 0) {
-                String ooString="<u>" + count + " pending" + (count > 1 ? " offers</u>" : " offer</u>");
+                String ooString = "<u>" + count + " pending" + (count > 1 ? " offers</u>" : " offer</u>");
                 requestViewHolder.vOpenOffers.setText(Html.fromHtml(ooString));
             }
         }
@@ -502,7 +497,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialoginterface, int i) {
                         response.setSellerStatus(Response.SellerStatus.WITHDRAWN);
-                        historyFragment.updateOffer(response, request, null);
+                        historyFragment.updateOffer(response, request, null, null, null);
                     }
                 })
                 .create();
@@ -543,7 +538,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
             profileImage = (ImageView) v.findViewById(R.id.profileImage);
-            moreSwipe =  (TextView) v.findViewById(R.id.more_swipe);
+            moreSwipe = (TextView) v.findViewById(R.id.more_swipe);
             closeSwipe = (TextView) v.findViewById(R.id.close_swipe);
             exchangeSwipe = (TextView) v.findViewById(R.id.exchange_swipe);
         }

@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -56,11 +57,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
@@ -850,6 +854,34 @@ public class MainActivity extends AppCompatActivity
             snackbar.show();
         }
     };
+
+    public static void getRequests(final LatLng latLng) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/notifications" +
+                            "?latitude=" + latLng.latitude + "&longitude=" + latLng.longitude);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    int responseCode = conn.getResponseCode();
+                    Log.i("GET /notifications", "Response Code : " + responseCode);
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not get notifications: " + e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+
+            }
+        }.execute();
+    }
 
 
 }

@@ -16,6 +16,7 @@ import java.net.URL;
 
 import superstartupteam.nearby.AppUtils;
 import superstartupteam.nearby.Constants;
+import superstartupteam.nearby.MainActivity;
 import superstartupteam.nearby.PrefUtils;
 import superstartupteam.nearby.model.User;
 
@@ -41,39 +42,11 @@ public class RequestNotificationService extends IntentService implements Locatio
             //only get notifications if app is in background
             Log.i("RequestNotificationSrvc", "currentLatLng: " + latLng.latitude + " * " + latLng.longitude);
             if (!AppUtils.isAppInForeground(this) && hasNetwork) {
-                getRequests();
+                MainActivity.getRequests(latLng);
             }
         } else {
             Log.i("NotificationService", "user or latLng are null");
         }
-    }
-
-    private void getRequests() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/notifications" +
-                            "?latitude=" + latLng.latitude + "&longitude=" + latLng.longitude);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    int responseCode = conn.getResponseCode();
-                    Log.i("GET /notifications", "Response Code : " + responseCode);
-                } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get notifications: " + e.getMessage());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-
-            }
-        }.execute();
     }
 
     @Override

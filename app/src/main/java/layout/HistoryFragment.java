@@ -238,7 +238,6 @@ public class HistoryFragment extends Fragment {
     }
 
 
-
     public void showConfirmChargeDialog(Double calculatedPrice, String description, String transactionId) {
         dismissConfirmChargeDialog();
         confirmChargeDialogFragment = ConfirmChargeDialogFragment
@@ -391,11 +390,18 @@ public class HistoryFragment extends Fragment {
         }.execute();
     }
 
-    public void updateOffer(final Response response, final Request request, final DialogInterface dialog) {
+    public void updateOffer(final Response response, final Request request,
+                            final DialogInterface dialog, final String returnToScreen,
+                            final HistoryFragment historyFragment) {
         if (!MainActivity.isNetworkConnected()) {
             showNoNetworkSnack();
             return;
         }
+        parentScroll.setVisibility(View.GONE);
+        noHistoryLayout.setVisibility(View.GONE);
+        spinnerScreen.setVisibility(View.VISIBLE);
+        dismissViewRequestFragment();
+        dismissViewTransactionFragment();
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
@@ -412,7 +418,7 @@ public class HistoryFragment extends Fragment {
 
                     if (request.getUser().getId().equals(user.getId()) && dialog != null) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
-                    } else if (dialog != null){
+                    } else if (dialog != null) {
                         response.setSellerStatus(Response.SellerStatus.ACCEPTED);
                     }
                     ObjectMapper mapper = new ObjectMapper();
@@ -445,17 +451,83 @@ public class HistoryFragment extends Fragment {
                         dialog.dismiss();
                         dismissViewRequestFragment();
                     }
-                    ((MainActivity) getActivity()).goToHistory("successfully updated offer");
+                    if (returnToScreen == null) {
+                        parentScroll.setVisibility(View.VISIBLE);
+                        spinnerScreen.setVisibility(View.GONE);
+                        ((MainActivity) getActivity()).goToHistory("successfully updated offer");
+                    } else {
+                        getUpdatedHistory(request.getId(), returnToScreen, historyFragment);
+                    }
+
                 } else {
                     if (dialog != null) {
                         dialog.dismiss();
                         dismissViewRequestFragment();
                     }
-                    ((MainActivity) getActivity()).goToHistory("could not update offer");
+                    if (returnToScreen == null) {
+                        parentScroll.setVisibility(View.VISIBLE);
+                        spinnerScreen.setVisibility(View.GONE);
+                        ((MainActivity) getActivity()).goToHistory("could not update offer");
+                    } else {
+                        getUpdatedHistory(request.getId(), returnToScreen, historyFragment);
+                    }
                 }
             }
         }.execute();
 
+    }
+
+    public void getUpdatedHistory(final String requestId, final String screenToRefresh, final HistoryFragment historyFragment) {
+        new AsyncTask<Void, Void, History>() {
+            @Override
+            protected History doInBackground(Void... params) {
+                try {
+                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(30000);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    String output = AppUtils.getResponseContent(conn);
+                    try {
+                        recentHistory = AppUtils.jsonStringToHistoryList(output);
+                        for (History h : recentHistory) {
+                            if (h.getRequest().getId().equals(requestId)) {
+                                return h;
+                            }
+                        }
+                    } catch (IOException e) {
+                        Log.e("Error", "Received an error while trying to fetch " +
+                                "requests from server, please try again later!");
+                    }
+                } catch (IOException e) {
+                    Log.e("ERROR ", "Could not get requests: " + e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(History h) {
+                if (screenToRefresh.equals("view_transaction")) {
+                    dismissViewTransactionFragment();
+                    final Transaction transaction = h.getTransaction();
+                    Response resp = null;
+                    for (Response res : h.getResponses()) {
+                        if (res.getId().equals(transaction.getResponseId())) {
+                            resp = res;
+                            break;
+                        }
+                    }
+                    getHistory(historyFragment);
+                    showTransactionDialog(h, resp);
+                } else if (screenToRefresh.equals("view_request")) {
+                    dismissViewRequestFragment();
+                    getHistory(historyFragment);
+                    showRequestDialog(h);
+                }
+            }
+        }.execute();
     }
 
     public void updateRequest(final Request request) {
