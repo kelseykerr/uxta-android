@@ -18,11 +18,13 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -118,6 +120,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         pickupTimeLayout = (TextInputLayout) view.findViewById(R.id.pickup_time_layout);
         pickupTimeLayout.setErrorEnabled(true);
         pickupTime = (EditText) view.findViewById(R.id.pickup_time);
+        pickupTime.setKeyListener(null);
         setDateTimeFunctionality(pickupTime, true);
 
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
@@ -126,6 +129,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         returnLocation.setText(response.getReturnLocation());
         returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
         returnTime = (EditText) view.findViewById(R.id.return_time);
+        returnTime.setKeyListener(null);
         if (!request.getRental()) {
             returnLocation.setVisibility(View.GONE);
             returnTime.setVisibility(View.GONE);
@@ -133,6 +137,27 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             this.view = view;
             setDateTimeFunctionality(returnTime, false);
         }
+        pickupLocation.setOnEditorActionListener(
+                new EditText.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                            openDatePicker(pickupTime, false);
+                        }
+                        return true;
+                    }
+                });
+
+        returnLocation.setOnEditorActionListener(
+                new EditText.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                            openDatePicker(returnTime, false);
+                        }
+                        return true;
+                    }
+                });
         offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
         offerPrice.addTextChangedListener(new TextWatcher() {
@@ -153,14 +178,6 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         });
         BigDecimal formattedValue = AppUtils.formatCurrency(response.getOfferPrice());
         offerPrice.setText(formattedValue.toString());
-        //offerType = (Spinner) view.findViewById(R.id.offer_type);
-        /*if (response.getPriceType().toLowerCase().equals("flat")) {
-            offerType.setSelection(0);
-        } else if (response.getPriceType().toLowerCase().equals("per_hour")) {
-            offerType.setSelection(1);
-        } else {
-            offerType.setSelection(2);
-        }*/
         backButton = (ImageButton) view.findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -381,56 +398,60 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             @Override
             public boolean onTouch(View arg0, MotionEvent event) {
                 if(event.getAction() == MotionEvent.ACTION_UP){
-                    // date time picker
-                    final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
-                    final AlertDialog alertDialog = new Builder(context).create();
-
-                    dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
-                            TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-
-                            Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                                    datePicker.getMonth(),
-                                    datePicker.getDayOfMonth(),
-                                    timePicker.getCurrentHour(),
-                                    timePicker.getCurrentMinute());
-
-                            Date newPickupTime = new Date(calendar.getTimeInMillis());
-
-                            Date current = new Date();
-                            if (!pickup) {
-                                if (exchangeDate != null) {
-                                    newPickupTime = newPickupTime.before(exchangeDate) ? exchangeDate : newPickupTime;
-                                } else {
-                                    newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
-                                }
-                            } else {
-                                newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
-                                if (returnDate != null) {
-                                    newPickupTime = newPickupTime.after(returnDate) ? returnDate : newPickupTime;
-                                }
-                            }
-                            String formattedDate = formatter.format(newPickupTime);
-
-                            textView.setText(formattedDate);
-                            if (!pickup) {
-                                returnDate = newPickupTime;
-                            } else {
-                                exchangeDate = newPickupTime;
-                            }
-                            alertDialog.dismiss();
-                        }
-                    });
-                    alertDialog.setView(dateTimeView);
-                    alertDialog.show();
+                    openDatePicker(textView, pickup);
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    private void openDatePicker(final EditText textView, final boolean pickup) {
+        // date time picker
+        final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
+        final AlertDialog alertDialog = new Builder(context).create();
+
+        dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
+                TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
+
+                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth(),
+                        timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+
+                Date newPickupTime = new Date(calendar.getTimeInMillis());
+
+                Date current = new Date();
+                if (!pickup) {
+                    if (exchangeDate != null) {
+                        newPickupTime = newPickupTime.before(exchangeDate) ? exchangeDate : newPickupTime;
+                    } else {
+                        newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                    }
+                } else {
+                    newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                    if (returnDate != null) {
+                        newPickupTime = newPickupTime.after(returnDate) ? returnDate : newPickupTime;
+                    }
+                }
+                String formattedDate = formatter.format(newPickupTime);
+
+                textView.setText(formattedDate);
+                if (!pickup) {
+                    returnDate = newPickupTime;
+                } else {
+                    exchangeDate = newPickupTime;
+                }
+                alertDialog.dismiss();
+            }
+        });
+        alertDialog.setView(dateTimeView);
+        alertDialog.show();
     }
 
 
