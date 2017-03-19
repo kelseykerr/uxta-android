@@ -13,9 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -145,9 +149,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         private TextView vPostedDate;
         private TextView vDescription;
         protected Context context;
-        private ImageButton profileImage;
-        private FrameLayout card;
-        private FrameLayout offerSwipe;
+        private ImageView profileImage;
+        private RelativeLayout card;
+        private LinearLayout offerSwipe;
+        private SwipeRevealLayout swipeLayout;
 
         public RequestViewHolder(Context context, View v) {
             super(v);
@@ -155,9 +160,32 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vCategoryName = (TextView) v.findViewById(R.id.category_name);
             vPostedDate = (TextView) v.findViewById(R.id.posted_date);
             vDescription = (TextView) v.findViewById(R.id.description);
-            profileImage = (ImageButton) v.findViewById(R.id.profile_image);
-            card = (FrameLayout) v.findViewById(R.id.request_card);
-            offerSwipe = (FrameLayout) v.findViewById(R.id.offer_layout);
+            profileImage = (ImageView) v.findViewById(R.id.profile_image);
+            card = (RelativeLayout) v.findViewById(R.id.request_card);
+            offerSwipe = (LinearLayout) v.findViewById(R.id.offer_layout);
+            swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
+            swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
+                boolean wasOpen = false;
+                @Override
+                public void onClosed(SwipeRevealLayout view) {
+                    if (!wasOpen) {
+                        card.performClick();
+                    }
+                    wasOpen = false;
+                }
+
+                @Override
+                public void onOpened(SwipeRevealLayout view) {
+                    wasOpen = true;
+                }
+
+                @Override
+                public void onSlide(SwipeRevealLayout view, float slideOffset) {
+                    if (slideOffset > 0.02) {
+                        wasOpen = true;
+                    }
+                }
+            });
             this.context = context;
         }
 
@@ -165,7 +193,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             final boolean isGoogle = user.getAuthMethod() != null &&
                     user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
             try {
-                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=120" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=120");
+                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=500" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=500");
                 Glide.with(context)
                         .load(imageURL)
                         .asBitmap()

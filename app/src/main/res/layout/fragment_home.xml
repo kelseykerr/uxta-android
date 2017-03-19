@@ -76,7 +76,6 @@
                     android:paddingEnd="20dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:background="@color/white"
                     android:text="@string/noRequestsFound"
                     android:textStyle="bold"
                     android:textColor="@color/colorAccent"/>

@@ -6,8 +6,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ok">ok</string>
     <string name="radius_spinner_title">radius</string>
-    <string name="permission_fine_location_rationale">Location is used to display requests in your area and find matches for request you make</string>
-    <string name="permission_wifi_state_rationale">Wifi state is used to store your devices ip address when you accept the terms of service</string>
+    <string name="permission_fine_location_rationale">Please enable location permissions.</string>
+    <string name="permission_wifi_state_rationale">Please enable WiFi state.</string>
+    <string name="permission_camera_rationale">Please enable camera permissions so QR codes can be scanned during exchanges.</string>
     <string-array name="request_type_array">
         <item>item</item>
         <item>service</item>
@@ -36,7 +37,6 @@
         <item>distance</item>
         <item>best match</item>
     </string-array>
-    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="stripe_tos">Payment processing services for sellers on Nearby are provided by Stripe and are subject to the Stripe Connected Account Agreement, which includes the Stripe Terms of Service (collectively, the “Stripe Services Agreement”). By agreeing to these terms or continuing to operate as a user on Nearby, you agree to be bound by the Stripe Services Agreement, as the same may be modified by Stripe from time to time. As a condition of Nearby enabling payment processing services through Stripe, you agree to provide Nearby accurate and complete information about you and your business, and you authorize Nearby to share it and transaction information related to your use of the payment processing services provided by Stripe.</string>
     <string name="dobLabel">date of birth</string>
     <string name="changeButtonLabel">CHANGE</string>

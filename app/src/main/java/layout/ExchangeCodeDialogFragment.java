@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -50,7 +51,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
     private String exchangeCode;
     private User user;
     private View view;
-    private ImageButton qrCodeView;
+    private ImageView qrCodeView;
     private ProgressBar loadingSpinner;
     private Bitmap bitmap;
     private Button switchCodeViewBtn;
@@ -102,7 +103,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_confirm_exchange_dialog, container, false);
         TextView dialogHeader = (TextView) view.findViewById(R.id.confirm_exchange_text);
         dialogHeader.setText(heading);
-        qrCodeView = (ImageButton) view.findViewById(R.id.qr_code);
+        qrCodeView = (ImageView) view.findViewById(R.id.qr_code);
         loadingSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_confirm_request);
         exchangeCodeView = (TextView) view.findViewById(R.id.exchange_code);

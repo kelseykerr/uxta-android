@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -522,6 +523,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private TextView moreSwipe;
         private TextView closeSwipe;
         private TextView exchangeSwipe;
+        private SwipeRevealLayout swipeLayout;
 
         public HistoryCardViewHolder(Context context, View v) {
             super(v);
@@ -541,13 +543,36 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             moreSwipe = (TextView) v.findViewById(R.id.more_swipe);
             closeSwipe = (TextView) v.findViewById(R.id.close_swipe);
             exchangeSwipe = (TextView) v.findViewById(R.id.exchange_swipe);
+            swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
+            swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
+                boolean wasOpen = false;
+                @Override
+                public void onClosed(SwipeRevealLayout view) {
+                    if (!wasOpen) {
+                        historyCard.performClick();
+                    }
+                    wasOpen = false;
+                }
+
+                @Override
+                public void onOpened(SwipeRevealLayout view) {
+                    wasOpen = true;
+                }
+
+                @Override
+                public void onSlide(SwipeRevealLayout view, float slideOffset) {
+                    if (slideOffset > 0.02) {
+                        wasOpen = true;
+                    }
+                }
+            });
         }
 
         private void setUpProfileImage(final User user) {
             final boolean isGoogle = user.getAuthMethod() != null &&
                     user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
             try {
-                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=250" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=250");
+                URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=500" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=500");
                 Glide.with(context)
                         .load(imageURL)
                         .asBitmap()

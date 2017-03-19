@@ -231,7 +231,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         final boolean isGoogle = user.getAuthMethod() != null &&
                 user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
         try {
-            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=250" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=250");
+            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=500" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=500");
             Glide.with(context)
                     .load(imageURL)
                     .asBitmap()

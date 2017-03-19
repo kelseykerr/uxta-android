@@ -146,6 +146,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQUEST_WIFI_STATE = 1;
 
+    private static final int REQUEST_CAMERA = 2;
+
     private boolean hasMessage() {
         notificationType = getIntent().getStringExtra("type");
         return notificationType != null;
@@ -204,20 +206,20 @@ public class MainActivity extends AppCompatActivity
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Fine location permission has not been granted.
-            requestFineLocationPermission();
-        } else {
-            // Fine location is already available, show the camera preview.
-            Log.i(TAG, "FINE LOCATION permission has already been granted.");
+            requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                    R.string.permission_fine_location_rationale, REQUEST_FINE_LOCATION);
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Fine location permission has not been granted.
-            requestWifiStatePermission();
-        } else {
-            // Fine location is already available, show the camera preview.
-            Log.i(TAG, "WIFI STATE permission has already been granted.");
+            requestPermission(Manifest.permission.ACCESS_WIFI_STATE,
+                    R.string.permission_wifi_state_rationale, REQUEST_WIFI_STATE);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(Manifest.permission.CAMERA,
+                    R.string.permission_camera_rationale, REQUEST_CAMERA);
         }
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
@@ -570,70 +572,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void requestWifiStatePermission() {
-        Log.e(TAG, "WIFI STATE permission has NOT been granted. Requesting permission.");
-        Log.e(TAG, ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_WIFI_STATE) + " *should show rationale");
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_WIFI_STATE)) {
+    private void requestPermission(final String permission, int rationale, final int requestCode) {
+        Log.e(TAG, permission + " permission has NOT been granted. Requesting permission.");
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
             // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
-            Log.i(TAG,
-                    "Displaying fine wifi state permission rationale to provide additional context.");
-            Snackbar.make(mLayout, R.string.permission_wifi_state_rationale,
-                    Snackbar.LENGTH_INDEFINITE)
+            final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+            Snackbar snackbar = Snackbar.make(viewGroup.getRootView(), rationale, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_WIFI_STATE},
-                                    REQUEST_WIFI_STATE);
+                                    new String[]{permission},
+                                    requestCode);
                         }
-                    })
-                    .show();
-        } else {
-            // Wifi state permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE},
-                    REQUEST_WIFI_STATE);
-        }
-        // END_INCLUDE(fine_location_permission_request)
-    }
+                    });
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                    snackbar.getView().getRootView().getLayoutParams();
 
-    /**
-     * Requests the Camera permission.
-     * If the permission has been denied previously, a SnackBar will prompt the user to grant the
-     * permission, otherwise it is requested directly.
-     */
-    private void requestFineLocationPermission() {
-        Log.e(TAG, "FINE LOCATION permission has NOT been granted. Requesting permission.");
-        Log.e(TAG, ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) + " *should show rationale");
-        // BEGIN_INCLUDE(fine_location_permission_request)
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
-            Log.i(TAG,
-                    "Displaying fine location permission rationale to provide additional context.");
-            Snackbar.make(mLayout, R.string.permission_fine_location_rationale,
-                    Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    REQUEST_FINE_LOCATION);
-                        }
-                    })
-                    .show();
+            params.setMargins(params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    params.bottomMargin + 260);
+            snackbar.getView().getRootView().setLayoutParams(params);
+            snackbar.show();
         } else {
-            // Fine location permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_FINE_LOCATION);
+            // Permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{permission},
+                    requestCode);
         }
-        // END_INCLUDE(fine_location_permission_request)
     }
 
     public void goToHistory(String message) {

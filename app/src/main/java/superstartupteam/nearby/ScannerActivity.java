@@ -27,7 +27,6 @@ import superstartupteam.nearby.model.User;
 public class ScannerActivity extends AppCompatActivity implements
         SimpleScannerFragment.OnFragmentInteractionListener {
     // permission request codes need to be < 256
-    private static final int RC_HANDLE_CAMERA_PERM = 2;
     private Button changeInputBtn;
     private Boolean qrFrag = true;
     private ImageButton backBtn;
@@ -35,87 +34,108 @@ public class ScannerActivity extends AppCompatActivity implements
     private User user;
     private String heading;
     FragmentManager fragmentManager = getFragmentManager();
+    private static final String TAG = "ScannerActivity";
+    private static final int REQUEST_CAMERA = 2;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = PrefUtils.getCurrentUser(ScannerActivity.this);
-        int rc = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA);
-        if (rc != PackageManager.PERMISSION_GRANTED) {
-            requestCameraPermission();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(android.Manifest.permission.CAMERA,
+                    R.string.permission_camera_rationale, REQUEST_CAMERA);
         }
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            transactionId = extras.getString("TRANSACTION_ID");
-            heading = extras.getString("HEADER");
-        }
-        setContentView(R.layout.activity_scanner);
-        TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
-        header.setText(heading);
-        changeInputBtn = (Button) findViewById(R.id.change_input_button);
-        backBtn = (ImageButton) findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                .commit();
-        changeInputBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (qrFrag) {
-                    fragmentManager.beginTransaction()
-                            .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                            .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                            .commit();
-                    qrFrag = false;
-                    changeInputBtn.setText("Scan QR Code");
-                } else {
-                    fragmentManager.beginTransaction()
-                            .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                            .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                            .commit();
-                    qrFrag = true;
-                    changeInputBtn.setText("Type In Code");
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            setContentView(R.layout.fragment_enter_code);
+            TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                transactionId = extras.getString("TRANSACTION_ID");
+                heading = extras.getString("HEADER");
+                header.setText(heading);
+            }
+            changeInputBtn = (Button) findViewById(R.id.change_input_button);
+            backBtn = (ImageButton) findViewById(R.id.back_button);
+            backBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
                 }
-
+            });
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                    .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.CODE_FRAGMENT_TAG)
+                    .commit();
+            changeInputBtn.setVisibility(View.GONE);
+        } else {
+            setContentView(R.layout.activity_scanner);
+            TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                transactionId = extras.getString("TRANSACTION_ID");
+                heading = extras.getString("HEADER");
+                header.setText(heading);
             }
-        });
+            changeInputBtn = (Button) findViewById(R.id.change_input_button);
+            changeInputBtn.setVisibility(View.VISIBLE);
+            backBtn = (ImageButton) findViewById(R.id.back_button);
+            backBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            fragmentManager.beginTransaction()
+                    .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                    .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                    .commit();
+            changeInputBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (qrFrag) {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                                .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                                .commit();
+                        qrFrag = false;
+                        changeInputBtn.setText("Scan QR Code");
+                    } else {
+                        fragmentManager.beginTransaction()
+                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                                .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                                .commit();
+                        qrFrag = true;
+                        changeInputBtn.setText("Type In Code");
+                    }
+
+                }
+            });
+        }
+
     }
 
-    /**
-     * Handles the requesting of the camera permission.  This includes
-     * showing a "Snackbar" message of why the permission is needed then
-     * sending the request.
-     */
-    private void requestCameraPermission() {
-        Log.i("QR Scanner", "Camera permission is not granted. Requesting permission");
 
-        final String[] permissions = new String[]{android.Manifest.permission.CAMERA};
-
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                android.Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
-            return;
+    private void requestPermission(final String permission, int rationale, final int requestCode) {
+        Log.e(TAG, permission + " permission has NOT been granted. Requesting permission.");
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            final Activity act = this;
+            Snackbar.make(findViewById(R.id.scanner_layout), rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(act,
+                                    new String[]{permission},
+                                    requestCode);
+                        }
+                    })
+                    .show();
+        } else {
+            // Permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{permission},
+                    requestCode);
         }
-
-        final Activity act = this;
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(act, permissions,
-                        RC_HANDLE_CAMERA_PERM);
-            }
-        };
-
-        Snackbar.make(findViewById(R.id.scanner_layout), R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
-                .show();
     }
 
 

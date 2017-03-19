@@ -336,7 +336,7 @@ public class ViewTransactionFragment extends DialogFragment {
                 protected Bitmap doInBackground(Void... params) {
                     URL imageURL = null;
                     try {
-                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=400" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=400");
+                        imageURL = new URL(googlePic ? user.getPictureUrl() + "?sz=800" : "https://graph.facebook.com/" + user.getUserId() + "/picture?height=800");
                         Bitmap bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
                         return bitmap;
                     } catch (MalformedURLException e) {

@@ -407,6 +407,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         });
         map.getUiSettings().setZoomGesturesEnabled(true);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        map.getUiSettings().setMapToolbarEnabled(false);
 
         try {
             map.setMyLocationEnabled(true);
