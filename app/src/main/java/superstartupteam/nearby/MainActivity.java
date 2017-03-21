@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -821,7 +820,29 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    public static void getRequests(final LatLng latLng) {
+    public static void refreshTokenAndGetRequests(GoogleSignInResult result, LatLng latLng) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            try {
+                Log.i("token-> ", acct.getIdToken());
+                //user = new User();
+                user.setGoogleId(acct.getId());
+                user.setAccessToken(acct.getIdToken());
+                user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
+                getRequestNotifications(latLng);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Signed out, show unauthenticated UI.
+            Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
+            //TODO: show error message
+        }
+    }
+
+    public static void getRequestNotifications(final LatLng latLng) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -847,6 +868,31 @@ public class MainActivity extends AppCompatActivity
 
             }
         }.execute();
+    }
+
+    public static void getRequests(final LatLng latLng) {
+        if (user != null && user.getAuthMethod() != null && user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD)) {
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            if (opr.isDone()) {
+                // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+                // and the GoogleSignInResult will be available instantly.
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                refreshTokenAndGetRequests(result, latLng);
+            } else {
+                // If the user has not previously signed in on this device or the sign-in has expired,
+                // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+                // single sign-on will occur in this branch.
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        refreshTokenAndGetRequests(googleSignInResult, latLng);
+                    }
+                });
+            }
+        } else {
+            getRequestNotifications(latLng);
+        }
     }
 
 
