@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import superstartupteam.nearby.ScannerActivity;
+import iuxta.nearby.ScannerActivity;
 
 /**
  * Created by kerrk on 9/30/16.

@@ -31,13 +31,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.LoginActivity;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.LoginActivity;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.User;
 
 /**
  * A simple {@link Fragment} subclass.

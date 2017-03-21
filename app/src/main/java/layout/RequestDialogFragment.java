@@ -18,7 +18,6 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -45,7 +44,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -61,15 +59,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.Category;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.User;
-import superstartupteam.nearby.service.RequestNotificationService;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.Category;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.User;
+import iuxta.nearby.service.RequestNotificationService;
 
 /**
  * Created by kerrk on 8/23/16.

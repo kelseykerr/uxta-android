@@ -18,10 +18,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.Constants;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 3/12/17.

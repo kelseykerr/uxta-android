@@ -25,12 +25,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.Transaction;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.Constants;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.Transaction;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 10/4/16.

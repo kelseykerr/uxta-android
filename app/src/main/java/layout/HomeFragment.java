@@ -54,15 +54,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.RequestAdapter;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.User;
-import superstartupteam.nearby.service.RequestNotificationService;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.RequestAdapter;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.User;
+import iuxta.nearby.service.RequestNotificationService;
 
 
 /**

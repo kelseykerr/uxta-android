@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
@@ -31,18 +30,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.HistoryCardAdapter;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.ScannerActivity;
-import superstartupteam.nearby.model.History;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.Transaction;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.HistoryCardAdapter;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.ScannerActivity;
+import iuxta.nearby.model.History;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.Response;
+import iuxta.nearby.model.Transaction;
+import iuxta.nearby.model.User;
 
 /**
  * A simple {@link Fragment} subclass.

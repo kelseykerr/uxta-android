@@ -28,15 +28,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.History;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.Transaction;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.History;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.Response;
+import iuxta.nearby.model.Transaction;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 2/26/17.

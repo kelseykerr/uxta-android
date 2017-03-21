@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="superstartupteam.nearby">
+    package="iuxta.nearby">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SplashActivity"
+            android:name="iuxta.nearby.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,9 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name="iuxta.nearby.LoginActivity"></activity>
         <activity
-            android:name=".MainActivity"
+            android:name="iuxta.nearby.MainActivity"
             android:screenOrientation="portrait"></activity>
 
         <meta-data
@@ -50,25 +50,25 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
 
-        <service android:name=".service.NearbyMessagingService">
+        <service android:name="iuxta.nearby.service.NearbyMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".service.NearbyInstanceIdService">
+        <service android:name="iuxta.nearby.service.NearbyInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
-        <activity android:name=".ScannerActivity"></activity>
+        <activity android:name="iuxta.nearby.ScannerActivity"></activity>
 
         <receiver
-            android:name=".ConnectivityReceiver"
+            android:name="iuxta.nearby.ConnectivityReceiver"
             android:process=":remote"></receiver>
 
         <service
-            android:name=".service.RequestNotificationService"
+            android:name="iuxta.nearby.service.RequestNotificationService"
             android:exported="false" />
 
     </application>

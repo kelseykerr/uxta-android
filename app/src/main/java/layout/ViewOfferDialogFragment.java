@@ -7,7 +7,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,7 +28,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -47,14 +44,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.Response;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 9/16/16.

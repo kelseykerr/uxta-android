@@ -34,22 +34,19 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.DobPickerFragment;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.SharedAsyncMethods;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.DobPickerFragment;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.SharedAsyncMethods;
+import iuxta.nearby.model.User;
 
 import static android.content.Context.WIFI_SERVICE;
-import static android.support.v7.appcompat.R.styleable.SwitchCompat;
 
 
 public class UpdateAccountDialogFragment extends DialogFragment {

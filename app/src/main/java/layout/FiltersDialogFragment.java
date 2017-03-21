@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.Constants;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 11/23/16.

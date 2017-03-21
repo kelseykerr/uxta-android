@@ -29,14 +29,14 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.InputFilterMinMax;
-import superstartupteam.nearby.MainActivity;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.model.Transaction;
-import superstartupteam.nearby.model.User;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
+import iuxta.nearby.InputFilterMinMax;
+import iuxta.nearby.MainActivity;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.model.Transaction;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 10/1/16.

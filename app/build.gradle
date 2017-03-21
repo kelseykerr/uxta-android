@@ -5,11 +5,11 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "superstartupteam.nearby"
+        applicationId "iuxta.nearby"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 25
-        versionName "0.25"
+        versionCode 26
+        versionName "0.26"
     }
     buildTypes {
         debug {

@@ -13,7 +13,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +20,14 @@ import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import superstartupteam.nearby.AppUtils;
-import superstartupteam.nearby.PrefUtils;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.RequestResponseCardAdapter;
-import superstartupteam.nearby.model.History;
-import superstartupteam.nearby.model.Request;
-import superstartupteam.nearby.model.Response;
-import superstartupteam.nearby.model.User;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+import iuxta.nearby.AppUtils;
+import iuxta.nearby.PrefUtils;
+import iuxta.nearby.R;
+import iuxta.nearby.RequestResponseCardAdapter;
+import iuxta.nearby.model.History;
+import iuxta.nearby.model.Request;
+import iuxta.nearby.model.Response;
+import iuxta.nearby.model.User;
 
 /**
  * Created by kerrk on 2/25/17.

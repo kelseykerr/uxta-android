@@ -9,9 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import superstartupteam.nearby.Constants;
-import superstartupteam.nearby.R;
-import superstartupteam.nearby.ScannerActivity;
+import iuxta.nearby.R;
+import iuxta.nearby.ScannerActivity;
 
 /**
  * Created by kerrk on 9/30/16.

@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:491459641376:android:3871a1f4198f10f7",
         "android_client_info": {
-          "package_name": "superstartupteam.nearby"
+          "package_name": "iuxta.nearby"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "491459641376-3dlu720luktd74t1jjf58ej8gfjpvs3c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "superstartupteam.nearby",
+            "package_name": "iuxta.nearby",
             "certificate_hash": "133920FE42E6C052D5332A6CC4C698C0B12EC257"
           }
         },
@@ -26,7 +26,7 @@
           "client_id": "491459641376-2en8gnmrkjnq2ga3p5vd5fam55p823g6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "superstartupteam.nearby",
+            "package_name": "iuxta.nearby",
             "certificate_hash": "BE96A450E8A5CE3846834FC38E1DAA78AC3E59CA"
           }
         },
