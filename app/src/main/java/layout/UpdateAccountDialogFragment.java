@@ -13,6 +13,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.SwitchCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.format.Formatter;
@@ -79,7 +80,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private ScrollView screen2;
     private ScrollView screen3;
     private RelativeLayout updatingScreen;
-    private CheckBox acceptTos;
+    private AppCompatCheckBox acceptTos;
     private TextView acceptTosError;
 
 
@@ -227,7 +228,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             });
             acceptTosError = (TextView) view.findViewById(R.id.acceptTosError);
             acceptTosError.setVisibility(View.GONE);
-            acceptTos = (CheckBox) view.findViewById(R.id.acceptTos);
+            acceptTos = (AppCompatCheckBox) view.findViewById(R.id.acceptTos);
             acceptTos.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

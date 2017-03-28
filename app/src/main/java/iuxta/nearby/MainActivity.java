@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity
     private void checkNotificationOnOpen() {
         notificationType = getIntent().getStringExtra("type");
         if (notificationType != null) {
-            if (notificationType.equals("response_update")) {
+            if (notificationType.equals(NearbyMessagingService.NotificationType.response_update.toString())) {
                 String responseJson = getIntent().getStringExtra("response");
                 String requestJson = getIntent().getStringExtra("request");
                 try {

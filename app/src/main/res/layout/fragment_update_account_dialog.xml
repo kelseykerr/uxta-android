@@ -438,12 +438,13 @@
                 android:text="@string/stripe_tos"
                 android:textSize="12sp" />
 
-            <CheckBox
+            <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/acceptTos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/stripe_tos"
                 android:textColor="@color/colorAccent"
+                app:buttonTint="@color/colorPrimary"
                 android:text="accept terms of service" />
 
             <TextView

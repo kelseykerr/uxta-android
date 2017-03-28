@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -83,13 +84,7 @@ public class NearbyMessagingService extends FirebaseMessagingService {
             intent.putExtra("type", type);
             switch (type) {
                 case "response_update":
-                    intent.putExtra("request", payload.get("request"));
-                    intent.putExtra("response", payload.get("response"));
-                    break;
                 case "offer_closed":
-                    intent.putExtra("request", payload.get("request"));
-                    intent.putExtra("response", payload.get("response"));
-                    break;
                 case "offer_accepted":
                     intent.putExtra("request", payload.get("request"));
                     intent.putExtra("response", payload.get("response"));
