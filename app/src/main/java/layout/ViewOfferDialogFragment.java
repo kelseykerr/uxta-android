@@ -6,6 +6,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -51,6 +52,7 @@ import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.Response;
+import iuxta.nearby.model.Transaction;
 import iuxta.nearby.model.User;
 
 /**
@@ -65,10 +67,13 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private TextInputLayout offerPriceLayout;
     private EditText offerPrice;
     private Spinner offerType;
+    private TextInputLayout descriptionLayout;
+    private EditText description;
     private EditText pickupLocation;
     private EditText returnLocation;
     private Button updateRequestBtn;
     private Button rejectRequestBtn;
+    private Button messageSellerBtn;
     private ImageButton backButton;
     private TextInputLayout pickupTimeLayout;
     private EditText pickupTime;
@@ -155,6 +160,15 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                         return true;
                     }
                 });
+        descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
+        description = (EditText) view.findViewById(R.id.description);
+        description.setText(response.getDescription());
+        //if this is the buyer, don't allow them to edit the description
+        if (!response.getSellerId().equals(user.getId())) {
+            description.setEnabled(false);
+        } else {
+            description.setEnabled(true);
+        }
         offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.response_offer_price);
         offerPrice.addTextChangedListener(new TextWatcher() {
@@ -195,8 +209,26 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 declineResponse();
             }
         });
+        messageSellerBtn = (Button) view.findViewById(R.id.message_seller_button);
         if (response.getSellerId().equals(user.getId())) {
+            messageSellerBtn.setVisibility(View.GONE);
             rejectRequestBtn.setText("withdraw offer");
+        } else if (response.getMessagesEnabled() == null || !response.getMessagesEnabled() || response.getSeller().getPhone() == null) {
+            messageSellerBtn.setVisibility(View.GONE);
+        } else {
+            messageSellerBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    messageSellerBtn.setEnabled(false);
+                    Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                    smsIntent.setType("vnd.android-dir/mms-sms");
+                    String phone;
+                    phone = response.getSeller().getPhone().replace("-", "");
+                    smsIntent.putExtra("address", phone);
+                    smsIntent.putExtra("sms_body","");
+                    context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+                    messageSellerBtn.setEnabled(true);
+                }
+            });
         }
         this.view = view;
         return view;

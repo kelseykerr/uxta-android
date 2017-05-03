@@ -21,6 +21,10 @@ public class Response {
      */
     private Double offerPrice;
 
+    private String description;
+
+    private Boolean messagesEnabled;
+
     /**
      * should be initially set by the seller
      */
@@ -218,5 +222,21 @@ public class Response {
 
     public void setCanceledReason(String canceledReason) {
         this.canceledReason = canceledReason;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getMessagesEnabled() {
+        return messagesEnabled;
+    }
+
+    public void setMessagesEnabled(Boolean messagesEnabled) {
+        this.messagesEnabled = messagesEnabled;
     }
 }

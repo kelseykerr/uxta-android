@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -85,6 +86,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private Date returnDate;
     private ScrollView scrollView;
     private RelativeLayout spinnerScreen;
+    private TextInputLayout descriptionLayout;
+    private EditText description;
+    private AppCompatCheckBox enableMessages;
 
 
     public NewOfferDialogFragment() {
@@ -148,6 +152,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
         offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
+
+        descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
+        description = (EditText) view.findViewById(R.id.description);
 
         offerPrice.addTextChangedListener(new TextWatcher() {
             @Override
@@ -216,6 +223,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                 dismiss();
             }
         });
+        enableMessages = (AppCompatCheckBox) view.findViewById(R.id.enable_messages);
         this.view = view;
         return view;
     }
@@ -395,6 +403,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         response.setRequestId(requestId);
         response.setSellerId(user.getId());
         response.setExchangeLocation(pickupLocation.getText().toString());
+        response.setDescription(description.getText().toString());
         if (exchangeDate != null) {
             response.setExchangeTime(exchangeDate);
         }
@@ -409,6 +418,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             response.setOfferPrice(offer);
         }
         response.setPriceType("flat");
+        response.setMessagesEnabled(enableMessages.isChecked());
         return response;
     }
 
