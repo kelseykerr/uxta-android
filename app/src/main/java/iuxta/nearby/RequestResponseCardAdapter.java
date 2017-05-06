@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -128,7 +129,12 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             rvh.acceptBtn.setEnabled(true);
             setUpAcceptBtn(rvh, response, price);
         }
-        setUpMessageBtn(rvh, response);
+        if (response.getMessagesEnabled() != null && response.getMessagesEnabled()) {
+            setUpMessageBtn(rvh, response);
+        } else {
+            rvh.messageUserBtn.setEnabled(false);
+            rvh.messageUserBtn.setColorFilter(ContextCompat.getColor(context,R.color.mutedGrey));
+        }
     }
 
     private void setUpMessageBtn(final RequestResponseCardAdapter.ResponseCardViewHolder rvh,
