@@ -37,7 +37,7 @@
                     android:id="@+id/no_results"
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_gravity="center|bottom"
+                    android:layout_gravity="center|center"
                     android:textSize="18sp"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
@@ -45,7 +45,7 @@
                     android:paddingBottom="10dp"
                     android:background="@color/colorPrimary"
                     android:text="@string/noRequestsFound"
-                    android:textStyle="bold"
+                    android:textStyle=""
                     android:textColor="@color/white"/>
 
             </fragment>
@@ -64,6 +64,7 @@
                     android:id="@+id/request_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
 
                 <TextView
                     android:layout_width="wrap_content"

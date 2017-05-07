@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
@@ -171,11 +173,19 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         privacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://thenearbyapp.com/privacy/privacypolicy.htm";
-
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+                PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
+                List activities = packageManager.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+                boolean isIntentSafe = activities.size() > 0;
+                if (isIntentSafe) {
+                    String url = "http://thenearbyapp.com/privacy";
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "no browser found, view our privacy policy at http://thenearbyapp.com/privacy", Constants.LONG_SNACK);
+                    snackbar.show();
+                }
             }
         });
 

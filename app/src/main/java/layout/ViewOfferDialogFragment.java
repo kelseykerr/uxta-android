@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -44,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
@@ -52,7 +54,6 @@ import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.Response;
-import iuxta.nearby.model.Transaction;
 import iuxta.nearby.model.User;
 
 /**
@@ -218,15 +219,24 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         } else {
             messageSellerBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    messageSellerBtn.setEnabled(false);
                     Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                    smsIntent.setType("vnd.android-dir/mms-sms");
-                    String phone;
-                    phone = response.getSeller().getPhone().replace("-", "");
-                    smsIntent.putExtra("address", phone);
-                    smsIntent.putExtra("sms_body","");
-                    context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
-                    messageSellerBtn.setEnabled(true);
+                    PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
+                    List activities = packageManager.queryIntentActivities(smsIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                    boolean isIntentSafe = activities.size() > 0;
+                    if (isIntentSafe) {
+                        Snackbar snackbar = Snackbar
+                                .make(v, "no messaging app found", Constants.LONG_SNACK);
+                        snackbar.show();
+                    } else {
+                        messageSellerBtn.setEnabled(false);
+                        smsIntent.setType("vnd.android-dir/mms-sms");
+                        String phone;
+                        phone = response.getSeller().getPhone().replace("-", "");
+                        smsIntent.putExtra("address", phone);
+                        smsIntent.putExtra("sms_body","");
+                        context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+                        messageSellerBtn.setEnabled(true);
+                    }
                 }
             });
         }

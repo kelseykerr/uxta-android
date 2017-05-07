@@ -5,14 +5,17 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +30,11 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
+import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.History;
@@ -249,24 +254,33 @@ public class ViewTransactionFragment extends DialogFragment {
 
     private void messageUserClick(boolean isSeller) {
         Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-        smsIntent.setType("vnd.android-dir/mms-sms");
-        String phone;
-        if (isSeller) {
-            phone = history.getRequest().getUser().getPhone().replace("-", "");
-        } else {
-            Response resp = null;
-            final Transaction transaction = history.getTransaction();
-            for (Response res : history.getResponses()) {
-                if (res.getId().equals(transaction.getResponseId())) {
-                    resp = res;
-                    break;
+        PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
+        List activities = packageManager.queryIntentActivities(smsIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        boolean isIntentSafe = activities.size() > 0;
+        if (isIntentSafe) {
+            smsIntent.setType("vnd.android-dir/mms-sms");
+            String phone;
+            if (isSeller) {
+                phone = history.getRequest().getUser().getPhone().replace("-", "");
+            } else {
+                Response resp = null;
+                final Transaction transaction = history.getTransaction();
+                for (Response res : history.getResponses()) {
+                    if (res.getId().equals(transaction.getResponseId())) {
+                        resp = res;
+                        break;
+                    }
                 }
+                phone = resp.getSeller().getPhone().replace("-", "");
             }
-            phone = resp.getSeller().getPhone().replace("-", "");
+            smsIntent.putExtra("address", phone);
+            smsIntent.putExtra("sms_body","");
+            context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+        } else {
+            Snackbar snackbar = Snackbar
+                    .make(view, "no messaging app found", Constants.LONG_SNACK);
+            snackbar.show();
         }
-        smsIntent.putExtra("address", phone);
-        smsIntent.putExtra("sms_body","");
-        context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
     }
 
     private void exchangeBtnClick(boolean isSeller) {

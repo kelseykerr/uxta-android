@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
     private View view;
     public static Boolean homeLocation = false;
-    public static Double currentRadius = 1.0;
+    public static Double currentRadius = 10.0;
     public static String sortBy;
     private Location currentLocation;
     public static String searchTerm;
@@ -263,9 +263,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         else if (user == null) {
             return;
         }
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Integer doInBackground(Void... params) {
                 if (latLng == null) {
                     return null;
                 }
@@ -291,11 +291,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     String output = AppUtils.getResponseContent(conn);
                     int responseCode = conn.getResponseCode();
                     Log.i("GET /requests", "Response Code : " + responseCode);
+                    //Nearby is not available in this location
+                    if (responseCode == 403) {
+                        return responseCode;
+                    }
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);
                     } catch (IOException e) {
                         Log.e("Error", output);
                     }
+                    return responseCode;
                 } catch (IOException e) {
                     Log.e("ERROR ", "Could not get requests: " + e.getMessage());
                 }
@@ -303,41 +308,55 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             }
 
             @Override
-            protected void onPostExecute(Void result) {
-                if (requestAdapter != null) {
-                    requestAdapter.swap(requests);
-                }
-                if (requestMarkers != null) {
-                    //remove old markers
-                    for (Marker m : requestMarkers) {
-                        m.remove();
-                    }
-                }
-                requestMarkers.clear();
-                if (requests.size() < 1) {
-                    noResults.setVisibility(View.VISIBLE);
-                    noResultsList.setVisibility(View.VISIBLE);
-                } else {
-                    noResults.setVisibility(View.GONE);
-                    noResultsList.setVisibility(View.GONE);
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(currLocationMarker.getPosition());
-                    setMarkerClick();
-                    for (Request request : requests) {
-                        LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title(request.getItemName());
-                        if (request.getDescription() != null && request.getDescription().length() > 0) {
-                            markerOptions.snippet(request.getDescription());
+            protected void onPostExecute(Integer responseCode) {
+                //Nearby not in this location yet
+                if (responseCode == 403) {
+                    if (requestMarkers != null) {
+                        //remove old markers
+                        for (Marker m : requestMarkers) {
+                            m.remove();
                         }
+                    }
+                    requestMarkers.clear();
+                    noResults.setText("Nearby is not yet available here");
+                    noResults.setVisibility(View.VISIBLE);
+                } else {
+                    if (requestAdapter != null) {
+                        requestAdapter.swap(requests);
+                    }
+                    if (requestMarkers != null) {
+                        //remove old markers
+                        for (Marker m : requestMarkers) {
+                            m.remove();
+                        }
+                    }
+                    requestMarkers.clear();
+                    if (requests.size() < 1) {
+                        noResults.setText("no results found");
+                        noResults.setVisibility(View.VISIBLE);
+                        noResultsList.setVisibility(View.VISIBLE);
+                    } else {
+                        noResults.setVisibility(View.GONE);
+                        noResultsList.setVisibility(View.GONE);
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        builder.include(currLocationMarker.getPosition());
+                        setMarkerClick();
+                        for (Request request : requests) {
+                            LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
+                            MarkerOptions markerOptions = new MarkerOptions();
+                            markerOptions.position(latLng);
+                            markerOptions.title(request.getItemName());
+                            if (request.getDescription() != null && request.getDescription().length() > 0) {
+                                markerOptions.snippet(request.getDescription());
+                            }
 
-                        float[] hsv = new float[3];
-                        Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
-                        Marker marker = map.addMarker(markerOptions);
-                        requestMarkers.add(marker);
-                        builder.include(marker.getPosition());
+                            float[] hsv = new float[3];
+                            Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+                            Marker marker = map.addMarker(markerOptions);
+                            requestMarkers.add(marker);
+                            builder.include(marker.getPosition());
+                        }
                     }
                 }
                 if (latLng != null && !homeLocation) {
@@ -348,7 +367,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
                     updateZoom(null, home);
                 }
-
             }
         }.execute();
     }
