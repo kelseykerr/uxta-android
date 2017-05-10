@@ -216,10 +216,11 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     }
 
     private void setSaveBtnClick() {
-        //TODO: uncomment below and remove the manual set of cc number & exp date
-        /*user.setCreditCardNumber(newCcNumber.getText().toString());
-        user.setCcExpirationDate(newExpDate.getText().toString());*/
-        Card card = new Card("4242424242424242", 5, 19, cvcNumber.getText().toString());
+        String exp = newExpDate.getText().toString();
+        Integer year = Integer.parseInt(exp.substring(exp.length()-2, exp.length()));
+        Integer month = Integer.parseInt(exp.substring(0, 2);
+        //Card card = new Card("4242424242424242", 5, 19, cvcNumber.getText().toString());
+        Card card = new Card(newCcNumber.getText().toString(), month, year, cvcNumber.getText().toString());
         if (!card.validateCard()) {
             // Show errors
             Log.e(TAG, "Card was not valid");
