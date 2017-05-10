@@ -227,7 +227,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
             return;
         }
         try {
-            Stripe stripe = new Stripe(Constants.STRIPE_TEST_KEY);
+            Stripe stripe = new Stripe(Constants.STRIPE_PUBLISHABLE_KEY);
             stripe.createToken(
                     card,
                     new TokenCallback() {

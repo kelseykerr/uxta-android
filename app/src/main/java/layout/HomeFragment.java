@@ -310,7 +310,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             @Override
             protected void onPostExecute(Integer responseCode) {
                 //Nearby not in this location yet
-                if (responseCode == 403) {
+                if (responseCode != null && responseCode == 403) {
                     if (requestMarkers != null) {
                         //remove old markers
                         for (Marker m : requestMarkers) {
