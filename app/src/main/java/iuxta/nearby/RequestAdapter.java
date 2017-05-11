@@ -99,7 +99,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
             int position = (Integer) v.getTag();
             Request r = requests.get(position);
-            homeFragment.showDialog(r.getId());
+            homeFragment.showDialog(r.getId(), r.getRental());
         } else {
             String title;
             boolean showAction = false;

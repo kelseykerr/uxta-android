@@ -181,7 +181,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                             if (r.getLatitude().equals(marker.getPosition().latitude) &&
                                     r.getLongitude().equals(marker.getPosition().longitude) &&
                                     marker.getTitle().equals(r.getItemName())) {
-                                showDialog(r.getId());
+                                showDialog(r.getId(), r.getRental());
                                 break;
                             }
                         }
@@ -222,12 +222,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-    public void showDialog(String itemId) {
+    public void showDialog(String itemId, Boolean isRental) {
         if (!MainActivity.areLocationServicesOn()) {
             ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
             return;
         }
-        DialogFragment newFragment = NewOfferDialogFragment.newInstance(itemId);
+        DialogFragment newFragment = NewOfferDialogFragment.newInstance(itemId, isRental);
         newFragment.show(getFragmentManager(), "dialog");
     }
 

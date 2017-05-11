@@ -67,6 +67,7 @@ import iuxta.nearby.model.User;
  */
 public class NewOfferDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private String requestId;
+    private Boolean isRental;
     private User user;
     private Context context;
     private OnFragmentInteractionListener mListener;
@@ -95,10 +96,11 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         // Required empty public constructor
     }
 
-    public static NewOfferDialogFragment newInstance(String requestId) {
+    public static NewOfferDialogFragment newInstance(String requestId, Boolean isRental) {
         NewOfferDialogFragment fragment = new NewOfferDialogFragment();
         Bundle args = new Bundle();
         args.putString("REQUEST_ID", requestId);
+        args.putBoolean("RENTAL", isRental);
         fragment.setArguments(args);
         return fragment;
     }
@@ -116,10 +118,11 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         user = PrefUtils.getCurrentUser(context);
-        super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             requestId = getArguments().getString("REQUEST_ID");
+            isRental = getArguments().getBoolean("RENTAL");
         }
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -187,9 +190,14 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
         returnTime = (EditText) view.findViewById(R.id.return_time);
         returnTime.setKeyListener(null);
+        if (isRental != null && !isRental) {
+            returnLocation.setVisibility(View.GONE);
+            returnTime.setVisibility(View.GONE);
+        } else {
+            setDateFunctionality(returnTime, true);
+        }
 
         setDateFunctionality(pickupTime, false);
-        setDateFunctionality(returnTime, true);
 
         pickupLocation.setOnEditorActionListener(
                 new EditText.OnEditorActionListener() {
