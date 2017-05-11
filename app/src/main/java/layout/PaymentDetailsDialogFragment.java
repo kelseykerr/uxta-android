@@ -218,7 +218,7 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
     private void setSaveBtnClick() {
         String exp = newExpDate.getText().toString();
         Integer year = Integer.parseInt(exp.substring(exp.length()-2, exp.length()));
-        Integer month = Integer.parseInt(exp.substring(0, 2);
+        Integer month = Integer.parseInt(exp.substring(0, 2));
         //Card card = new Card("4242424242424242", 5, 19, cvcNumber.getText().toString());
         Card card = new Card(newCcNumber.getText().toString(), month, year, cvcNumber.getText().toString());
         if (!card.validateCard()) {
