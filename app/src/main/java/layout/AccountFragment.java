@@ -52,8 +52,6 @@ import iuxta.nearby.model.User;
 public class AccountFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
     private Context context;
     private Bitmap bitmap;
-    private TextView btnLogout;
-    private TextView editProfile;
     private TextView noCustomerText;
     private TextView noMerchantText;
     private TextView missingUserInfoText;
@@ -121,73 +119,16 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         updateAccountRequest = false;
 
         logoutLayout = (RelativeLayout) view.findViewById(R.id.logout_layout);
-
-        logoutLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
+        handleLogout();
 
         editAccntLayout = (RelativeLayout) view.findViewById(R.id.edit_accnt_layout);
-
-        editAccntLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!MainActivity.isNetworkConnected()) {
-                    showNoConnectionSnackbar();
-                } else {
-                    updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                    updateAccountDialog.show(getFragmentManager(), "dialog");
-                }
-            }
-        });
+        handleEditAccount();
 
         paymentsLayout = (RelativeLayout) view.findViewById(R.id.payments_layout);
-        paymentsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!MainActivity.isNetworkConnected()) {
-                    showNoConnectionSnackbar();
-                } else if (!AppUtils.canAddPayments(user)) {
-                    Snackbar snackbar = Snackbar
-                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Constants.LONG_SNACK);
-                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                            snackbar.getView().getRootView().getLayoutParams();
-
-                    params.setMargins(params.leftMargin,
-                            params.topMargin,
-                            params.rightMargin,
-                            params.bottomMargin + 150);
-                    snackbar.getView().getRootView().setLayoutParams(params);
-                    snackbar.show();
-                } else {
-                    paymentDialogFragment = PaymentDialogFragment.newInstance();
-                    paymentDialogFragment.show(getFragmentManager(), "dialog");
-                }
-            }
-        });
+        handlePayments();
 
         privacyLayout = (RelativeLayout) view.findViewById(R.id.privacy_layout);
-
-        privacyLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
-                List activities = packageManager.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
-                boolean isIntentSafe = activities.size() > 0;
-                if (isIntentSafe) {
-                    String url = "http://thenearbyapp.com/privacy";
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
-                } else {
-                    Snackbar snackbar = Snackbar
-                            .make(view, "no browser found, view our privacy policy at http://thenearbyapp.com/privacy", Constants.LONG_SNACK);
-                    snackbar.show();
-                }
-            }
-        });
+        handlePrivacy();
 
         parentScroll = (ScrollView) view.findViewById(R.id.account_parent_scrollview);
 
@@ -293,6 +234,76 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         this.view = view;
         return view;
 
+    }
+
+    public void handlePrivacy() {
+        privacyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
+                List activities = packageManager.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+                boolean isIntentSafe = activities.size() > 0;
+                if (isIntentSafe) {
+                    String url = "http://thenearbyapp.com/privacy";
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "no browser found, view our privacy policy at http://thenearbyapp.com/privacy", Constants.LONG_SNACK);
+                    snackbar.show();
+                }
+            }
+        });
+    }
+
+    public void handlePayments() {
+        paymentsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!MainActivity.isNetworkConnected()) {
+                    showNoConnectionSnackbar();
+                } else if (!AppUtils.canAddPayments(user)) {
+                    Snackbar snackbar = Snackbar
+                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Constants.LONG_SNACK);
+                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                            snackbar.getView().getRootView().getLayoutParams();
+
+                    params.setMargins(params.leftMargin,
+                            params.topMargin,
+                            params.rightMargin,
+                            params.bottomMargin + 150);
+                    snackbar.getView().getRootView().setLayoutParams(params);
+                    snackbar.show();
+                } else {
+                    paymentDialogFragment = PaymentDialogFragment.newInstance();
+                    paymentDialogFragment.show(getFragmentManager(), "dialog");
+                }
+            }
+        });
+    }
+
+    public void handleEditAccount() {
+        editAccntLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!MainActivity.isNetworkConnected()) {
+                    showNoConnectionSnackbar();
+                } else {
+                    updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+                    updateAccountDialog.show(getFragmentManager(), "dialog");
+                }
+            }
+        });
+    }
+
+    public void handleLogout() {
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
     }
 
     @Override

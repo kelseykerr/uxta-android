@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity
         locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         user = PrefUtils.getCurrentUser(MainActivity.this);
         if (user == null || user.getAccessToken() == null) {
+            //TODO: WTF is this?!
             if (user != null && user.getAccessToken() != null) {
                 Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
@@ -828,7 +829,7 @@ public class MainActivity extends AppCompatActivity
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             try {
-                Log.i("token-> ", acct.getIdToken());
+                Log.i(TAG, "token-> " + acct.getIdToken());
                 //user = new User();
                 user.setGoogleId(acct.getId());
                 user.setAccessToken(acct.getIdToken());

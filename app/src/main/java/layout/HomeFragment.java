@@ -281,13 +281,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     if (sortBy != null && !sortBy.isEmpty() && !sortBy.equals("best match")) {
                         urlString += ("&sortBy=" + sortBy);
                     }
-                    URL url = new URL(urlString);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    HttpURLConnection conn = AppUtils.getHttpConnection(urlString, "GET", user);
                     String output = AppUtils.getResponseContent(conn);
                     int responseCode = conn.getResponseCode();
                     Log.i("GET /requests", "Response Code : " + responseCode);

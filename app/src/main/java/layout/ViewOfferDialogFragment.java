@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -250,15 +249,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId() + "/responses/" + response.getId());
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    String apiPath = "/requests/" + request.getId() + "/responses/" + response.getId();
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     if (request.getUser().getId().equals(user.getId())) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
                     }
@@ -316,15 +308,8 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId() + "/responses/" + response.getId());
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    String apiPath = "/requests/" + request.getId() + "/responses/" + response.getId();
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     if (request.getUser().getId().equals(user.getId())) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
                     } else {
@@ -456,35 +441,27 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
                 DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
                 TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                        datePicker.getMonth(),
-                        datePicker.getDayOfMonth(),
-                        timePicker.getCurrentHour(),
-                        timePicker.getCurrentMinute());
-
-                Date newPickupTime = new Date(calendar.getTimeInMillis());
-
+                Date date = AppUtils.getCalendarDate(datePicker, timePicker);
                 Date current = new Date();
                 if (!pickup) {
                     if (exchangeDate != null) {
-                        newPickupTime = newPickupTime.before(exchangeDate) ? exchangeDate : newPickupTime;
+                        date = date.before(exchangeDate) ? exchangeDate : date;
                     } else {
-                        newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                        date = date.before(current) ? current : date;
                     }
                 } else {
-                    newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                    date = date.before(current) ? current : date;
                     if (returnDate != null) {
-                        newPickupTime = newPickupTime.after(returnDate) ? returnDate : newPickupTime;
+                        date = date.after(returnDate) ? returnDate : date;
                     }
                 }
-                String formattedDate = formatter.format(newPickupTime);
+                String formattedDate = formatter.format(date);
 
                 textView.setText(formattedDate);
                 if (!pickup) {
-                    returnDate = newPickupTime;
+                    returnDate = date;
                 } else {
-                    exchangeDate = newPickupTime;
+                    exchangeDate = date;
                 }
                 alertDialog.dismiss();
             }

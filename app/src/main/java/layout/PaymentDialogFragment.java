@@ -24,10 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.PaymentDetails;
@@ -113,13 +111,7 @@ public class PaymentDialogFragment extends DialogFragment {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/payments");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/users/me/payments", "GET", user);
                     responseCode = conn.getResponseCode();
                     String output = AppUtils.getResponseContent(conn);
                     if (responseCode != 200) {

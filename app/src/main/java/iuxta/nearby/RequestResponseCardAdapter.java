@@ -22,13 +22,12 @@ import com.bumptech.glide.Glide;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
-import layout.HistoryFragment;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.Response;
 import iuxta.nearby.model.User;
+import layout.HistoryFragment;
 
 /**
  * Created by kerrk on 11/8/16.
@@ -41,7 +40,6 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
     private User user;
     private Context context;
     private LayoutInflater mInflater;
-    private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
     private static final String TAG = "RequestResponseCardAdap";
 
     public RequestResponseCardAdapter(Context context, List<Response> responses, Request request, HistoryFragment hf) {
@@ -63,26 +61,42 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             return;
         }
         final BigDecimal price = AppUtils.formatCurrency(response.getOfferPrice());
-        String htmlString = "<font color='#767474'>" + response.getSeller().getFirstName() +
+        String htmlString = "<font color='#767474'>" + response.getSellerName() +
                 " made an offer for $" + price + "</font>";
         rvh.offerText.setText(Html.fromHtml(htmlString));
-        if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
+        if (response.isClosed()) {
             String statusString = "CLOSED";
             if (response.getCanceledReason() != null && response.getCanceledReason().length() > 0) {
                 statusString += (" - " + response.getCanceledReason());
             }
             rvh.responseStatus.setText(statusString);
-        } else if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
-            rvh.responseStatus.setText("OPEN");
-        } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
-            rvh.responseStatus.setText("PENDING SELLER ACCEPTANCE");
+            rvh.editBtn.setVisibility(View.GONE);
+            rvh.rejectBtn.setVisibility(View.GONE);
+            rvh.acceptBtn.setVisibility(View.GONE);
         } else {
-            rvh.responseStatus.setText(response.getResponseStatus().toString());
+              if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
+                rvh.responseStatus.setText("OPEN");
+            } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
+                rvh.responseStatus.setText("PENDING SELLER ACCEPTANCE");
+            } else {
+                rvh.responseStatus.setText(response.getResponseStatus().toString());
+            }
+            rvh.editBtn.setEnabled(true);
+            rvh.editBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(response);
+                }
+            });
+            rvh.rejectBtn.setEnabled(true);
+            setUpRejectBtn(rvh, response, price);
+            rvh.acceptBtn.setEnabled(true);
+            setUpAcceptBtn(rvh, response, price);
         }
         String diff = AppUtils.getTimeDiffString(response.getResponseTime());
         rvh.postedDate.setText(diff);
 
-        String formatedExchangeTime = response.getExchangeTime() != null ? formatter.format(response.getExchangeTime()) : null;
+        String formatedExchangeTime = response.getExchangeTime() != null ? Constants.DATE_FORMATTER.format(response.getExchangeTime()) : null;
         if (formatedExchangeTime != null) {
             String exchangeTime = "<b>exchange time:</b> " + formatedExchangeTime;
             rvh.exchangeTime.setText(Html.fromHtml(exchangeTime));
@@ -97,7 +111,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         } else {
             rvh.exchangeLocation.setVisibility(View.GONE);
         }
-        String formatedReturnTime = response.getReturnTime() != null ? formatter.format(response.getReturnTime()) : null;
+        String formatedReturnTime = response.getReturnTime() != null ? Constants.DATE_FORMATTER.format(response.getReturnTime()) : null;
         if (formatedReturnTime != null) {
             String returnTime = "<b>return time:</b> " + formatedReturnTime;
             rvh.returnTime.setText(Html.fromHtml(returnTime));
@@ -111,23 +125,6 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             rvh.returnLocation.setVisibility(View.VISIBLE);
         } else {
             rvh.returnLocation.setVisibility(View.GONE);
-        }
-        if (response.getResponseStatus().equals(Response.Status.CLOSED)) {
-            rvh.editBtn.setVisibility(View.GONE);
-            rvh.rejectBtn.setVisibility(View.GONE);
-            rvh.acceptBtn.setVisibility(View.GONE);
-        } else {
-            rvh.editBtn.setEnabled(true);
-            rvh.editBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    historyFragment.showResponseDialog(response);
-                }
-            });
-            rvh.rejectBtn.setEnabled(true);
-            setUpRejectBtn(rvh, response, price);
-            rvh.acceptBtn.setEnabled(true);
-            setUpAcceptBtn(rvh, response, price);
         }
         if (response.getMessagesEnabled() != null && response.getMessagesEnabled()) {
             setUpMessageBtn(rvh, response);

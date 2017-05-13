@@ -27,10 +27,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
 import iuxta.nearby.InputFilterMinMax;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
@@ -52,15 +50,19 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
     private RelativeLayout confirmChargeScreen;
     private RelativeLayout spinnerScreen;
     private EditText price;
+    private static final String DESCRIPTION = "DESCRIPTION";
+    private static final String CALCULATED_PRICE = "CALCULATED_PRICE";
+    private static final String TRANSACTION_ID = "TRANSACTION_ID";
+    private static final String TAG = "ConfirmChargeDialogFrag";
 
 
     public static ConfirmChargeDialogFragment newInstance(Double calculatedPrice, String description,
                                                           String transactionId) {
         ConfirmChargeDialogFragment fragment = new ConfirmChargeDialogFragment();
         Bundle args = new Bundle();
-        args.putString("DESCRIPTION", description);
-        args.putDouble("CALCULATED_PRICE", calculatedPrice);
-        args.putString("TRANSACTION_ID", transactionId);
+        args.putString(DESCRIPTION, description);
+        args.putDouble(CALCULATED_PRICE, calculatedPrice);
+        args.putString(TRANSACTION_ID, transactionId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,10 +82,10 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
         user = PrefUtils.getCurrentUser(context);
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            description = getArguments().getString("DESCRIPTION");
-            calculatedPrice = getArguments().getDouble("CALCULATED_PRICE");
+            description = getArguments().getString(DESCRIPTION);
+            calculatedPrice = getArguments().getDouble(CALCULATED_PRICE);
             originalPrice = calculatedPrice;
-            transactionId = getArguments().getString("TRANSACTION_ID");
+            transactionId = getArguments().getString(TRANSACTION_ID);
         }
 
     }
@@ -140,7 +142,6 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
 
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -178,17 +179,7 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
             @Override
             protected Integer doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/transactions/"
-                            + transactionId + "/price");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/transactions/" + transactionId + "/price", "PUT", user);
                     Transaction t = new Transaction();
                     double p = Double.parseDouble(offer);
                     if (p != originalPrice) {
@@ -202,13 +193,13 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
                     os.close();
 
                     Integer responseCode = conn.getResponseCode();
-                    Log.i("PUT /price", "Response Code : " + responseCode);
+                    Log.i(TAG, "PUT /price response code : " + responseCode);
                     if (responseCode != 200) {
                         throw new IOException(conn.getResponseMessage());
                     }
                     return responseCode;
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not confirm price: " + e.getMessage());
+                    Log.e(TAG, "ERROR could not confirm price: " + e.getMessage());
                 }
                 return null;
             }

@@ -50,69 +50,77 @@ public class ScannerActivity extends AppCompatActivity implements
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            setContentView(R.layout.fragment_enter_code);
-            TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-                transactionId = extras.getString("TRANSACTION_ID");
-                heading = extras.getString("HEADER");
-                header.setText(heading);
-            }
-            changeInputBtn = (Button) findViewById(R.id.change_input_button);
-            backBtn = (ImageButton) findViewById(R.id.back_button);
-            backBtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                    .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.CODE_FRAGMENT_TAG)
-                    .commit();
-            changeInputBtn.setVisibility(View.GONE);
+            showManualEntry();
         } else {
-            setContentView(R.layout.activity_scanner);
-            TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-                transactionId = extras.getString("TRANSACTION_ID");
-                heading = extras.getString("HEADER");
-                header.setText(heading);
-            }
-            changeInputBtn = (Button) findViewById(R.id.change_input_button);
-            changeInputBtn.setVisibility(View.VISIBLE);
-            backBtn = (ImageButton) findViewById(R.id.back_button);
-            backBtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-            fragmentManager.beginTransaction()
-                    .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                    .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                    .commit();
-            changeInputBtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    if (qrFrag) {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                                .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                                .commit();
-                        qrFrag = false;
-                        changeInputBtn.setText("Scan QR Code");
-                    } else {
-                        fragmentManager.beginTransaction()
-                                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
-                                .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
-                                .commit();
-                        qrFrag = true;
-                        changeInputBtn.setText("Type In Code");
-                    }
-
-                }
-            });
+            showScannerEntry();
         }
 
+    }
+
+    private void showManualEntry() {
+        setContentView(R.layout.fragment_enter_code);
+        TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            transactionId = extras.getString("TRANSACTION_ID");
+            heading = extras.getString("HEADER");
+            header.setText(heading);
+        }
+        changeInputBtn = (Button) findViewById(R.id.change_input_button);
+        backBtn = (ImageButton) findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.CODE_FRAGMENT_TAG)
+                .commit();
+        changeInputBtn.setVisibility(View.GONE);
+    }
+
+    private void showScannerEntry() {
+        setContentView(R.layout.activity_scanner);
+        TextView header = (TextView) findViewById(R.id.confirm_exchange_text);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            transactionId = extras.getString("TRANSACTION_ID");
+            heading = extras.getString("HEADER");
+            header.setText(heading);
+        }
+        changeInputBtn = (Button) findViewById(R.id.change_input_button);
+        changeInputBtn.setVisibility(View.VISIBLE);
+        backBtn = (ImageButton) findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                .commit();
+        changeInputBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (qrFrag) {
+                    fragmentManager.beginTransaction()
+                            .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                            .replace(R.id.scanner_layout, new EnterCodeFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                            .commit();
+                    qrFrag = false;
+                    changeInputBtn.setText("Scan QR Code");
+                } else {
+                    fragmentManager.beginTransaction()
+                            .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left)
+                            .replace(R.id.scanner_layout, new SimpleScannerFragment(), Constants.SCANNER_FRAGMENT_TAG)
+                            .commit();
+                    qrFrag = true;
+                    changeInputBtn.setText("Type In Code");
+                }
+
+            }
+        });
     }
 
 

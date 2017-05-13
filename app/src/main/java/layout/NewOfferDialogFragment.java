@@ -41,7 +41,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -288,15 +287,8 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + requestId + "/responses");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    String apiPath = "/requests/" + requestId + "/responses";
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "POST", user);
                     Response newResponse = createNewResponseObject();
                     ObjectMapper mapper = new ObjectMapper();
                     String responseJson = mapper.writeValueAsString(newResponse);
@@ -455,35 +447,28 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             public void onClick(View view) {
                 DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
                 TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                        datePicker.getMonth(),
-                        datePicker.getDayOfMonth(),
-                        timePicker.getCurrentHour(),
-                        timePicker.getCurrentMinute());
-
-                Date newPickupTime = new Date(calendar.getTimeInMillis());
+                Date date = AppUtils.getCalendarDate(datePicker, timePicker);
                 Date current = new Date();
                 if (isReturn) {
                     if (exchangeDate != null) {
-                        newPickupTime = newPickupTime.before(exchangeDate) ? exchangeDate : newPickupTime;
+                        date = date.before(exchangeDate) ? exchangeDate : date;
                     } else {
-                        newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                        date = date.before(current) ? current : date;
                     }
                 } else {
-                    newPickupTime = newPickupTime.before(current) ? current : newPickupTime;
+                    date = date.before(current) ? current : date;
                     if (returnDate != null) {
-                        newPickupTime = newPickupTime.after(returnDate) ? returnDate : newPickupTime;
+                        date = date.after(returnDate) ? returnDate : date;
                     }
                 }
                 SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
-                String formattedDate = formatter.format(newPickupTime);
+                String formattedDate = formatter.format(date);
 
                 time.setText(formattedDate);
                 if (isReturn) {
-                    returnDate = newPickupTime;
+                    returnDate = date;
                 } else {
-                    exchangeDate = newPickupTime;
+                    exchangeDate = date;
                 }
                 alertDialog.dismiss();
             }

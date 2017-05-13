@@ -27,10 +27,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
@@ -203,15 +201,7 @@ public class PaymentDestinationDialogFragment extends DialogFragment {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/stripe/bank");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/stripe/bank", "POST", user);
                     ObjectMapper mapper = new ObjectMapper();
                     String userJson = mapper.writeValueAsString(user);
                     Log.i("updated user json: ", userJson);

@@ -30,10 +30,8 @@ import com.google.zxing.common.BitMatrix;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
@@ -61,6 +59,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
     private TextView forgotBtn;
     private boolean initialExchange;
     private boolean forgot = false;
+    private static final String TAG = "ExchangeCodeDialogFragm";
 
     public static ExchangeCodeDialogFragment newInstance(String transactionId, String heading,
                                                          boolean initialExchange) {
@@ -249,14 +248,8 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
             @Override
             protected Bitmap doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/transactions/"
-                            + transactionId + "/code");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    String apiPath = "/transactions/" + transactionId + "/code";
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "GET", user);
                     String output = AppUtils.getResponseContent(conn);
                     exchangeCode = output;
                     try {
@@ -266,7 +259,7 @@ public class ExchangeCodeDialogFragment extends DialogFragment {
                         e.printStackTrace();
                     }
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not get exchange code: " + e.getMessage());
+                    Log.e(TAG, "could not get exchange code: " + e.getMessage());
                 }
                 return null;
             }

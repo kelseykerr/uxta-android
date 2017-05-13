@@ -54,7 +54,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -366,15 +365,7 @@ public class RequestDialogFragment extends DialogFragment
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId());
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/requests/" + request.getId(), "PUT", user);
                     updateRequestObject();
                     ObjectMapper mapper = new ObjectMapper();
                     // we don't need to update the location or user info
@@ -431,15 +422,7 @@ public class RequestDialogFragment extends DialogFragment
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/requests", "POST", user);
                     Request newRequest = createNewRequestObject(lat, lng);
                     ObjectMapper mapper = new ObjectMapper();
                     String requestJson = mapper.writeValueAsString(newRequest);
@@ -483,13 +466,7 @@ public class RequestDialogFragment extends DialogFragment
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/categories");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/categories", "GET", user);
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         ObjectMapper mapper = new ObjectMapper();

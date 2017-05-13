@@ -23,9 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
-import iuxta.nearby.Constants;
+import iuxta.nearby.AppUtils;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
@@ -43,6 +42,7 @@ public class ConfirmExchangeOverrideDialogFragment extends DialogFragment {
     private String exchangeTime;
     private String description;
     private boolean isSeller = false;
+    private static final String TAG = "ConfirmExchangeOverride";
 
     public static ConfirmExchangeOverrideDialogFragment newInstance(String exchangeTime,
                                                                     String description,
@@ -172,27 +172,20 @@ public class ConfirmExchangeOverrideDialogFragment extends DialogFragment {
             @Override
             protected Integer doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/transactions/"
-                            + transactionId + "/exchange");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    String apiPath = "/transactions/" + transactionId + "/exchange";
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     ObjectMapper mapper = new ObjectMapper();
-                    String responseJson = mapper.writeValueAsString(t);
-                    byte[] outputInBytes = responseJson.getBytes("UTF-8");
+                    String json = mapper.writeValueAsString(t);
+                    byte[] outputInBytes = json.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
                     os.close();
 
                     Integer responseCode = conn.getResponseCode();
-                    Log.i("PUT /exchange", "Response Code : " + responseCode);
+                    Log.i(TAG, "PUT /exchange response code : " + responseCode);
                     return responseCode;
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not post exchange override: " + e.getMessage());
+                    Log.e(TAG, "could not post exchange override: " + e.getMessage());
                 }
                 return null;
             }

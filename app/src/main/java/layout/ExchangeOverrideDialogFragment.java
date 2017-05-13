@@ -31,12 +31,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
@@ -61,8 +60,8 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
     private LinearLayout exchangeTimeBorder;
     private boolean initialExchangeOverride = true;
     private String description;
-    private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
     private ExchangeOverrideDialogFragment.OnFragmentInteractionListener mListener;
+    private static final String TAG = "ExchangeOverrideDialogF";
 
 
 
@@ -210,19 +209,11 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
             dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
                     DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
                     TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-
-                    Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                            datePicker.getMonth(),
-                            datePicker.getDayOfMonth(),
-                            timePicker.getCurrentHour(),
-                            timePicker.getCurrentMinute());
-
-                    Date newPickupTime = new Date(calendar.getTimeInMillis());
-                    String formattedDate = formatter.format(newPickupTime);
-                    exchangeTimeDate = newPickupTime;
+                    Date date = AppUtils.getCalendarDate(datePicker, timePicker);
+                    String formattedDate = Constants.DATE_FORMATTER.format(date);
+                    exchangeTimeDate = date;
                     exchangeTime.setText(formattedDate);
                     exchangeTimeLabel.setVisibility(View.VISIBLE);
                     alertDialog.dismiss();
@@ -252,27 +243,19 @@ public class ExchangeOverrideDialogFragment extends DialogFragment {
             @Override
             protected Integer doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/transactions/"
-                            + transactionId + "/exchange");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    String apiPath = "/transactions/" + transactionId + "/exchange";
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "POST", user);
                     ObjectMapper mapper = new ObjectMapper();
                     String responseJson = mapper.writeValueAsString(t);
                     byte[] outputInBytes = responseJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
                     os.close();
-
                     Integer responseCode = conn.getResponseCode();
-                    Log.i("POST /exchange", "Response Code : " + responseCode);
+                    Log.i(TAG, "POST /exchange response code : " + responseCode);
                     return responseCode;
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not post exchange override: " + e.getMessage());
+                    Log.e(TAG,  "could not post exchange override: " + e.getMessage());
                 }
                 return null;
             }

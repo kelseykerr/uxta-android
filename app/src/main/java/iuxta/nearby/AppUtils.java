@@ -3,6 +3,8 @@ package iuxta.nearby;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.util.Log;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +12,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import iuxta.nearby.model.BaseEntity;
@@ -136,6 +142,27 @@ public class AppUtils {
 
     public static boolean validateField(String field) {
         return field != null && !field.isEmpty();
+    }
+
+    public static HttpURLConnection getHttpConnection(String apiPath, String requestMethod, User user) throws IOException {
+        URL url = new URL(Constants.NEARBY_API_PATH + apiPath);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000);
+        conn.setConnectTimeout(30000);
+        conn.setRequestMethod(requestMethod);
+        conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
+        conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+        conn.setRequestProperty("Content-Type", "application/json");
+        return conn;
+    }
+
+    public static Date getCalendarDate(DatePicker datePicker, TimePicker timePicker) {
+        Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                datePicker.getMonth(),
+                datePicker.getDayOfMonth(),
+                timePicker.getCurrentHour(),
+                timePicker.getCurrentMinute());
+        return new Date(calendar.getTimeInMillis());
     }
 
 }

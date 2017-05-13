@@ -19,6 +19,7 @@ public class EnterCodeFragment extends Fragment {
 
     private EditText codeInput;
     private Button submitCodeBtn;
+    private static final String TAG = "EnterCodeFragment";
 
 
     @Override
@@ -29,7 +30,7 @@ public class EnterCodeFragment extends Fragment {
         submitCodeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String code = codeInput.getText().toString();
-                Log.i("**", "input code was: " + code);
+                Log.i(TAG, "input code was: " + code);
                 ((ScannerActivity)getActivity()).verifyCode(code);
             }
         });

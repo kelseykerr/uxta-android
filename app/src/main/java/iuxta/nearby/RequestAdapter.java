@@ -51,7 +51,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(final RequestViewHolder requestViewHolder, int i) {
         Request r = requests.get(i);
         requestViewHolder.setUpProfileImage(r.getUser());
-        String htmlString = r.getUser().getFirstName() + " would like to " +
+        String htmlString = r.getRequesterName() + " would like to " +
                 (r.getRental() ? " borrow a " : " buy a ") + "<b>" +
                 r.getItemName() + "</b>";
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
@@ -102,8 +102,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             homeFragment.showDialog(r.getId(), r.getRental());
         } else {
             String title;
-            boolean showAction = false;
-            showAction = true;
+            boolean showAction = true;
             title = "Please link your bank account to your profile";
             Snackbar snack = Snackbar.make(view.getRootView(), title,
                     Constants.LONG_SNACK);

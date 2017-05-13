@@ -406,15 +406,8 @@ public class HistoryFragment extends Fragment {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId() + "/responses/" + response.getId());
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    String apiPath = "/requests/" + request.getId() + "/responses/" + response.getId();
+                    HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     if (request.getUser().getId().equals(user.getId()) && dialog != null) {
                         response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
                     } else if (dialog != null) {
@@ -481,13 +474,7 @@ public class HistoryFragment extends Fragment {
             @Override
             protected History doInBackground(Void... params) {
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/users/me/history");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/users/me/history", "GET", user);
                     String output = AppUtils.getResponseContent(conn);
                     try {
                         recentHistory = AppUtils.jsonStringToHistoryList(output);
@@ -539,15 +526,7 @@ public class HistoryFragment extends Fragment {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    URL url = new URL(Constants.NEARBY_API_PATH + "/requests/" + request.getId());
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000);
-                    conn.setConnectTimeout(30000);
-                    conn.setRequestMethod("PUT");
-                    conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
-                    conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
-                    conn.setRequestProperty("Content-Type", "application/json");
-
+                    HttpURLConnection conn = AppUtils.getHttpConnection("/requests/" + request.getId(), "PUT", user);
                     ObjectMapper mapper = new ObjectMapper();
                     // we don't need to update the location or user info
                     Request r = request;
