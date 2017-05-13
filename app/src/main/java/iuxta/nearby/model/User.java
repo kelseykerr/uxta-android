@@ -1,6 +1,7 @@
 package iuxta.nearby.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stripe.android.model.Token;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * Created by kerrk on 7/16/16.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseEntity {
 
     private String userId;

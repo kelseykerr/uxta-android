@@ -10,10 +10,7 @@ import java.util.Date;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Transaction {
-
-    private String id;
-
+public class Transaction extends BaseEntity {
     private String requestId;
 
     private String responseId;
@@ -82,14 +79,6 @@ public class Transaction {
     private String sellerId;
 
     private String buyerId;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getRequestId() {
         return requestId;

@@ -8,6 +8,8 @@ import iuxta.nearby.service.RequestNotificationService;
 
 /**
  * Created by kerrk on 10/12/16.
+ *
+ * Hits the server to fetch recurring notifications (recent requests)
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
 

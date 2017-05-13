@@ -17,35 +17,35 @@ import iuxta.nearby.model.User;
 /**
  * Created by kerrk on 10/12/16.
  */
-//public class RequestNotificationService extends Service implements LocationListener {
 public class RequestNotificationService extends IntentService implements LocationListener {
 
+    private static final String TAG = "RequestNotificationServ";
     private User user;
     public static LatLng latLng;
 
     public RequestNotificationService() {
-        super("RequestNotificationService");
+        super(TAG);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i("RNotificationService", "Service running");
+        Log.i(TAG, "Service running");
         user = PrefUtils.getCurrentUser(this);
         if (user != null && latLng != null) {
             final boolean hasNetwork = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
             //only get notifications if app is in background
-            Log.i("RequestNotificationSrvc", "currentLatLng: " + latLng.latitude + " * " + latLng.longitude);
+            Log.i(TAG, "currentLatLng: " + latLng.latitude + " * " + latLng.longitude);
             if (!AppUtils.isAppInForeground(this) && hasNetwork) {
                 MainActivity.getRequests(latLng);
             }
         } else {
-            Log.i("NotificationService", "user or latLng are null");
+            Log.i(TAG, "user or latLng are null");
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i("RequestNotifications", "location changed*****");
+        Log.i(TAG, "location changed*****");
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
     }
 }

@@ -1,5 +1,6 @@
 package iuxta.nearby.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,6 +10,7 @@ import java.util.Date;
  * Created by kerrk on 8/7/16.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Request extends BaseEntity {
 
     private User user;
@@ -132,6 +134,23 @@ public class Request extends BaseEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isClosed() {
+        return this.getStatus() != null && this.getStatus().toLowerCase().equals("closed");
+    }
+
+    public boolean isOpen() {
+        return this.getStatus() != null && this.getStatus().toLowerCase().equals("open");
+    }
+
+    public boolean isMyRequest(User user) {
+        return user.getId().equals(this.getUser().getId());
+    }
+
+    public String getRequesterName() {
+        return this.getUser().getFirstName() != null ?
+                this.getUser().getFirstName() : this.getUser().getFullName();
     }
 
     public static class Location {

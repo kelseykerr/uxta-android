@@ -10,26 +10,10 @@
       "client_info": {
         "mobilesdk_app_id": "1:491459641376:android:3871a1f4198f10f7",
         "android_client_info": {
-          "package_name": "iuxta.nearby"
+          "package_name": "superstartupteam.nearby"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "491459641376-3dlu720luktd74t1jjf58ej8gfjpvs3c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "iuxta.nearby",
-            "certificate_hash": "133920FE42E6C052D5332A6CC4C698C0B12EC257"
-          }
-        },
-        {
-          "client_id": "491459641376-2en8gnmrkjnq2ga3p5vd5fam55p823g6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "iuxta.nearby",
-            "certificate_hash": "BE96A450E8A5CE3846834FC38E1DAA78AC3E59CA"
-          }
-        },
         {
           "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
           "client_type": 3
@@ -47,6 +31,65 @@
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491459641376:android:bbfe0cb9fa7e0aec",
+        "android_client_info": {
+          "package_name": "iuxta.nearby"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "491459641376-3dlu720luktd74t1jjf58ej8gfjpvs3c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.nearby",
+            "certificate_hash": "133920fe42e6c052d5332a6cc4c698c0b12ec257"
+          }
+        },
+        {
+          "client_id": "491459641376-2en8gnmrkjnq2ga3p5vd5fam55p823g6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.nearby",
+            "certificate_hash": "be96a450e8a5ce3846834fc38e1daa78ac3e59ca"
+          }
+        },
+        {
+          "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGQrVLaAbRtVj8EuGb_CLSWl8AvgeLSAY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "491459641376-a0o6orf4feb3i2sj4g3t5km1l3vbbnpg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.iuxtainc.Nearby"
+              }
+            }
+          ]
         },
         "ads_service": {
           "status": 2

@@ -373,7 +373,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     private void updateZoom(Marker marker, LatLng latLng) {
         if (currentRadius == null) {
-            currentRadius = 1.0;
+            currentRadius = 10.0;
         }
         CircleOptions options = new CircleOptions();
         options.center(marker != null ? marker.getPosition() : latLng);
@@ -461,7 +461,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = map.addMarker(markerOptions);
-            getRequests(1.0);
+            getRequests(currentRadius);
             if (recList != null) {
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
@@ -506,7 +506,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        getRequests(1.0);
+        getRequests(currentRadius);
         if (requestAdapter != null) {
             requestAdapter.swap(requests);
         }

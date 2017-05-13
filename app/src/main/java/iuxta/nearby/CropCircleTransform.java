@@ -14,6 +14,8 @@ import com.bumptech.glide.load.resource.bitmap.BitmapResource;
 
 /**
  * Created by kerrk on 3/5/17.
+ *
+ * Creates circular profile pictures
  */
 public class CropCircleTransform implements Transformation<Bitmap> {
 

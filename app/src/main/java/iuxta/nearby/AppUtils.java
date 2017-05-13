@@ -27,9 +27,11 @@ import iuxta.nearby.model.User;
  */
 public class AppUtils {
 
+    private static final String TAG = "AppUtils";
     public static final Currency USD = Currency.getInstance("USD");
     public static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
     public static final Double DEFAULT_REQUEST_RADIUS = .25;
+
 
      public static <T extends BaseEntity> T jsonStringToPojo(Class<T> c, String jsonString) throws IOException {
          ObjectMapper mapper = new ObjectMapper();
@@ -43,7 +45,7 @@ public class AppUtils {
             List<Request> pojos = mapper.readValue(jsonString, new TypeReference<List<Request>>() {});
             return pojos;
         } catch (IOException e) {
-            Log.e("***", "error converting string to response list: " + e.getMessage());
+            Log.e(TAG, "error converting string to response list: " + e.getMessage());
             throw new IOException(e);
         }
     }
@@ -54,7 +56,7 @@ public class AppUtils {
             List<History> pojos = mapper.readValue(jsonString, new TypeReference<List<History>>() {});
             return pojos;
         } catch (IOException e) {
-            Log.e("***", "error converting string to history list: " + e.getMessage());
+            Log.e(TAG, "error converting string to history list: " + e.getMessage());
             throw new IOException(e);
         }
     }

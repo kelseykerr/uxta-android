@@ -1,5 +1,7 @@
 package iuxta.nearby;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by kerrk on 8/24/16.
  */
@@ -50,4 +52,7 @@ public class Constants {
     public static final Double MINIMUM_OFFER_PRICE = 0.50;
 
     public static final int LONG_SNACK = 6000;
+
+    public static final  SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+
 }

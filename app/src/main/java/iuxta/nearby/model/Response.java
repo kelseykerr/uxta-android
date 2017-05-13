@@ -1,15 +1,17 @@
 package iuxta.nearby.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by kerrk on 9/8/16.
  */
-public class Response {
-
-    private String id;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Response extends BaseEntity {
     private String requestId;
 
     private String sellerId;
@@ -93,15 +95,6 @@ public class Response {
      */
     public static enum Status {
         PENDING, ACCEPTED, CLOSED
-    }
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getRequestId() {
@@ -238,5 +231,18 @@ public class Response {
 
     public void setMessagesEnabled(Boolean messagesEnabled) {
         this.messagesEnabled = messagesEnabled;
+    }
+
+    public boolean isClosed() {
+        return this.getResponseStatus() != null && this.getResponseStatus().equals(Status.CLOSED);
+    }
+
+    public boolean isPending() {
+        return this.getResponseStatus() != null && this.getResponseStatus().equals(Status.PENDING);
+    }
+
+    public String getSellerName() {
+        return this.getSeller().getFirstName() != null ?
+                this.getSeller().getFirstName() : this.getSeller().getName();
     }
 }

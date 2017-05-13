@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 
 /**
  * Created by kerrk on 7/17/16.
+ *
+ * Used to store the user object
  */
 public class ComplexPreferences {
     private static ComplexPreferences complexPreferences;

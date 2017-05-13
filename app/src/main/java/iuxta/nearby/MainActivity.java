@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity
     private Request request;
     private boolean readNotification = false;
     public static GoogleApiClient mGoogleApiClient;
-    public static User updatedUser;
     public static ConnectivityManager connMgr;
     public static LocationManager locationMgr;
     private FloatingActionButton fab;
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity
                     newFragment.show(getFragmentManager(), "dialog");
                     readNotification = true;
                 } catch (IOException e) {
-                    Log.e("JSON ERROR", "**" + e.getMessage());
+                    Log.e(TAG, "Error reading json from notification**" + e.getMessage());
                 }
             }
         }
@@ -235,6 +234,30 @@ public class MainActivity extends AppCompatActivity
         toolbar.setSubtitle("");
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        setUpFab();
+
+        mBottomBar = BottomBar.attach(this, savedInstanceState);
+        mBottomBar.setItems(R.menu.bottom_bar);
+        // if this is being opened from a notification message, default to history view
+        if (hasMessage() && !notificationType.equals("request_notification")) {
+            mBottomBar.setDefaultTabPosition(1);
+        }
+        //TODO: if request_notification, the radius should be set to the user's settings
+        setmBottomBarListener();
+        Log.i(TAG, "user access token: " +  user.getAccessToken() + " ****************");
+        Log.i(TAG, "user name: " + user.getName() + " ****************");
+        Log.i(TAG, "auth method: " + user.getAuthMethod() + "********");
+        Log.i(TAG, "****FCM TOKEN: " +  FirebaseInstanceId.getInstance().getToken());
+        NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
+        checkNotificationOnOpen();
+        scheduleNotificationsAlarm();
+        if (user.getTosAccepted() == null || user.getTosAccepted().equals(Boolean.FALSE)) {
+            AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
+            AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+        }
+    }
+
+    public void setUpFab() {
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (!AppUtils.canAddPayments(user)) {
@@ -254,26 +277,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
-        mBottomBar = BottomBar.attach(this, savedInstanceState);
-        mBottomBar.setItems(R.menu.bottom_bar);
-        // if this is being opened from a notification message, default to history view
-        if (hasMessage() && !notificationType.equals("request_notification")) {
-            mBottomBar.setDefaultTabPosition(1);
-        }
-        //TODO: if request_notification, the radius should be set to the user's settings
-        setmBottomBarListener();
-        Log.i("user access token: ", user.getAccessToken() + " ****************");
-        Log.i("user name: ", user.getName() + " ****************");
-        Log.i("auth method: ", user.getAuthMethod() + "********");
-        Log.i("****FCM TOKEN: ", FirebaseInstanceId.getInstance().getToken() + "***");
-        NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
-        checkNotificationOnOpen();
-        scheduleNotificationsAlarm();
-        if (user.getTosAccepted() == null || user.getTosAccepted().equals(Boolean.FALSE)) {
-            AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-            AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
-        }
     }
 
     public void showNoLocationServicesSnack(View view) {
@@ -685,7 +688,6 @@ public class MainActivity extends AppCompatActivity
                 user.setAccessToken(acct.getIdToken());
                 user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
                 PrefUtils.setCurrentUser(user, MainActivity.this);
-                //SharedAsyncMethods.getUserInfoFromServer(user, MainActivity.this);
             } catch (Exception e) {
                 e.printStackTrace();
             }

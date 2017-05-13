@@ -64,12 +64,12 @@ public class NearbyInstanceIdService extends FirebaseInstanceIdService {
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
                     int responseCode = conn.getResponseCode();
-                    Log.i("PUT /fcmToken", "Response Code : " + responseCode);
+                    Log.i(TAG, "PUT /fcmToken response code : " + responseCode);
                     if (responseCode != 204) {
                         throw new IOException(conn.getResponseMessage());
                     }
                 } catch (IOException e) {
-                    Log.e("ERROR ", "Could not update user's fcm token: " + e.getMessage());
+                    Log.e(TAG, "ERROR: Could not update user's fcm token: " + e.getMessage());
                 }
                 return null;
             }

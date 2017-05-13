@@ -53,20 +53,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        if(user != null && user.getAccessToken() != null){
-            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+        if (hasAccessToken()) {
+            goToMainActivity();
         }
     }
 
     @Override
     public void onPostResume() {
         super.onPostResume();
-        if(user != null && user.getAccessToken() != null){
-            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+        if (hasAccessToken()) {
+            goToMainActivity();
         }
     }
 
@@ -94,20 +90,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     }
                 });
             }
-        } else if(user != null && user.getAccessToken() != null){
-            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+        } else if (hasAccessToken()) {
+            goToMainActivity();
         }
     } // Always call the superclass method first
 
     @Override
     public void onRestart() {
         super.onRestart();
-        if(user != null && user.getAccessToken() != null){
-            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+        if (hasAccessToken()) {
+            goToMainActivity();
         }
     }
 
@@ -131,11 +123,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
         user = PrefUtils.getCurrentUser(LoginActivity.this);
-        if(user != null && user.getAccessToken() != null && user.getId() != null){
+        if(hasAccessToken() && user.getId() != null){
             Log.i("Current token: ", user.getAccessToken() + " ****************");
-            Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+            goToMainActivity();
         }
         info = (TextView) findViewById(R.id.info);
         fb = (Button) findViewById(R.id.fb);
@@ -190,7 +180,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             JSONObject object,
                             GraphResponse response) {
                         try {
-                            Log.i("token-> ", loginResult.getAccessToken().getToken());
+                            Log.i(TAG, "token-> " + loginResult.getAccessToken().getToken());
                             user = new User();
                             user.setAuthMethod(Constants.FB_AUTH_METHOD);
                             user.setFacebookId(object.getString("id").toString());
@@ -241,7 +231,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             try {
-                Log.i("token-> ", acct.getIdToken());
+                Log.i(TAG, "token-> " + acct.getIdToken());
                 user = new User();
                 user.setGoogleId(acct.getId());
                 user.setAccessToken(acct.getIdToken());
@@ -303,6 +293,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
         }
+    }
+
+    private boolean hasAccessToken() {
+        return user != null && user.getAccessToken() != null;
+    }
+
+    private void goToMainActivity() {
+        Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(homeIntent);
+        finish();
     }
 
 }

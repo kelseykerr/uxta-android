@@ -9,7 +9,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 /**
  * Created by kerrk on 1/24/17.
  */
-
 public class GoogleApiClientSingleton extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "GoogleApiClientSingleto";
