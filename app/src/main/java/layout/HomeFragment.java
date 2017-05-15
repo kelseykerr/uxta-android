@@ -107,6 +107,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public static String sortBy;
     private Location currentLocation;
     public static String searchTerm;
+    private static final String TAG = "HomeFragment";
 
 
     private OnFragmentInteractionListener mListener;
@@ -186,7 +187,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                             }
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        Log.e("marker click", " could not find request from marker index [" +
+                        Log.e(TAG, " marker click - could not find request from marker index [" +
                                 marker.getSnippet() + "]");
                     }
                 } else {
@@ -271,7 +272,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 }
                 try {
                     Double r = radius != null ? radius : currentRadius;
-                    String urlString = Constants.NEARBY_API_PATH + "/requests?radius=" + r +
+                    String urlString = "/requests?radius=" + r +
                             "&latitude=" + (homeLocation ? user.getHomeLatitude() : latLng.latitude)
                             + "&longitude=" + (homeLocation ? user.getHomeLongitude() : latLng.longitude) +
                             "&includeMine=false&expired=false";
@@ -284,7 +285,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     HttpURLConnection conn = AppUtils.getHttpConnection(urlString, "GET", user);
                     String output = AppUtils.getResponseContent(conn);
                     int responseCode = conn.getResponseCode();
-                    Log.i("GET /requests", "Response Code : " + responseCode);
+                    Log.i(TAG, "GET /requests response code : " + responseCode);
                     //Nearby is not available in this location
                     if (responseCode == 403) {
                         return responseCode;
@@ -292,7 +293,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     try {
                         requests = AppUtils.jsonStringToRequestList(output);
                     } catch (IOException e) {
-                        Log.e("Error", output);
+                        Log.e(TAG, "error getting requests: " + output);
                     }
                     return responseCode;
                 } catch (IOException e) {

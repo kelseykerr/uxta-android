@@ -43,9 +43,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import iuxta.nearby.AppUtils;
@@ -89,6 +87,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private TextInputLayout descriptionLayout;
     private EditText description;
     private AppCompatCheckBox enableMessages;
+    private static final String TAG = "NewOfferDialogFragment";
 
 
     public NewOfferDialogFragment() {
@@ -154,7 +153,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
         offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
-
         descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
         description = (EditText) view.findViewById(R.id.description);
 
@@ -180,11 +178,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
 
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
-
         pickupTimeLayout = (TextInputLayout) view.findViewById(R.id.pickup_time_layout);
         pickupTime = (EditText) view.findViewById(R.id.pickup_time);
         pickupTime.setKeyListener(null);
-
         returnLocation = (EditText) view.findViewById(R.id.return_location);
         returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
         returnTime = (EditText) view.findViewById(R.id.return_time);
@@ -297,7 +293,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
                     os.close();
-
                     responseCode = conn.getResponseCode();
                     Log.i("POST /responses", "Response Code : " + responseCode);
                     if (responseCode != 200) {

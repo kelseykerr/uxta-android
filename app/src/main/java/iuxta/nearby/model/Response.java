@@ -1,5 +1,6 @@
 package iuxta.nearby.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -233,15 +234,21 @@ public class Response extends BaseEntity {
         this.messagesEnabled = messagesEnabled;
     }
 
+    @JsonIgnore
     public boolean isClosed() {
         return this.getResponseStatus() != null && this.getResponseStatus().equals(Status.CLOSED);
     }
 
+    @JsonIgnore
     public boolean isPending() {
         return this.getResponseStatus() != null && this.getResponseStatus().equals(Status.PENDING);
     }
 
+    @JsonIgnore
     public String getSellerName() {
+        if (this.getSeller() == null) {
+            return null;
+        }
         return this.getSeller().getFirstName() != null ?
                 this.getSeller().getFirstName() : this.getSeller().getName();
     }

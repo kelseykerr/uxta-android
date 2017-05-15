@@ -1,6 +1,7 @@
 package iuxta.nearby.model;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -48,12 +49,14 @@ public class History implements ParentObject {
         this.transaction = transaction;
     }
 
+    @JsonIgnore
     public boolean hasOpenTransaction() {
         Request request = this.getRequest();
         return this.getTransaction() != null && !request.isClosed() &&
                 (this.getTransaction().getCanceled() != null && !this.getTransaction().getCanceled());
     }
 
+    @JsonIgnore
     public boolean isTransactionComplete() {
         if (this.getRequest() == null || this.getTransaction() == null) {
             return false;
@@ -62,6 +65,7 @@ public class History implements ParentObject {
                 transaction.getExchanged();
     }
 
+    @JsonIgnore
     public Response getAcceptedOffer() {
         if (this.transaction == null || this.getResponses() == null || this.getResponses().size() < 1) {
             return null;
