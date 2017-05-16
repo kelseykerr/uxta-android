@@ -23,11 +23,15 @@ import java.net.URL;
 import java.util.List;
 
 import layout.AccountFragment;
+import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.PaymentDialogFragment;
+import layout.ReportRequestFragment;
 import layout.UpdateAccountDialogFragment;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.User;
+
+import static layout.RequestDialogFragment.request;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
@@ -49,7 +53,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     @Override
     public void onBindViewHolder(final RequestViewHolder requestViewHolder, int i) {
-        Request r = requests.get(i);
+        final Request r = requests.get(i);
         requestViewHolder.setUpProfileImage(r.getUser());
         String htmlString = r.getRequesterName() + " would like to " +
                 (r.getRental() ? " borrow a " : " buy a ") + "<b>" +
@@ -80,6 +84,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 makeOffer(v, requestViewHolder);
             }
         });
+        requestViewHolder.flagSwipe.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                flagRequest(r);
+            }
+        });
+    }
+
+    public void flagRequest(Request request) {
+        homeFragment.showReportDialog(request);
     }
 
     public void makeOffer(View v, final RequestViewHolder requestViewHolder) {
@@ -147,7 +160,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected Context context;
         private ImageView profileImage;
         private RelativeLayout card;
-        private LinearLayout offerSwipe;
+        private TextView offerSwipe;
+        private TextView flagSwipe;
         private SwipeRevealLayout swipeLayout;
 
         public RequestViewHolder(Context context, View v) {
@@ -158,7 +172,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vDescription = (TextView) v.findViewById(R.id.description);
             profileImage = (ImageView) v.findViewById(R.id.profile_image);
             card = (RelativeLayout) v.findViewById(R.id.request_card);
-            offerSwipe = (LinearLayout) v.findViewById(R.id.offer_layout);
+            offerSwipe = (TextView) v.findViewById(R.id.offer_swipe);
+            flagSwipe = (TextView) v.findViewById(R.id.flag_swipe);
             swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
             swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
                 boolean wasOpen = false;

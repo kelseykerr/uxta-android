@@ -76,6 +76,7 @@ import layout.NewOfferDialogFragment;
 import layout.PaymentDestinationDialogFragment;
 import layout.PaymentDetailsDialogFragment;
 import layout.PaymentDialogFragment;
+import layout.ReportRequestFragment;
 import layout.RequestDialogFragment;
 import layout.UpdateAccountDialogFragment;
 import layout.ViewOfferDialogFragment;
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity
         PaymentDestinationDialogFragment.OnFragmentInteractionListener,
         PaymentDetailsDialogFragment.OnFragmentInteractionListener,
         GoogleApiClient.OnConnectionFailedListener,
-        ViewRequestFragment.OnFragmentInteractionListener {
+        ViewRequestFragment.OnFragmentInteractionListener,
+        ReportRequestFragment.OnFragmentInteractionListener {
 
     public static User user;
     private Toolbar toolbar;
@@ -623,6 +625,16 @@ public class MainActivity extends AppCompatActivity
         }
         snackbarMessage = message;
         mBottomBar.selectTabAtPosition(2, true);
+    }
+
+    public void goToHome(String message) {
+        HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+        if (homeFragment != null) {
+            //homeFragment.getRequests(null);
+        }
+        HomeFragment.snackbarMessage = message;
+        mBottomBar.selectTabAtPosition(0, true);
+
     }
 
     @Override

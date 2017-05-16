@@ -65,6 +65,8 @@ public class Response extends BaseEntity {
 
     private String canceledReason;
 
+    private Boolean inappropriate;
+
     public static enum PriceType {
         FLAT, PER_HOUR, PER_DAY
     }
@@ -251,5 +253,13 @@ public class Response extends BaseEntity {
         }
         return this.getSeller().getFirstName() != null ?
                 this.getSeller().getFirstName() : this.getSeller().getName();
+    }
+
+    public Boolean getInappropriate() {
+        return inappropriate;
+    }
+
+    public void setInappropriate(Boolean inappropriate) {
+        this.inappropriate = inappropriate;
     }
 }

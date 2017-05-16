@@ -39,6 +39,8 @@ public class Request extends BaseEntity {
     @JsonProperty("location")
     private Location location = new Location();
 
+    private Boolean inappropriate;
+
     public User getUser() {
         return user;
     }
@@ -156,6 +158,14 @@ public class Request extends BaseEntity {
     public String getRequesterName() {
         return this.getUser().getFirstName() != null ?
                 this.getUser().getFirstName() : this.getUser().getFullName();
+    }
+
+    public Boolean getInappropriate() {
+        return inappropriate;
+    }
+
+    public void setInappropriate(Boolean inappropriate) {
+        this.inappropriate = inappropriate;
     }
 
     public static class Location {

@@ -264,6 +264,11 @@ public class HistoryFragment extends Fragment {
         newFragment.show(getFragmentManager(), "dialog");
     }
 
+    public void showReportDialog(Request request, Response response) {
+        ReportRequestFragment frag = ReportRequestFragment.newInstance(request, response, null, false, true);
+        frag.show(getFragmentManager(), "dialog");
+    }
+
     public void showExchangeOverrideDialog(String transactionId, String header, String description,
                                            boolean initialExchange) {
         ExchangeOverrideDialogFragment f = ExchangeOverrideDialogFragment

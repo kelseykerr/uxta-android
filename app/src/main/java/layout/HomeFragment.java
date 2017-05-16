@@ -60,7 +60,9 @@ import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.RequestAdapter;
+import iuxta.nearby.model.History;
 import iuxta.nearby.model.Request;
+import iuxta.nearby.model.Response;
 import iuxta.nearby.model.User;
 import iuxta.nearby.service.RequestNotificationService;
 
@@ -108,6 +110,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private Location currentLocation;
     public static String searchTerm;
     private static final String TAG = "HomeFragment";
+    public static String snackbarMessage = null;
 
 
     private OnFragmentInteractionListener mListener;
@@ -162,6 +165,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         noResultsList = (TextView) v.findViewById(R.id.no_results_list);
         noResultsList.setVisibility(View.GONE);
+        if (snackbarMessage != null) {
+            Snackbar snackbar = Snackbar
+                    .make(view, snackbarMessage, Constants.LONG_SNACK);
+            snackbar.show();
+        }
         return v;
     }
 
@@ -623,6 +631,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         snack.getView().getRootView().setLayoutParams(params);
         snack.show();
+    }
+
+    public void showReportDialog(Request request) {
+        ReportRequestFragment frag = ReportRequestFragment.newInstance(request, null, null, true, false);
+        frag.show(getFragmentManager(), "dialog");
     }
 
 }

@@ -93,6 +93,12 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             rvh.acceptBtn.setEnabled(true);
             setUpAcceptBtn(rvh, response, price);
         }
+        rvh.flagBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showReportDialog(request, response);
+            }
+        });
         String diff = AppUtils.getTimeDiffString(response.getResponseTime());
         rvh.postedDate.setText(diff);
 
@@ -264,6 +270,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         private ImageButton acceptBtn;
         private ImageButton rejectBtn;
         private ImageButton messageUserBtn;
+        private ImageButton flagBtn;
 
         public ResponseCardViewHolder(Context context, View v) {
             super(v);
@@ -276,6 +283,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             acceptBtn = (ImageButton) v.findViewById(R.id.accept_btn);
             rejectBtn = (ImageButton) v.findViewById(R.id.reject_btn);
             messageUserBtn = (ImageButton) v.findViewById(R.id.message_user_btn);
+            flagBtn = (ImageButton) v.findViewById(R.id.flag_btn);
             exchangeTime = (TextView) v.findViewById(R.id.exchange_time);
             exchangeLocation = (TextView) v.findViewById(R.id.exchange_location);
             returnTime = (TextView) v.findViewById(R.id.return_time);

@@ -29,12 +29,24 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/offer_swipe"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="@color/colorPrimary"
                 android:gravity="center"
                 android:text="offer"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/flag_swipe"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/redPink"
+                android:gravity="center"
+                android:text="flag"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
         </LinearLayout>
