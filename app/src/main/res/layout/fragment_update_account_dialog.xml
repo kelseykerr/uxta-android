@@ -434,7 +434,8 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"
-                android:gravity="center_horizontal"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:text="@string/stripe_tos"
                 android:textSize="12sp" />
 
@@ -445,7 +446,7 @@
                 android:layout_below="@id/stripe_tos"
                 android:textColor="@color/colorAccent"
                 app:buttonTint="@color/colorPrimary"
-                android:text="accept terms of service" />
+                android:text="Accept End User Agreement and Terms of Service" />
 
             <TextView
                 android:id="@+id/acceptTosError"
@@ -454,7 +455,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/acceptTos"
                 android:layout_marginStart="5dp"
-                android:text="you must accept the terms of service"
+                android:text="you must accept the End User Agreement and Terms of Service"
                 android:textColor="@color/redPink"/>
 
             <Button
