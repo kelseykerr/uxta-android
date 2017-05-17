@@ -26,35 +26,92 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <TextView
+            <FrameLayout
+                android:layout_width="80dp"
                 android:id="@+id/more_swipe"
-                android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:background="@color/colorPrimary"
-                android:gravity="center"
-                android:text="more"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="80dp"
+                    android:layout_marginTop="-20dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimary">
+                    <ImageButton
+                        android:id="@+id/more_swipe_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:background="@color/colorPrimary"
+                        android:src="@drawable/ic_more_horiz_black_24dp"
+                        android:tint="@color/white" />
+                    <TextView
+                        android:id="@+id/more_swipe_text"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:layout_below="@id/more_swipe_btn"
+                        android:text="more"/>
+                </RelativeLayout>
+            </FrameLayout>
 
-            <TextView
+            <FrameLayout
+                android:layout_width="80dp"
                 android:id="@+id/close_swipe"
-                android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:background="@color/redPink"
-                android:gravity="center"
-                android:text="close"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="80dp"
+                    android:layout_marginTop="-20dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/redPink">
+                    <ImageButton
+                        android:id="@+id/close_swipe_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:background="@color/redPink"
+                        android:src="@drawable/ic_close_black_24dp"
+                        android:tint="@color/white" />
+                    <TextView
+                        android:id="@+id/close_swipe_text"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:layout_below="@id/close_swipe_btn"
+                        android:text="close"/>
+                </RelativeLayout>
+            </FrameLayout>
 
-            <TextView
-                android:id="@+id/exchange_swipe"
+            <FrameLayout
                 android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:background="@color/green"
-                android:gravity="center"
-                android:text="exchange"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:id="@+id/exchange_swipe"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="80dp"
+                    android:layout_marginTop="-20dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/green">
+                    <ImageButton
+                        android:id="@+id/exchange_swipe_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:background="@color/green"
+                        android:src="@drawable/ic_swap_horiz_black_24dp"
+                        android:tint="@color/white" />
+                    <TextView
+                        android:id="@+id/exchange_swipe_text"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:layout_below="@id/exchange_swipe_btn"
+                        android:text="exchange"/>
+                </RelativeLayout>
+            </FrameLayout>
         </LinearLayout>
 
 

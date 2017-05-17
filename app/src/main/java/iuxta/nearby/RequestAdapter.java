@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,16 +81,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             }
         });
         requestViewHolder.offerSwipe.setTag(i);
-        requestViewHolder.offerSwipe.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener offerClick = new View.OnClickListener() {
             public void onClick(View v) {
                 makeOffer(v, requestViewHolder);
             }
-        });
-        requestViewHolder.flagSwipe.setOnClickListener(new View.OnClickListener() {
+        };
+        requestViewHolder.offerSwipe.setOnClickListener(offerClick);
+        requestViewHolder.offerBtn.setOnClickListener(offerClick);
+        View.OnClickListener flagClick = new View.OnClickListener() {
             public void onClick(View v) {
                 flagRequest(r);
             }
-        });
+        };
+        requestViewHolder.flagSwipe.setOnClickListener(flagClick);
+        requestViewHolder.flagBtn.setOnClickListener(flagClick);
     }
 
     public void flagRequest(Request request) {
@@ -160,8 +166,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         protected Context context;
         private ImageView profileImage;
         private RelativeLayout card;
-        private TextView offerSwipe;
-        private TextView flagSwipe;
+        private FrameLayout offerSwipe;
+        private ImageButton offerBtn;
+        private FrameLayout flagSwipe;
+        private ImageButton flagBtn;
         private SwipeRevealLayout swipeLayout;
 
         public RequestViewHolder(Context context, View v) {
@@ -172,8 +180,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             vDescription = (TextView) v.findViewById(R.id.description);
             profileImage = (ImageView) v.findViewById(R.id.profile_image);
             card = (RelativeLayout) v.findViewById(R.id.request_card);
-            offerSwipe = (TextView) v.findViewById(R.id.offer_swipe);
-            flagSwipe = (TextView) v.findViewById(R.id.flag_swipe);
+            offerSwipe = (FrameLayout) v.findViewById(R.id.offer_swipe);
+            offerBtn = (ImageButton) v.findViewById(R.id.offer_btn);
+            flagSwipe = (FrameLayout) v.findViewById(R.id.flag_swipe);
+            flagBtn = (ImageButton) v.findViewById(R.id.flag_btn);
             swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
             swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
                 boolean wasOpen = false;

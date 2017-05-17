@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -165,15 +167,24 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
         } else {
             requestViewHolder.closeSwipe.setVisibility(View.VISIBLE);
-            requestViewHolder.closeSwipe.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener closeClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     closeOffer(resp, r);
                 }
-            });
+            };
+            requestViewHolder.closeSwipe.setOnClickListener(closeClick);
+            requestViewHolder.closeSwipeBtn.setOnClickListener(closeClick);
             requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
-            requestViewHolder.moreSwipe.setText("edit");
+            requestViewHolder.moreSwipeText.setText("edit");
+            requestViewHolder.moreSwipeBtn.setImageResource(R.drawable.ic_mode_edit_black_24dp);
             requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            });
+            requestViewHolder.moreSwipeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     historyFragment.showResponseDialog(resp);
@@ -217,12 +228,14 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
         if (r.isOpen()) {
             requestViewHolder.closeSwipe.setVisibility(View.VISIBLE);
-            requestViewHolder.closeSwipe.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener closeClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     closeRequest(r);
                 }
-            });
+            };
+            requestViewHolder.closeSwipe.setOnClickListener(closeClick);
+            requestViewHolder.closeSwipeBtn.setOnClickListener(closeClick);
             int count = 0;
             for (Response resp : h.getResponses()) {
                 if (resp.isPending()) {
@@ -244,6 +257,12 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         });
         requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
         requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showRequestDialog(h);
+            }
+        });
+        requestViewHolder.moreSwipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 historyFragment.showRequestDialog(h);
@@ -375,10 +394,16 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 historyFragment.showTransactionDialog(h, resp);
             }
         });
+        requestViewHolder.moreSwipeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyFragment.showTransactionDialog(h, resp);
+            }
+        });
     }
 
     private void handleExchangeClick(HistoryCardViewHolder requestViewHolder, final Transaction transaction, final boolean isSeller) {
-        requestViewHolder.exchangeSwipe.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isSeller) {
@@ -395,7 +420,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                     }
                 }
             }
-        });
+        };
+        requestViewHolder.exchangeSwipeBtn.setOnClickListener(onClickListener);
+        requestViewHolder.exchangeSwipe.setOnClickListener(onClickListener);
     }
 
     private void handleOverride(History history, Request request, Response response, boolean isExchange) {
@@ -501,9 +528,15 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         private LinearLayout responseSeparator;
         private TextView vTransactionStatus;
         private ImageView profileImage;
-        private TextView moreSwipe;
-        private TextView closeSwipe;
-        private TextView exchangeSwipe;
+        private FrameLayout moreSwipe;
+        private TextView moreSwipeText;
+        private ImageButton moreSwipeBtn;
+        private FrameLayout closeSwipe;
+        private TextView closeSwipeText;
+        private ImageButton closeSwipeBtn;
+        private FrameLayout exchangeSwipe;
+        private TextView exchangeSwipeText;
+        private ImageButton exchangeSwipeBtn;
         private SwipeRevealLayout swipeLayout;
 
         public HistoryCardViewHolder(Context context, View v) {
@@ -521,9 +554,15 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             responseSeparator = (LinearLayout) v.findViewById(R.id.response_separator);
             vTransactionStatus = (TextView) v.findViewById(R.id.transaction_status);
             profileImage = (ImageView) v.findViewById(R.id.profileImage);
-            moreSwipe = (TextView) v.findViewById(R.id.more_swipe);
-            closeSwipe = (TextView) v.findViewById(R.id.close_swipe);
-            exchangeSwipe = (TextView) v.findViewById(R.id.exchange_swipe);
+            moreSwipe = (FrameLayout) v.findViewById(R.id.more_swipe);
+            moreSwipeText = (TextView) v.findViewById(R.id.more_swipe_text);
+            moreSwipeBtn = (ImageButton) v.findViewById(R.id.more_swipe_btn);
+            closeSwipe = (FrameLayout) v.findViewById(R.id.close_swipe);
+            closeSwipeText = (TextView) v.findViewById(R.id.close_swipe_text);
+            closeSwipeBtn = (ImageButton) v.findViewById(R.id.close_swipe_btn);
+            exchangeSwipe = (FrameLayout) v.findViewById(R.id.exchange_swipe);
+            exchangeSwipeText = (TextView) v.findViewById(R.id.exchange_swipe_text);
+            exchangeSwipeBtn = (ImageButton) v.findViewById(R.id.exchange_swipe_btn);
             swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
             swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
                 boolean wasOpen = false;

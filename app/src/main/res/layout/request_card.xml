@@ -28,27 +28,61 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <TextView
+            <FrameLayout
+                android:layout_width="80dp"
                 android:id="@+id/offer_swipe"
-                android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@color/colorPrimary"
-                android:gravity="center"
-                android:text="offer"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="80dp"
+                    android:layout_marginTop="-20dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimary">
+                    <ImageButton
+                        android:id="@+id/offer_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:background="@color/colorPrimary"
+                        android:src="@drawable/ic_reply_black_24dp"
+                        android:tint="@color/white" />
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:layout_below="@id/offer_btn"
+                        android:text="respond"/>
+                </RelativeLayout>
+            </FrameLayout>
 
-            <TextView
-                android:id="@+id/flag_swipe"
+            <FrameLayout
                 android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@color/redPink"
-                android:gravity="center"
-                android:text="flag"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:id="@+id/flag_swipe"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="80dp"
+                    android:layout_marginTop="-20dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/redPink">
+                    <ImageButton
+                        android:id="@+id/flag_btn"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:background="@color/redPink"
+                        android:src="@drawable/ic_flag_black_24dp"
+                        android:tint="@color/white" />
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:layout_below="@id/flag_btn"
+                        android:text="flag"/>
+                </RelativeLayout>
+            </FrameLayout>
         </LinearLayout>
 
 

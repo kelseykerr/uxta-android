@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/additional_details_layout"
                 android:layout_marginBottom="15dp"
-                android:background="@color/redPink"
+                android:background="@color/colorPrimary"
                 android:text="Flag as Inappropriate"
                 android:textColor="#ffffff" />
 
@@ -88,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/flag_request_button"
-                android:background="@color/redPink"
+                android:background="@color/colorPrimary"
                 android:text="Block User"
                 android:textColor="#ffffff" />
             </RelativeLayout>
