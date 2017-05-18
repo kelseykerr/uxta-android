@@ -312,6 +312,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             protected void onPostExecute(Integer responseCode) {
+                if (!isAdded()) {
+                    return;
+                }
                 //Nearby not in this location yet
                 if (responseCode != null && responseCode == 403) {
                     if (requestMarkers != null) {
