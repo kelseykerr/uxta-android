@@ -357,8 +357,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                             }
 
                             float[] hsv = new float[3];
-                            //Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
-                            Color.colorToHSV(-11607316, hsv);
+                            Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                            //Color.colorToHSV(-11607316, hsv);
                             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
                             Marker marker = map.addMarker(markerOptions);
                             requestMarkers.add(marker);

@@ -308,11 +308,11 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (responseCode == 200) {
+                if (responseCode != null && responseCode == 200) {
                     submitOfferBtn.setEnabled(true);
                     dismiss();
                     ((MainActivity) getActivity()).goToHistory("successfully created offer");
-                } else if (responseCode == 406) {
+                } else if (responseCode != null && responseCode == 406) {
                     scrollView.setVisibility(View.VISIBLE);
                     spinnerScreen.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar

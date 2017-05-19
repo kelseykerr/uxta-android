@@ -213,7 +213,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         if (response.getSellerId().equals(user.getId())) {
             messageSellerBtn.setVisibility(View.GONE);
             rejectRequestBtn.setText("withdraw offer");
-        } else if (response.getMessagesEnabled() == null || !response.getMessagesEnabled() || response.getSeller().getPhone() == null) {
+        } else if (response.getMessagesEnabled() == null || !response.getMessagesEnabled() || response.getSeller() == null || response.getSeller().getPhone() == null) {
             messageSellerBtn.setVisibility(View.GONE);
         } else {
             messageSellerBtn.setOnClickListener(new View.OnClickListener() {
