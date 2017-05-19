@@ -77,13 +77,13 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         requestViewHolder.card.setTag(i);
         requestViewHolder.card.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                makeOffer(v, requestViewHolder);
+                makeOffer(r, requestViewHolder);
             }
         });
         requestViewHolder.offerSwipe.setTag(i);
         View.OnClickListener offerClick = new View.OnClickListener() {
             public void onClick(View v) {
-                makeOffer(v, requestViewHolder);
+                makeOffer(r, requestViewHolder);
             }
         };
         requestViewHolder.offerSwipe.setOnClickListener(offerClick);
@@ -101,7 +101,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         homeFragment.showReportDialog(request);
     }
 
-    public void makeOffer(View v, final RequestViewHolder requestViewHolder) {
+    public void makeOffer(Request r, final RequestViewHolder requestViewHolder) {
         boolean goodMerchantStatus = user.getCanRespond();
         if (!AppUtils.canAddPayments(user)) {
             Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
@@ -116,8 +116,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             });
             snack.show();
         } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-            int position = (Integer) v.getTag();
-            Request r = requests.get(position);
             homeFragment.showDialog(r.getId(), r.getRental());
         } else {
             String title;

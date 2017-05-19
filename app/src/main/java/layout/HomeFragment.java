@@ -170,6 +170,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     .make(view, snackbarMessage, Constants.LONG_SNACK);
             snackbar.show();
         }
+        snackbarMessage = null;
         return v;
     }
 

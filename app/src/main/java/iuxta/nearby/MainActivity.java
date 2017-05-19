@@ -421,6 +421,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.HOME_FRAGMENT_TAG, R.animator.exit_to_left);
                 } else if (menuItemId == R.id.bottomBarAccountItem) {
+                    HomeFragment.snackbarMessage = null;
                     toolbar.setVisibility(View.GONE);
                     if (fragmentManager.findFragmentByTag(Constants.ACCOUNT_FRAGMENT_TAG) != null) {
                         fragmentManager.beginTransaction()
@@ -435,6 +436,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     hideOtherFragments(Constants.ACCOUNT_FRAGMENT_TAG, R.animator.exit_to_right);
                 } else {
+                    HomeFragment.snackbarMessage = null;
                     toolbar.setVisibility(View.VISIBLE);
                     toolbarLine2.setVisibility(View.GONE);
                     toolbarHistory.setVisibility(View.VISIBLE);
