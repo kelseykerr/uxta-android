@@ -411,7 +411,7 @@
 
     </ScrollView>
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/account_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -470,7 +470,7 @@
 
         </RelativeLayout>
 
-    </ScrollView>
+    </ScrollView>-->
 
     <RelativeLayout
         android:id="@+id/updating_account_screen"

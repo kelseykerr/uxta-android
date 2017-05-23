@@ -64,4 +64,14 @@
 
     </FrameLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_below="@id/google_button"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/white"
+        android:id="@+id/terms_text"
+        android:text="By signing up, I agree to Nearby's Terms of Service, End User License Agreement, and Privacy Policy."/>
+
 </RelativeLayout>

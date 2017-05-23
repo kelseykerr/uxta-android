@@ -43,4 +43,6 @@
     <string name="noRequestsFound">no requests found</string>
     <string name="noNetworkConnection">you aren\'t connected to the network</string>
     <string name="noLocationServices">location services must be turned on</string>
+    <string name="termsText">By signing up, I agree to Nearby\'s &lt;a href=http://thenearbyapp.com/terms&gt;Terms of Service, End User License Agreement&lt;/a&gt;, and &lt;a href=http://thenearbyapp.com/privacy&gt;Privacy Policy&lt;/a&gt;.</string>
+
 </resources>

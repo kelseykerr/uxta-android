@@ -78,11 +78,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private TextView dob;
     private ScrollView screen1;
     private ScrollView screen2;
-    private ScrollView screen3;
     private RelativeLayout updatingScreen;
-    private AppCompatCheckBox acceptTos;
-    private TextView acceptTosError;
-
 
     /**
      * Use this factory method to create a new instance of
@@ -121,7 +117,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.fragment_update_account_dialog, container, false);
         screen1 = (ScrollView) view.findViewById(R.id.account_1);
         screen2 = (ScrollView) view.findViewById(R.id.account_2);
-        screen3 = (ScrollView) view.findViewById(R.id.account_3);
         updatingScreen = (RelativeLayout) view.findViewById(R.id.updating_account_screen);
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_edit_profile);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -212,43 +207,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
 
         final Button saveBtn = (Button) view.findViewById(R.id.next_button_2);
-        if (user.getTosAccepted() == null || !user.getTosAccepted()) {
-            saveBtn.setText("continue");
-            saveBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveBtn.setEnabled(false);
-                    if (validateScreenTwo()) {
-                        screen2.setVisibility(View.GONE);
-                        screen3.setVisibility(View.VISIBLE);
-                    }
-                    saveBtn.setEnabled(true);
-
-                }
-            });
-            acceptTosError = (TextView) view.findViewById(R.id.acceptTosError);
-            acceptTosError.setVisibility(View.GONE);
-            acceptTos = (AppCompatCheckBox) view.findViewById(R.id.acceptTos);
-            acceptTos.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    boolean isChecked = ((CheckBox) v).isChecked();
-                    user.setTosAccepted(isChecked);
-                    if (isChecked) {
-                        acceptTos.setError(null);
-                        acceptTosError.setVisibility(View.GONE);
-                        WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
-                        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-                        user.setTosAcceptIp(ip);
-                    }
-                }
-            });
-            Button acceptAndSave = (Button) view.findViewById(R.id.accept_and_save);
-            setSaveBtnClick(acceptAndSave);
-        } else {
-            saveBtn.setText("save");
-            setSaveBtnClick(saveBtn);
-        }
+        saveBtn.setText("save");
+        setSaveBtnClick(saveBtn);
          this.view = view;
         return view;
     }
@@ -260,13 +220,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 if (!validateScreenTwo()) {
                     return;
                 }
-                if ((acceptTos != null && !acceptTos.isChecked()) || !user.getTosAccepted()) {
-                    acceptTos.setError("");
-                    acceptTosError.setVisibility(View.VISIBLE);
-                    return;
-                }
                 screen2.setVisibility(View.GONE);
-                screen3.setVisibility(View.GONE);
                 updatingScreen.setVisibility(View.VISIBLE);
                 String first = firstName.getText().toString();
                 user.setFirstName(first);
@@ -290,6 +244,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
                 user.setDateOfBirth(dob.getText().toString());
+                if (user.getTosAccepted() == null || !user.getTosAccepted()) {
+                    user.setTosAccepted(true);
+                    WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
+                    String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+                    user.setTosAcceptIp(ip);
+                }
                 if (sPhone != null) {
                     sPhone = sPhone.replaceAll("\\)", "");
                     sPhone = sPhone.replaceAll("\\(", "");

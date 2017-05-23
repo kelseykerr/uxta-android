@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static GoogleApiClient mGoogleApiClient;
     private static final String TAG = "LoginActivity";
     private ProgressDialog mProgressDialog;
+    private TextView termsText;
 
 
     @Override
@@ -160,6 +163,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
         googleSignInBtn = (SignInButton) findViewById(R.id.google_sign_in_button);
+        termsText = (TextView) findViewById(R.id.terms_text);
+        String termsTxt=getResources().getString(R.string.termsText);
+        termsText.setMovementMethod(LinkMovementMethod.getInstance());
+        termsText.setText(Html.fromHtml(termsTxt));
     }
 
     public void onClick(View v) {
