@@ -437,7 +437,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         try {
             map.setMyLocationEnabled(true);
-            map.getUiSettings().setMyLocationButtonEnabled(false);
+            map.getUiSettings().setMyLocationButtonEnabled(true);
         } catch (SecurityException e) {
             Log.e("map permission error: ", "unable to get user's current location, " + e.getMessage());
         }

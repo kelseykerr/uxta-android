@@ -222,7 +222,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                     PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
                     List activities = packageManager.queryIntentActivities(smsIntent, PackageManager.MATCH_DEFAULT_ONLY);
                     boolean isIntentSafe = activities.size() > 0;
-                    if (isIntentSafe) {
+                    if (!isIntentSafe) {
                         Snackbar snackbar = Snackbar
                                 .make(v, "no messaging app found", Constants.LONG_SNACK);
                         snackbar.show();

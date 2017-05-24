@@ -3,7 +3,9 @@ package iuxta.nearby;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -146,12 +148,21 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             @Override
             public void onClick(View view) {
                 Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                smsIntent.setType("vnd.android-dir/mms-sms");
-                String phone;
-                phone = response.getSeller().getPhone().replace("-", "");
-                smsIntent.putExtra("address", phone);
-                smsIntent.putExtra("sms_body", "");
-                context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+                PackageManager packageManager = ((MainActivity)historyFragment.getActivity()).getPackageManager();
+                List activities = packageManager.queryIntentActivities(smsIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                boolean isIntentSafe = activities.size() > 0;
+                if (!isIntentSafe) {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "no messaging app found", Constants.LONG_SNACK);
+                    snackbar.show();
+                } else {
+                    smsIntent.setType("vnd.android-dir/mms-sms");
+                    String phone;
+                    phone = response.getSeller().getPhone().replace("-", "");
+                    smsIntent.putExtra("address", phone);
+                    smsIntent.putExtra("sms_body", "");
+                    context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
+                }
             }
         });
     }
