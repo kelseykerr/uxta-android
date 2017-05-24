@@ -301,11 +301,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             stateLayout.setError(null);
         }
-        return valid;
-    }
-
-    private boolean validateScreenTwo() {
-        boolean valid = true;
         String zipString = zip.getText().toString();
         if (zipString.isEmpty() || zipString.length() != 5) {
             zipLayout.setError("please enter your 5 digit zip code");
@@ -313,6 +308,11 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             zipLayout.setError(null);
         }
+        return valid;
+    }
+
+    private boolean validateScreenTwo() {
+        boolean valid = true;
         String emailString = email.getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailLayout.setError("please enter a valid email");
