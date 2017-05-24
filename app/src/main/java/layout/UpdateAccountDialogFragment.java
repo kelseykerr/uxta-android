@@ -75,7 +75,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private Double currentRadius;
     private OnFragmentInteractionListener mListener;
     private View view;
-    private TextView dob;
+    private TextInputLayout dobLayout;
+    private EditText dob;
     private ScrollView screen1;
     private ScrollView screen2;
     private RelativeLayout updatingScreen;
@@ -155,7 +156,8 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         phone.setText(user.getPhone());
 
-        dob = (TextView) view.findViewById(R.id.dob);
+        dobLayout = (TextInputLayout) view.findViewById(R.id.dob_layout);
+        dob = (EditText) view.findViewById(R.id.dob);
         dob.setText(user.getDateOfBirth());
         Log.i("UpdateAccount", "dob from user data = " + user.getDateOfBirth());
 
@@ -197,6 +199,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
             }
         });
 
+        dob.setKeyListener(null);
         dob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -326,10 +329,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         }
         String dobString = dob.getText().toString();
         if (dobString.isEmpty()) {
-            dob.setError("please enter your date of birth");
+            dobLayout.setError("please enter your date of birth");
             valid = false;
         } else {
-            dob.setError(null);
+            dobLayout.setError(null);
         }
         return valid;
     }

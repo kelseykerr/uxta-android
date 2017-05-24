@@ -72,6 +72,7 @@
         android:layout_marginTop="20dp"
         android:textColor="@color/white"
         android:id="@+id/terms_text"
+        android:textColorLink="@color/white"
         android:text="By signing up, I agree to Nearby's Terms of Service, End User License Agreement, and Privacy Policy."/>
 
 </RelativeLayout>
