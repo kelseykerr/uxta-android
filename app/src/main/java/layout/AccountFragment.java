@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,6 +65,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     public static PaymentDialogFragment paymentDialogFragment;
     private RelativeLayout editAccntLayout;
     private RelativeLayout logoutLayout;
+    private RelativeLayout shareLayout;
     private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
     private TextView versionText;
@@ -120,6 +122,9 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
 
         logoutLayout = (RelativeLayout) view.findViewById(R.id.logout_layout);
         handleLogout();
+
+        shareLayout = (RelativeLayout) view.findViewById(R.id.share_layout);
+        handleShare();
 
         editAccntLayout = (RelativeLayout) view.findViewById(R.id.edit_accnt_layout);
         handleEditAccount();
@@ -306,6 +311,15 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         });
     }
 
+    public void handleShare () {
+        shareLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                share();
+            }
+        });
+    }
+
     @Override
     public void onAttach(Context context) {
         this.context = context;
@@ -391,6 +405,40 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         } else {
             ((MainActivity)getActivity()).handleGoogleSignout(context);
         }
+    }
+
+    public void share() {
+        Log.i(TAG, "************************ Sharing :-)");
+/* Create the Intent */
+        final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+/* Fill it with Data */
+ //       emailIntent.setType("message/rfc822");
+        emailIntent.setType("text/html");
+/*        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"to@email.com"});  */
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Try Nearby - A Great New App");
+//        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Text");
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, Html.fromHtml(new StringBuilder()
+                .append("<html>")
+                .append("Nearby is a mobile app that just launched in Washington, DC.")
+                .append("  Are you looking to borrow or buy something?")
+                .append("  Do you want to make money from stuff you have sitting around? Learn more at ")
+                .append("<a href=\"http://thenearbyapp.com!\">http://thenearbyapp.com</a>")
+                .append(" or download it using one of the following links:")
+                .append("<br/>")
+                .append("<br/>")
+                .append("Google Play Store: ")
+                .append("<a href=\"Android Link\">https://play.google.com/store/apps/details?id=iuxta.nearby</a>")
+                .append("<br/>")
+                .append("<br/>")
+                .append("App Store: ")
+                .append("<a href=\"Apple Link\">https://itunes.apple.com/us/app/nearby-share-sell-borrow/id1223745552</a>")
+                .toString())
+        );
+
+/* Send it off to the Activity-Chooser */
+        context.startActivity(Intent.createChooser(emailIntent, "Send mail using..."));
+
     }
 
     public void setProfilePic() {
