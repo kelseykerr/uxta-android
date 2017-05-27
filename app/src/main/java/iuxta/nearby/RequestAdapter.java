@@ -1,6 +1,7 @@
 package iuxta.nearby;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
@@ -26,6 +27,7 @@ import java.util.List;
 import layout.AccountFragment;
 import layout.HomeFragment;
 import layout.PaymentDialogFragment;
+import layout.RequestPreviewFragment;
 import layout.UpdateAccountDialogFragment;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.User;
@@ -72,7 +74,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         requestViewHolder.card.setTag(i);
         requestViewHolder.card.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                makeOffer(r, requestViewHolder);
+                DialogFragment newFragment = RequestPreviewFragment.newInstance(r, homeFragment);
+                newFragment.show(((Activity) requestViewHolder.context).getFragmentManager(), "dialog");
+               // makeOffer(r, requestViewHolder);
             }
         });
         requestViewHolder.offerSwipe.setTag(i);

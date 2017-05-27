@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,21 +19,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
-import iuxta.nearby.CropCircleTransform;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.Request;
@@ -57,8 +49,7 @@ public class RequestPreviewFragment extends DialogFragment {
     private EditText description;
     private TextInputLayout descriptionLayout;
     private static HomeFragment homeFragment;
-    ImageView requesterImage;
-    TextView requesterName;
+    private Button flagBtn;
     private static final String TAG = "RequestPreviewFragment";
 
     public RequestPreviewFragment() {
@@ -99,10 +90,6 @@ public class RequestPreviewFragment extends DialogFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.request_preview_dialog, container, false);
         scrollView = (ScrollView) view.findViewById(R.id.scrollview);
-        requesterImage = (ImageView) view.findViewById(R.id.requester_image);
-        setUpProfileImage(request.getUser(), requesterImage);
-        requesterName = (TextView) view.findViewById(R.id.requester_name);
-        requesterName.setText(request.getUser().getFirstName());
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
         ArrayAdapter<String> rentBuyAdapter;
         List<String> rentBuyList = new ArrayList<>();
@@ -123,6 +110,13 @@ public class RequestPreviewFragment extends DialogFragment {
             public void onClick(View v) {
                 createOfferBtn.setEnabled(false);
                 createOffer();
+            }
+        });
+        flagBtn  = (Button) view.findViewById(R.id.flag_button);
+        flagBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dismiss();
+                homeFragment.showReportDialog(request);
             }
         });
         itemName = (EditText) view.findViewById(R.id.item_name);
@@ -229,21 +223,5 @@ public class RequestPreviewFragment extends DialogFragment {
         }
 
     }
-
-    public void setUpProfileImage(final User user, final ImageView imageBtn) {
-        final boolean isGoogle = user.getAuthMethod() != null &&
-                user.getAuthMethod().equals(Constants.GOOGLE_AUTH_METHOD);
-        try {
-            URL imageURL = new URL(isGoogle ? user.getPictureUrl() + "?sz=500" : "https://graph.facebook.com/" + user.getUserId() + "/picture?width=500");
-            Glide.with(context)
-                    .load(imageURL)
-                    .asBitmap()
-                    .transform(new CropCircleTransform(context))
-                    .into(imageBtn);
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "malformed url: " + e.getMessage());
-        }
-    }
-
 
 }
