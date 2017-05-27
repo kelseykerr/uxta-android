@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,15 +24,11 @@ import java.net.URL;
 import java.util.List;
 
 import layout.AccountFragment;
-import layout.HistoryFragment;
 import layout.HomeFragment;
 import layout.PaymentDialogFragment;
-import layout.ReportRequestFragment;
 import layout.UpdateAccountDialogFragment;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.User;
-
-import static layout.RequestDialogFragment.request;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
@@ -116,7 +111,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             });
             snack.show();
         } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-            homeFragment.showDialog(r.getId(), r.getRental());
+            homeFragment.showNewOfferDialog(r.getId(), r.getRental());
         } else {
             String title;
             boolean showAction = true;

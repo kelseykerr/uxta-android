@@ -2,8 +2,10 @@ package layout;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -43,6 +45,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -433,42 +436,45 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     }
 
     public void openDatePicker(final EditText time, final boolean isReturn) {
-        // date time picker
-        final View dateTimeView = View.inflate(context, R.layout.date_time_picker, null);
-        final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-
-        dateTimeView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+        final Calendar currentDate = Calendar.getInstance();
+        new DatePickerDialog(context, R.style.DialogTheme, new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onClick(View view) {
-                DatePicker datePicker = (DatePicker) dateTimeView.findViewById(R.id.date_picker);
-                TimePicker timePicker = (TimePicker) dateTimeView.findViewById(R.id.time_picker);
-                Date date = AppUtils.getCalendarDate(datePicker, timePicker);
-                Date current = new Date();
-                if (isReturn) {
-                    if (exchangeDate != null) {
-                        date = date.before(exchangeDate) ? exchangeDate : date;
-                    } else {
-                        date = date.before(current) ? current : date;
-                    }
-                } else {
-                    date = date.before(current) ? current : date;
-                    if (returnDate != null) {
-                        date = date.after(returnDate) ? returnDate : date;
-                    }
-                }
-                SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
-                String formattedDate = formatter.format(date);
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                final Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, day);
+                new TimePickerDialog(context, R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        Date date = calendar.getTime();
+                        Date current = new Date();
+                        if (isReturn) {
+                            if (exchangeDate != null) {
+                                Log.i(TAG, "Date selected: " + date.getTime());
+                                date = date.before(exchangeDate) ? exchangeDate : date;
+                            } else {
+                                date = date.before(current) ? current : date;
+                            }
+                        } else {
+                            date = date.before(current) ? current : date;
+                            if (returnDate != null) {
+                                date = date.after(returnDate) ? returnDate : date;
+                            }
+                        }
+                        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
+                        String formattedDate = formatter.format(date);
 
-                time.setText(formattedDate);
-                if (isReturn) {
-                    returnDate = date;
-                } else {
-                    exchangeDate = date;
-                }
-                alertDialog.dismiss();
+                        time.setText(formattedDate);
+                        if (isReturn) {
+                            returnDate = date;
+                        } else {
+                            exchangeDate = date;
+                        }
+
+                    }
+                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
             }
-        });
-        alertDialog.setView(dateTimeView);
-        alertDialog.show();
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
     }
 }

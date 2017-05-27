@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:textColor="@color/colorAccent"
+    android:weightSum="1">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollview"
+        android:layout_marginBottom="20dp"
+        android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/request_detail_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="Request Detail"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/close_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="start"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingBottom="8dp"
+                android:paddingEnd="25dp"
+                android:paddingStart="8dp"
+                android:paddingTop="20dp"
+                android:src="@drawable/x_svg"
+                android:tint="@color/colorAccent" />
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/rental_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/close_detail"
+                android:layout_marginBottom="40dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="false"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="rent or buy?"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                app:ms_thickness=".5dp" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/item_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rental_spinner"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginBottom="10dp"
+                    android:hint="name"
+                    android:maxLength="40"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/request_description_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/item_name_layout"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/TextErrorStyle"
+                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+                <EditText
+                    android:id="@+id/request_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginBottom="10dp"
+                    android:hint="description"
+                    android:maxLength="100"
+                    android:maxLines="3"
+                    android:paddingBottom="16dp"
+                    android:textColor="@color/colorAccent"
+                    android:theme="@style/EditTextTheme" />
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/create_offer_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/request_description_layout"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/primary_btn"
+                android:text="create offer"
+                android:textColor="#ffffff" />
+
+            </RelativeLayout>
+        </ScrollView>
+    </LinearLayout>

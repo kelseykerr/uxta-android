@@ -1,7 +1,9 @@
 package iuxta.nearby;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 
@@ -15,6 +17,8 @@ import java.net.URL;
 import layout.AccountFragment;
 import layout.HomeFragment;
 import iuxta.nearby.model.User;
+
+import static android.content.Context.WIFI_SERVICE;
 
 public class SharedAsyncMethods {
 
@@ -30,8 +34,11 @@ public class SharedAsyncMethods {
                     conn.setReadTimeout(10000);
                     conn.setConnectTimeout(30000);
                     conn.setRequestMethod("GET");
+                    WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
+                    String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
                     conn.setRequestProperty(Constants.AUTH_HEADER, user.getAccessToken());
                     conn.setRequestProperty(Constants.METHOD_HEADER, user.getAuthMethod());
+                    conn.setRequestProperty(Constants.IP_HEADER, ip);
                     Integer responseCode = conn.getResponseCode();
                     String output = AppUtils.getResponseContent(conn);
 

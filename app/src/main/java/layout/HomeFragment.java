@@ -48,7 +48,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,9 +59,7 @@ import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.RequestAdapter;
-import iuxta.nearby.model.History;
 import iuxta.nearby.model.Request;
-import iuxta.nearby.model.Response;
 import iuxta.nearby.model.User;
 import iuxta.nearby.service.RequestNotificationService;
 
@@ -191,7 +188,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                             if (r.getLatitude().equals(marker.getPosition().latitude) &&
                                     r.getLongitude().equals(marker.getPosition().longitude) &&
                                     marker.getTitle().equals(r.getItemName())) {
-                                showDialog(r.getId(), r.getRental());
+                                showRequestPreviewDialog(r);
                                 break;
                             }
                         }
@@ -232,12 +229,21 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-    public void showDialog(String itemId, Boolean isRental) {
+    public void showNewOfferDialog(String requestId, Boolean isRental) {
         if (!MainActivity.areLocationServicesOn()) {
             ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
             return;
         }
-        DialogFragment newFragment = NewOfferDialogFragment.newInstance(itemId, isRental);
+        DialogFragment newFragment = NewOfferDialogFragment.newInstance(requestId, isRental);
+        newFragment.show(getFragmentManager(), "dialog");
+    }
+
+    public void showRequestPreviewDialog(Request request) {
+        if (!MainActivity.areLocationServicesOn()) {
+            ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
+            return;
+        }
+        DialogFragment newFragment = RequestPreviewFragment.newInstance(request, this);
         newFragment.show(getFragmentManager(), "dialog");
     }
 

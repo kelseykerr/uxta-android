@@ -18,6 +18,10 @@
         <item name="android:windowAnimationStyle">@style/RequestDialogAnimation</item>
     </style>
 
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="RequestDialogAnimation">
         <item name="android:windowEnterAnimation">@animator/slide_up</item>
         <item name="android:windowExitAnimation">@animator/slide_down</item>

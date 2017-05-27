@@ -29,6 +29,8 @@ public class Constants {
 
     public static final String METHOD_HEADER = "x-auth-method";
 
+    public static final String IP_HEADER = "x-auth-ip";
+
     public static final String SCANNER_FRAGMENT_TAG = "scanner";
 
     public static final String CODE_FRAGMENT_TAG = "code";
