@@ -590,6 +590,9 @@ public class MainActivity extends AppCompatActivity
                             ActivityCompat.requestPermissions(MainActivity.this,
                                     new String[]{permission},
                                     requestCode);
+                            if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                goToHome(null);
+                            }
                         }
                     });
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)

@@ -174,6 +174,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "onActivityCreated ***");
         getRequests(currentRadius);
     }
 
@@ -319,7 +320,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (!isAdded()) {
+                if (!isAdded() || (!homeLocation && latLng == null)) {
                     return;
                 }
                 //Nearby not in this location yet
@@ -461,11 +462,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.i(TAG, "onConnected ***");
         try {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
         } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to get user's last location, " + e.getMessage());
+            Log.e(TAG, "map error: unable to get user's last location, " + e.getMessage());
         }
         if (mLastLocation != null) {
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
@@ -480,6 +482,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 requestAdapter = new RequestAdapter(requests, this);
                 recList.setAdapter(requestAdapter);
             }
+        } else {
+            ((MainActivity) getActivity()).goToHome(null);
         }
 
         mLocationRequest = new LocationRequest();
@@ -489,9 +493,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
         } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to request location updates, " + e.getMessage());
+            Log.e(TAG, "unable to request location updates, " + e.getMessage());
         }
     }
 
@@ -507,6 +510,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.i(TAG, "onLocationChanged***");
         currentLocation = location;
         if (homeLocation != null && homeLocation) {
             return;
