@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
         NearbyInstanceIdService.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), this);
         checkNotificationOnOpen();
         scheduleNotificationsAlarm();
-        if (user.getTosAccepted() == null || user.getTosAccepted().equals(Boolean.FALSE)) {
+        if (user.getTosAccepted() == null || user.getTosAccepted().equals(Boolean.FALSE) || !AppUtils.canAddPayments(user)) {
             AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
             AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
         }
@@ -707,6 +707,7 @@ public class MainActivity extends AppCompatActivity
                 PrefUtils.setCurrentUser(user, MainActivity.this);
                 HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
                 if (homeFragment != null) {
+                    homeFragment.user = user;
                     homeFragment.getRequests(null);
                 }
             } catch (Exception e) {

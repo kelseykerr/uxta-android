@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONObject;
 
 import iuxta.nearby.model.User;
+import layout.HomeFragment;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
