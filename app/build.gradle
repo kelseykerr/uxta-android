@@ -8,8 +8,8 @@ android {
         applicationId "iuxta.nearby"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 45
-        versionName "0.45"
+        versionCode 47
+        versionName "0.47"
     }
     buildTypes {
         debug {

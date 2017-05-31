@@ -705,6 +705,10 @@ public class MainActivity extends AppCompatActivity
                 user.setAccessToken(acct.getIdToken());
                 user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
                 PrefUtils.setCurrentUser(user, MainActivity.this);
+                HomeFragment homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(Constants.HOME_FRAGMENT_TAG);
+                if (homeFragment != null) {
+                    homeFragment.getRequests(null);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
