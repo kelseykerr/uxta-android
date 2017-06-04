@@ -37,7 +37,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.DobPickerFragment;
@@ -80,6 +82,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private ScrollView screen1;
     private ScrollView screen2;
     private RelativeLayout updatingScreen;
+    private Map<Double, String> radiusMap = new HashMap<Double, String>();
 
     /**
      * Use this factory method to create a new instance of
@@ -200,6 +203,16 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         });
 
         dob.setKeyListener(null);
+        dob.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    showDobPickerDialog();
+                } else {
+                    // Hide your calender here
+                }
+            }
+        });
         dob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -267,42 +280,42 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private boolean validateScreenOne() {
         boolean valid = true;
         String first = firstName.getText().toString();
-        if (first.isEmpty() || first.length() < 2) {
+        if (first.isEmpty() || first.length() < 2 || first.trim().length() < 2) {
             firstNameLayout.setError("please enter a first name that is at least 2 characters long");
             valid = false;
         } else {
             firstNameLayout.setError(null);
         }
         String last = lastName.getText().toString();
-        if (last.isEmpty() || last.length() < 2) {
+        if (last.isEmpty() || last.length() < 2 || last.trim().length() < 2) {
             lastNameLayout.setError("please enter a last name that is at least 2 characters long");
             valid = false;
         } else {
             lastNameLayout.setError(null);
         }
         String address = addressLine1.getText().toString();
-        if (address.isEmpty() || address.length() < 6) {
+        if (address.isEmpty() || address.length() < 6 || address.trim().length() < 6) {
             addressLine1Layout.setError("please enter a valid address");
             valid = false;
         } else {
             addressLine1Layout.setError(null);
         }
         String cityText = city.getText().toString();
-        if (cityText.isEmpty() || cityText.length() < 2) {
+        if (cityText.isEmpty() || cityText.length() < 2 || cityText.trim().length() < 2) {
             cityLayout.setError("please enter a valid city");
             valid = false;
         } else {
             cityLayout.setError(null);
         }
         String stateText = state.getText().toString();
-        if (stateText.isEmpty() || stateText.length() != 2) {
+        if (stateText.isEmpty() || stateText.length() != 2 || stateText.trim().length() < 2) {
             stateLayout.setError("please enter your state");
             valid = false;
         } else {
             stateLayout.setError(null);
         }
         String zipString = zip.getText().toString();
-        if (zipString.isEmpty() || zipString.length() != 5) {
+        if (zipString.isEmpty() || zipString.length() != 5 || zipString.trim().length() < 5) {
             zipLayout.setError("please enter your 5 digit zip code");
             valid = false;
         } else {
@@ -446,23 +459,52 @@ public class UpdateAccountDialogFragment extends DialogFragment {
 
     private void configureRadiusSpinner(View v) {
         Spinner radiusSpinner = (Spinner) v.findViewById(R.id.radius_spinner);
-        List<Double> radiusList = getRadiusList();
-        ArrayAdapter<Double> dataAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, radiusList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        List<String> radiusList = new ArrayList<>();
+        radiusMap.put(.1, ".1 miles");
+        radiusMap.put(.25, ".25 miles");
+        radiusMap.put(.5, ".5 miles ");
+        radiusMap.put(1.0, "1 mile");
+        radiusMap.put(5.0, "5 miles");
+        radiusMap.put(10.0, "10 miles");
+        radiusList.add(radiusMap.get(.1));
+        radiusList.add(radiusMap.get(.25));
+        radiusList.add(radiusMap.get(.5));
+        radiusList.add(radiusMap.get(1.0));
+        radiusList.add(radiusMap.get(5.0));
+        radiusList.add(radiusMap.get(10.0));
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, radiusList);
+        dataAdapter.setDropDownViewResource(R.layout.spinner_item);
+
+        // attaching data adapter to spinner
         radiusSpinner.setAdapter(dataAdapter);
-        int spinnerPosition = dataAdapter.getPosition(user.getNotificationRadius());
-        if (spinnerPosition >= 0) {
-            radiusSpinner.setSelection(spinnerPosition);
+
+        // set radius spinner to current radius
+        if (user.getNotificationRadius() != null) {
+            String selectedRadius = radiusMap.get(user.getNotificationRadius());
+            for (int i = 0; i < radiusList.size(); i++) {
+                if (radiusList.get(i).equals(selectedRadius)) {
+                    radiusSpinner.setSelection(i+1);
+                    break;
+                }
+            }
         } else {
-            radiusSpinner.setSelection(0);
+            radiusSpinner.setSelection(4);
         }
 
         radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
                                        int position, long id) {
-                Double radius = (Double) parentView.getItemAtPosition(position);
-                currentRadius = radius;
+                String radiusString = (String) parentView.getItemAtPosition(position);
+                for (Map.Entry<Double, String> entry : radiusMap.entrySet()) {
+                    Double key = entry.getKey();
+                    String value = entry.getValue();
+                    if (value.equals(radiusString)) {
+                        currentRadius = key;
+                        break;
+                    }
+                }
             }
 
             @Override

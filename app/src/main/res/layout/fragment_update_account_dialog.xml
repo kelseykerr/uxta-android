@@ -396,28 +396,32 @@
                 android:textOn="enabled"
                 android:thumb="@drawable/switch_compat_thumb" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_below="@id/notifications_nearby"
-                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/radius_spinner_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Notifications radius: " />
-
-                <Spinner
-                    android:id="@+id/radius_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/radius_spinner_label"
-                    android:background="@color/white"
-                    android:prompt="@string/radius_spinner_title"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/radius_spinner"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="0dp"
+                android:paddingStart="0dp"
+                android:textColor="@color/colorAccent"
+                app:ms_alignLabels="true"
+                app:ms_arrowColor="@color/colorAccent"
+                app:ms_arrowSize="16dp"
+                app:ms_baseColor="@color/colorAccent"
+                app:ms_enableErrorLabel="false"
+                app:ms_enableFloatingLabel="true"
+                app:ms_errorColor="@color/redPink"
+                app:ms_floatingLabelColor="@color/colorAccent"
+                app:ms_floatingLabelText="Notification Radius"
+                app:ms_highlightColor="@color/colorPrimary"
+                app:ms_hint="Notification Radius"
+                app:ms_hintColor="@color/colorAccent"
+                app:ms_multiline="false"
+                app:ms_thickness=".5dp" />
 
 
             <Button
