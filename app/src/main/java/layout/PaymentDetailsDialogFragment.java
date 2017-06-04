@@ -224,6 +224,13 @@ public class PaymentDetailsDialogFragment extends DialogFragment {
         if (!card.validateCard()) {
             // Show errors
             Log.e(TAG, "Card was not valid");
+            if (!card.validateNumber()) {
+                expDateLayout.setError("Invalid card number entered");
+            } else if (!card.validateExpiryDate()) {
+                expDateLayout.setError("Invalid expiry date entered");
+            } else if (!card.validateCVC()) {
+                expDateLayout.setError("Invalid CVC entered");
+            }
             saveBtn.setEnabled(true);
             return;
         }
