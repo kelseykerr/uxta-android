@@ -44,7 +44,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Regions;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.Auth;
@@ -61,9 +67,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 import layout.AccountFragment;
 import layout.ExchangeCodeDialogFragment;
@@ -130,6 +138,10 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab;
     private ProgressDialog mProgressDialog;
     private LocalBroadcastManager mLocalBroadcastManager;
+    public static CognitoCachingCredentialsProvider credentialsProvider;
+    public static AmazonS3 s3;
+    public static TransferUtility transferUtility;
+
 
     /**
      * Root of the layout of this Activity.
@@ -257,6 +269,13 @@ public class MainActivity extends AppCompatActivity
             AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
             AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
         }
+        credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(), // Context
+                "us-east-1:c505ec70-228a-498f-87e5-d9035d10a8e3", // Identity Pool ID
+                Regions.US_EAST_1 // Region
+        );
+        s3 = new AmazonS3Client(credentialsProvider);
+        transferUtility = new TransferUtility(s3, getApplicationContext());
     }
 
     public void setUpFab() {
@@ -918,6 +937,27 @@ public class MainActivity extends AppCompatActivity
             getRequestNotifications(latLng);
         }
     }
+
+    public static String uploadPhoto(Uri uri) {
+        File f = new File(uri.getPath());
+        String key = UUID.randomUUID().toString();
+        TransferObserver observer = transferUtility.upload(
+                Constants.NEARBY_BUCKET,     /* The bucket to upload to */
+                key,    /* The key for the uploaded object */
+                f        /* The file where the data to upload exists */
+        );
+        return observer.getKey();
+    }
+
+    /*public static File fetchPhoto(String key) {
+        File outputDir = context.getCacheDir();
+        File imageFile = File.createTempFile(key, "extension", outputDir);
+        TransferObserver observer = transferUtility.download(
+                Constants.NEARBY_BUCKET,     /* The bucket to download from */
+                //key,    /* The key for the object to download */
+                //imageFile       /* The file to download the object to */
+      //  );
+    //}
 
 
 }

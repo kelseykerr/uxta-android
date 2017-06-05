@@ -62,4 +62,6 @@ public class Constants {
     public static final String SELL_TEXT = "sell an item";
     public static final String LOAN_TEXT = "list a rentable item";
 
+    public static final String NEARBY_BUCKET = "nearbyappphotos";
+
 }

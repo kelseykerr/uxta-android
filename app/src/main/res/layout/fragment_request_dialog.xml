@@ -134,10 +134,79 @@
             </android.support.design.widget.TextInputLayout>
 
             <TextView
+                android:id="@+id/photos_text"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/request_description_layout"
+                android:textColor="@color/colorAccent"
+                android:text="photos"
+                android:textSize="16sp"
+                />
+
+            <ImageButton
+                android:id="@+id/add_photos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/photos_text"
+                android:layout_below="@id/request_description_layout"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingEnd="25dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:src="@drawable/ic_add_circle_outline_black_24dp"
+                android:tint="@color/colorPrimary" />
+
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/photo_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photos_text"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/photo_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="150dp"
+                    android:maxWidth="200dp"
+                    android:maxHeight="200dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_insert_photo_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/photo_2"
+                    android:minHeight="150dp"
+                    android:maxWidth="200dp"
+                    android:maxHeight="200dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_insert_photo_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/photo_3"
+                    android:minHeight="150dp"
+                    android:maxWidth="200dp"
+                    android:maxHeight="200dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_insert_photo_black_24dp" />
+
+            </LinearLayout>
+
+
+            <TextView
                 android:id="@+id/map_text"
                 android:visibility="gone"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/request_description_layout"
+                android:layout_below="@id/photo_layout"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12dp"

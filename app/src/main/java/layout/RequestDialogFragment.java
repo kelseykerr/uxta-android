@@ -7,6 +7,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -14,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
@@ -26,6 +30,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -51,7 +57,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -67,6 +76,8 @@ import iuxta.nearby.model.Category;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.User;
 import iuxta.nearby.service.RequestNotificationService;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by kerrk on 8/23/16.
@@ -107,11 +118,19 @@ public class RequestDialogFragment extends DialogFragment
     private RelativeLayout mapView;
     private ScrollView newRequestSV;
     private RelativeLayout spinnerScreen;
+    private TextView photosText;
+    private ImageButton addPhotos;
+    private LinearLayout photoLayout;
+    private ImageView photo1;
+    private ImageView photo2;
+    private ImageView photo3;
     private int zoomLevel = 15;
     private static final String RENT_TEXT = "request to rent an item";
     private static final String BUY_TEXT = "request to buy an item";
     private static final String SELL_TEXT = "sell an item";
     private static final String LOAN_TEXT = "list a rentable item";
+    private static final int SELECT_PICTURE = 17;
+    private List<Uri> photos;
 
 
     public RequestDialogFragment() {
@@ -156,7 +175,7 @@ public class RequestDialogFragment extends DialogFragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_request_dialog, container, false);
-
+        photos = new ArrayList<>();
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
             btn.setText("update");
@@ -179,6 +198,18 @@ public class RequestDialogFragment extends DialogFragment
         c.add("tools");
         categoryAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, c);
         categorySpinner.setAdapter(categoryAdapter);*/
+        photosText = (TextView) view.findViewById(R.id.photos_text);
+        addPhotos = (ImageButton) view.findViewById(R.id.add_photos);
+        addPhotos.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                addPhotos();
+            }
+        });
+        photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
+        photo1 = (ImageView) view.findViewById(R.id.photo_1);
+        photo2 = (ImageView) view.findViewById(R.id.photo_2);
+        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
         ArrayAdapter<String> rentBuyAdapter;
         List<String> rentBuyList = new ArrayList<>();
@@ -190,6 +221,28 @@ public class RequestDialogFragment extends DialogFragment
         rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
         rentalSpinner.setSelection(0);
+        rentalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if (position == 0 || position == 1) {
+                    photoLayout.setVisibility(View.GONE);
+                    photosText.setVisibility(View.GONE);
+                    addPhotos.setVisibility(View.GONE);
+                } else {
+                    photoLayout.setVisibility(View.VISIBLE);
+                    photosText.setVisibility(View.VISIBLE);
+                    addPhotos.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                photoLayout.setVisibility(View.GONE);
+                photosText.setVisibility(View.GONE);
+                addPhotos.setVisibility(View.GONE);
+            }
+
+        });
         spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
 
         requestBtn = (Button) view.findViewById(R.id.create_request_button);
@@ -739,5 +792,36 @@ public class RequestDialogFragment extends DialogFragment
         }
     }
 
+    private void addPhotos() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,
+                "Select Picture"), SELECT_PICTURE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri imageUri = data.getData();
+                try {
+                    photos.add(imageUri);
+                    InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
+                    Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    if (photos.size() == 1) {
+                        photo1.setImageBitmap(bm);
+                        String key = MainActivity.uploadPhoto(imageUri);
+                        Log.e("***", key);
+                    } else if (photos.size() == 2) {
+                        photo2.setImageBitmap(bm);
+                    } else if (photos.size() == 3) {
+                        photo3.setImageBitmap(bm);
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }
