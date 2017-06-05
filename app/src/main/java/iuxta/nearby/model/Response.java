@@ -15,12 +15,12 @@ import java.util.List;
 public class Response extends BaseEntity {
     private String requestId;
 
-    private String sellerId;
+    private String responderId;
 
     private Date responseTime;
 
     /**
-     * should be initially set by the seller
+     * should be initially set by the responder
      */
     private Double offerPrice;
 
@@ -29,7 +29,7 @@ public class Response extends BaseEntity {
     private Boolean messagesEnabled;
 
     /**
-     * should be initially set by the seller
+     * should be initially set by the responder
      */
     private String priceType;
 
@@ -61,11 +61,13 @@ public class Response extends BaseEntity {
 
     private List<Message> messages;
 
-    private User seller;
+    private User responder;
 
     private String canceledReason;
 
     private Boolean inappropriate;
+
+    private Boolean isOfferToBuyOrRent;
 
     public static enum PriceType {
         FLAT, PER_HOUR, PER_DAY
@@ -74,17 +76,17 @@ public class Response extends BaseEntity {
     /**
      * OPEN: the request is still open, the buyer has not accepted any offers
      * CLOSED: the request is closed either because the user accepted an offer from someone else, or withdrew the request
-     * ACCEPTED: the user accepted the offer from this seller
-     * DECLINED: the user declined the offer from this seller
+     * ACCEPTED: the user accepted the offer from this responder
+     * DECLINED: the user declined the offer from this responder
      */
     public static enum BuyerStatus {
         OPEN, CLOSED, ACCEPTED, DECLINED
     }
 
     /**
-     * OFFERED: seller extended the offer
-     * ACCEPTED: the user accepted the offer and proposed a meeting & return time/location & the seller has accepted
-     * WITHDRAWN: seller withdrew the offer (couldn't agree on price, item became unavailable...)
+     * OFFERED: responder extended the offer
+     * ACCEPTED: the user accepted the offer and proposed a meeting & return time/location & the responder has accepted
+     * WITHDRAWN: responder withdrew the offer (couldn't agree on price, item became unavailable...)
      */
     public static enum SellerStatus {
         OFFERED, ACCEPTED, WITHDRAWN
@@ -92,9 +94,9 @@ public class Response extends BaseEntity {
 
 
     /**
-     * PENDING: the seller status is 'offered' and the buyer status is either 'open' or 'accepted'
-     * ACCEPTED: both the buy and seller status is accepted, a transaction should now exist for the request
-     * CLOSED: either the buyer declined the request, the buyer closed the request, or the seller withdrew the request
+     * PENDING: the responder status is 'offered' and the buyer status is either 'open' or 'accepted'
+     * ACCEPTED: both the buy and responder status is accepted, a transaction should now exist for the request
+     * CLOSED: either the buyer declined the request, the buyer closed the request, or the responder withdrew the request
      */
     public static enum Status {
         PENDING, ACCEPTED, CLOSED
@@ -108,12 +110,12 @@ public class Response extends BaseEntity {
         this.requestId = requestId;
     }
 
-    public String getSellerId() {
-        return sellerId;
+    public String getResponderId() {
+        return responderId;
     }
 
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
+    public void setResponderId(String responderId) {
+        this.responderId = responderId;
     }
 
     public Date getResponseTime() {
@@ -204,12 +206,12 @@ public class Response extends BaseEntity {
         this.messages = messages;
     }
 
-    public User getSeller() {
-        return seller;
+    public User getResponder() {
+        return responder;
     }
 
-    public void setSeller(User seller) {
-        this.seller = seller;
+    public void setResponder(User responder) {
+        this.responder = responder;
     }
 
     public String getCanceledReason() {
@@ -247,12 +249,12 @@ public class Response extends BaseEntity {
     }
 
     @JsonIgnore
-    public String getSellerName() {
-        if (this.getSeller() == null) {
+    public String getResponderName() {
+        if (this.getResponder() == null) {
             return null;
         }
-        return this.getSeller().getFirstName() != null ?
-                this.getSeller().getFirstName() : this.getSeller().getName();
+        return this.getResponder().getFirstName() != null ?
+                this.getResponder().getFirstName() : this.getResponder().getName();
     }
 
     public Boolean getInappropriate() {
@@ -261,5 +263,13 @@ public class Response extends BaseEntity {
 
     public void setInappropriate(Boolean inappropriate) {
         this.inappropriate = inappropriate;
+    }
+
+    public Boolean getIsOfferToBuyOrRent() {
+        return isOfferToBuyOrRent;
+    }
+
+    public void setIsOfferToBuyOrRent(Boolean requestToBuyOrRent) {
+        isOfferToBuyOrRent = requestToBuyOrRent;
     }
 }

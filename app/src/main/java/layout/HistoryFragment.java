@@ -414,16 +414,24 @@ public class HistoryFragment extends Fragment {
                     String apiPath = "/requests/" + request.getId() + "/responses/" + response.getId();
                     HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     if (request.getUser().getId().equals(user.getId()) && dialog != null) {
-                        response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        if (request.isInventoryListing()) {
+                            response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        } else {
+                            response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        }
                     } else if (dialog != null) {
-                        response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        if (request.isInventoryListing()) {
+                            response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        } else {
+                            response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        }
                     }
                     ObjectMapper mapper = new ObjectMapper();
-                    User seller = response.getSeller();
-                    response.setSeller(null);
+                    User seller = response.getResponder();
+                    response.setResponder(null);
                     String responseJson = mapper.writeValueAsString(response);
                     Log.i("updated response: ", responseJson);
-                    response.setSeller(seller);
+                    response.setResponder(seller);
                     byte[] outputInBytes = responseJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);

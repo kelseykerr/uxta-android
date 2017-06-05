@@ -108,6 +108,10 @@ public class RequestDialogFragment extends DialogFragment
     private ScrollView newRequestSV;
     private RelativeLayout spinnerScreen;
     private int zoomLevel = 15;
+    private static final String RENT_TEXT = "request to rent an item";
+    private static final String BUY_TEXT = "request to buy an item";
+    private static final String SELL_TEXT = "sell an item";
+    private static final String LOAN_TEXT = "list a rentable item";
 
 
     public RequestDialogFragment() {
@@ -155,9 +159,9 @@ public class RequestDialogFragment extends DialogFragment
 
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
-            btn.setText("update request");
+            btn.setText("update");
             TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
-            dialogTitle.setText("Edit Request");
+            dialogTitle.setText("Edit Item");
         }
         newRequestSV = (ScrollView) view.findViewById(R.id.new_request_sv);
         itemNameLayout = (TextInputLayout) view.findViewById(R.id.request_name_layout);
@@ -178,8 +182,10 @@ public class RequestDialogFragment extends DialogFragment
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
         ArrayAdapter<String> rentBuyAdapter;
         List<String> rentBuyList = new ArrayList<>();
-        rentBuyList.add("rent");
-        rentBuyList.add("buy");
+        rentBuyList.add(RENT_TEXT);
+        rentBuyList.add(BUY_TEXT);
+        rentBuyList.add(SELL_TEXT);
+        rentBuyList.add(LOAN_TEXT);
         rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, rentBuyList);
         rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
@@ -225,10 +231,14 @@ public class RequestDialogFragment extends DialogFragment
         this.view = view;
         if (request != null) {
             itemName.setText(request.getItemName());
-            if (request.getRental()) {
+            if (request.getType().equals(Request.Type.renting)) {
                 rentalSpinner.setSelection(0);
-            } else {
+            } else if (request.getType().equals(Request.Type.buying)) {
                 rentalSpinner.setSelection(1);
+            } else if (request.getType().equals(Request.Type.selling)) {
+                rentalSpinner.setSelection(2);
+            } else if (request.getType().equals(Request.Type.loaning)) {
+                rentalSpinner.setSelection(3);
             }
             // TODO: update this as we add categories
             if (request.getCategory() != null) {
@@ -295,7 +305,7 @@ public class RequestDialogFragment extends DialogFragment
     }
 
     private void updateRequestObject() {
-        request.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
+        request.setRental(rentalSpinner.getSelectedItem().toString().equals(RENT_TEXT));
         /*if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {
@@ -304,16 +314,38 @@ public class RequestDialogFragment extends DialogFragment
                 }
             }
         }*/
+        setRequestType(request);
         request.setItemName(itemName.getText().toString());
         request.setDescription(description.getText().toString());
+    }
+
+    private void setRequestType(Request request) {
+        switch (rentalSpinner.getSelectedItem().toString()) {
+            case RENT_TEXT:
+                request.setType(Request.Type.renting);
+                return;
+            case BUY_TEXT:
+                request.setType(Request.Type.buying);
+                return;
+            case SELL_TEXT:
+                request.setType(Request.Type.selling);
+                return;
+            case LOAN_TEXT:
+                request.setType(Request.Type.loaning);
+                return;
+            default:
+                request.setType(Request.Type.renting);
+                return;
+        }
     }
 
     private Request createNewRequestObject(Double lat, Double lng) {
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
-        newRequest.setType(Request.Type.item);
-        newRequest.setRental(rentalSpinner.getSelectedItem().toString().equals("rent"));
+        boolean isRental = rentalSpinner.getSelectedItem().toString().equals(RENT_TEXT);
+        setRequestType(newRequest);
+        newRequest.setRental(isRental);
         /*if (!categorySpinner.getSelectedItem().toString().equals(Constants.SELECT_CATEGORY_STRING)) {
             String cat = categorySpinner.getSelectedItem().toString();
             for (Category c : categories) {

@@ -180,7 +180,7 @@ public class ReportRequestFragment extends DialogFragment {
             protected Integer doInBackground(Void... params) {
                 Integer responseCode = null;
                 try {
-                    String blockId = hasRequest ? request.getUser().getId() : response.getSellerId();
+                    String blockId = hasRequest ? request.getUser().getId() : response.getResponderId();
                     String apiPath = "/users/" + blockId + "/flags";
                     HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "POST", user);
                     Flag flag = new Flag(notes);

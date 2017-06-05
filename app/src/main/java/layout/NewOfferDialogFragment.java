@@ -67,7 +67,7 @@ import iuxta.nearby.model.User;
  */
 public class NewOfferDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     private String requestId;
-    private Boolean isRental;
+    private String requestType;
     private User user;
     private Context context;
     private OnFragmentInteractionListener mListener;
@@ -91,17 +91,18 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private EditText description;
     private AppCompatCheckBox enableMessages;
     private static final String TAG = "NewOfferDialogFragment";
+    private TextView title;
 
 
     public NewOfferDialogFragment() {
         // Required empty public constructor
     }
 
-    public static NewOfferDialogFragment newInstance(String requestId, Boolean isRental) {
+    public static NewOfferDialogFragment newInstance(String requestId, String requestType) {
         NewOfferDialogFragment fragment = new NewOfferDialogFragment();
         Bundle args = new Bundle();
         args.putString("REQUEST_ID", requestId);
-        args.putBoolean("RENTAL", isRental);
+        args.putString("TYPE", requestType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -121,7 +122,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         user = PrefUtils.getCurrentUser(context);
         if (getArguments() != null) {
             requestId = getArguments().getString("REQUEST_ID");
-            isRental = getArguments().getBoolean("RENTAL");
+            requestType = getArguments().getString("TYPE");
         }
         super.onCreate(savedInstanceState);
     }
@@ -140,8 +141,18 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         offerTypeSpinner.setAdapter(offerTypeAdapter);
         offerTypeSpinner.setOnItemSelectedListener(this);*/
         scrollView = (ScrollView) view.findViewById(R.id.scrollview);
+        title = (TextView) view.findViewById(R.id.new_offer_text);
         spinnerScreen = (RelativeLayout) view.findViewById(R.id.spinner_screen);
         submitOfferBtn = (Button) view.findViewById(R.id.submit_offer_button);
+        descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
+        description = (EditText) view.findViewById(R.id.description);
+        if (requestType.equals("loaning")) {
+            title.setText("Request Item");
+            submitOfferBtn.setText("create request");
+        }
+        if (requestType.equals("loaning") || requestType.equals("selling")) {
+            descriptionLayout.setHint("Message");
+        }
         submitOfferBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 submitOfferBtn.setEnabled(false);
@@ -156,8 +167,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         });
         offerPriceLayout = (TextInputLayout) view.findViewById(R.id.offer_price_layout);
         offerPrice = (EditText) view.findViewById(R.id.offer_price);
-        descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
-        description = (EditText) view.findViewById(R.id.description);
 
         offerPrice.addTextChangedListener(new TextWatcher() {
             @Override
@@ -188,7 +197,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
         returnTime = (EditText) view.findViewById(R.id.return_time);
         returnTime.setKeyListener(null);
-        if (isRental != null && !isRental) {
+        if (requestType.equals("buying") || requestType.equals("selling")) {
             returnLocation.setVisibility(View.GONE);
             returnTime.setVisibility(View.GONE);
         } else {
@@ -399,7 +408,7 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private Response createNewResponseObject() {
         Response response = new Response();
         response.setRequestId(requestId);
-        response.setSellerId(user.getId());
+        response.setResponderId(user.getId());
         response.setExchangeLocation(pickupLocation.getText().toString());
         response.setDescription(description.getText().toString());
         if (exchangeDate != null) {

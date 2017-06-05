@@ -58,13 +58,20 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
 
     public void onBindViewHolder(final RequestResponseCardAdapter.ResponseCardViewHolder rvh, int i) {
         final Response response = responses.get(i);
-        setUpProfileImage(response.getSeller(), rvh.profilePic);
-        if (response == null || response.getSeller() == null) {
+        setUpProfileImage(response.getResponder(), rvh.profilePic);
+        if (response == null || response.getResponder() == null) {
             return;
         }
         final BigDecimal price = AppUtils.formatCurrency(response.getOfferPrice());
-        String htmlString = "<font color='#767474'>" + response.getSellerName() +
-                " made an offer for $" + price + "</font>";
+        String htmlString = "";
+        if (response.getIsOfferToBuyOrRent()) {
+            htmlString = "<font color='#767474'>" + response.getResponderName() +
+                    " requested to " + (request.getType().equals(Request.Type.selling) ? "buy " : "rent ") +
+                    "for $" + price + "</font>";
+        } else {
+            htmlString = "<font color='#767474'>" + response.getResponderName() +
+                    " made an offer for $" + price + "</font>";
+        }
         rvh.offerText.setText(Html.fromHtml(htmlString));
         if (response.isClosed()) {
             String statusString = "CLOSED";
@@ -77,9 +84,17 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             rvh.acceptBtn.setVisibility(View.GONE);
         } else {
               if (response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED)) {
-                rvh.responseStatus.setText("OPEN");
+                  if (request.isInventoryListing()) {
+                      rvh.responseStatus.setText("PENDING BUYER ACCEPTANCE");
+                  } else {
+                      rvh.responseStatus.setText("OPEN");
+                  }
             } else if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
-                rvh.responseStatus.setText("PENDING SELLER ACCEPTANCE");
+                  if (request.isInventoryListing()) {
+                      rvh.responseStatus.setText("OPEN");
+                  } else {
+                      rvh.responseStatus.setText("PENDING SELLER ACCEPTANCE");
+                  }
             } else {
                 rvh.responseStatus.setText(response.getResponseStatus().toString());
             }
@@ -158,7 +173,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                 } else {
                     smsIntent.setType("vnd.android-dir/mms-sms");
                     String phone;
-                    phone = response.getSeller().getPhone().replace("-", "");
+                    phone = response.getResponder().getPhone().replace("-", "");
                     smsIntent.putExtra("address", phone);
                     smsIntent.putExtra("sms_body", "");
                     context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
@@ -174,7 +189,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             public void onClick(View view) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 String message = "Are you sure you want to reject " +
-                        response.getSeller().getFirstName() + "'s offer for $" + price + "?";
+                        response.getResponder().getFirstName() + "'s offer for $" + price + "?";
                 AlertDialog ad = dialog.setMessage(message)
                         .setNegativeButton("no", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int i) {
@@ -183,7 +198,11 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                         })
                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int i) {
-                                response.setBuyerStatus(Response.BuyerStatus.DECLINED);
+                                if (request.isInventoryListing()) {
+                                    response.setSellerStatus(Response.SellerStatus.WITHDRAWN);
+                                } else {
+                                    response.setBuyerStatus(Response.BuyerStatus.DECLINED);
+                                }
                                 historyFragment.updateOffer(response, request, null, "view_request", historyFragment);
                             }
                         })
@@ -201,9 +220,11 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                if (response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED)) {
+                boolean accepted = request.isInventoryListing() ? response.getSellerStatus().equals(Response.SellerStatus.ACCEPTED) :
+                        response.getBuyerStatus().equals(Response.BuyerStatus.ACCEPTED);
+                if (accepted) {
                     String message = "You already accepted " +
-                            response.getSeller().getFirstName() + "'s offer for $" + price + ".";
+                            response.getResponder().getFirstName() + "'s offer for $" + price + ".";
                     AlertDialog ad = dialog.setMessage(message)
                             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialoginterface, int i) {
@@ -215,7 +236,7 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
                     ad.show();
                 } else {
                     String message = "Are you sure you want to accept " +
-                            response.getSeller().getFirstName() + "'s offer for $" + price + "?";
+                            response.getResponder().getFirstName() + "'s offer for $" + price + "?";
                     AlertDialog ad = dialog.setMessage(message)
                             .setNegativeButton("no", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialoginterface, int i) {

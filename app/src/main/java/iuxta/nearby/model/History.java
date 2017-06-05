@@ -61,8 +61,13 @@ public class History implements ParentObject {
         if (this.getRequest() == null || this.getTransaction() == null) {
             return false;
         }
-        return this.getRequest().getRental() ? transaction.getExchanged() && transaction.getReturned() :
+        return this.isRental() ? transaction.getExchanged() && transaction.getReturned() :
                 transaction.getExchanged();
+    }
+
+    @JsonIgnore
+    public boolean isRental() {
+        return this.getRequest().getType().equals(Request.Type.renting) || this.getRequest().getType().equals(Request.Type.loaning);
     }
 
     @JsonIgnore

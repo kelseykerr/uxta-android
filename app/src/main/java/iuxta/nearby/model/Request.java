@@ -41,6 +41,8 @@ public class Request extends BaseEntity {
 
     private Boolean inappropriate;
 
+    private Boolean duplicate;
+
     public User getUser() {
         return user;
     }
@@ -150,6 +152,11 @@ public class Request extends BaseEntity {
     }
 
     @JsonIgnore
+    public boolean isRental() {
+        return this.getType().equals(Type.renting) || this.getType().equals(Type.loaning);
+    }
+
+    @JsonIgnore
     public boolean isMyRequest(User user) {
         return user.getId().equals(this.getUser().getId());
     }
@@ -158,6 +165,11 @@ public class Request extends BaseEntity {
     public String getRequesterName() {
         return this.getUser().getFirstName() != null ?
                 this.getUser().getFirstName() : this.getUser().getFullName();
+    }
+
+    @JsonIgnore
+    public boolean isInventoryListing() {
+        return this.getType().equals(Type.loaning) || this.getType().equals(Type.selling);
     }
 
     public Boolean getInappropriate() {
@@ -196,6 +208,14 @@ public class Request extends BaseEntity {
     }
 
     public static enum Type {
-        item, service
+        renting, buying, selling, loaning
+    }
+
+    public Boolean getDuplicate() {
+        return duplicate;
+    }
+
+    public void setDuplicate(Boolean duplicate) {
+        this.duplicate = duplicate;
     }
 }

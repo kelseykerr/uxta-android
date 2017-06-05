@@ -128,10 +128,38 @@
                 android:entries="@array/locationItems"
                 app:ms_thickness=".5dp" />
 
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/selling_loaning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/location_spinner"
+                android:button="@null"
+                android:padding="10dp"
+                android:text="Show items that are available to rent/buy"
+                android:textColor="@color/colorAccent"
+                android:textOff="disabled"
+                android:textOn="enabled"
+                android:thumb="@drawable/switch_compat_thumb"
+                android:trackTint="@color/colorPrimary" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/buying_renting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selling_loaning"
+                android:button="@null"
+                android:padding="10dp"
+                android:text="Show requests to buy/borrow"
+                android:textColor="@color/colorAccent"
+                android:textOff="disabled"
+                android:textOn="enabled"
+                android:thumb="@drawable/switch_compat_thumb"
+                android:trackTint="@color/colorPrimary" />
+
 
             <Button
                 android:id="@+id/filter_button"
-                android:layout_below="@id/location_spinner"
+                android:layout_below="@id/buying_renting"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

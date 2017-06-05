@@ -107,29 +107,53 @@ public class ViewTransactionFragment extends DialogFragment {
         Request request = history.getRequest();
         View view = inflater.inflate(R.layout.fragment_view_transaction, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profile_image);
-        final boolean isSeller = !user.getId().equals(history.getRequest().getUser().getId());
-        setProfilePic(isSeller ? history.getRequest().getUser() : response.getSeller(), profileImage);
+        Boolean isSeller = false;
+        if (!user.getId().equals(request.getUser().getId()) && (request.getType().equals(Request.Type.renting) || request.getType().equals(Request.Type.buying))) {
+            isSeller = true;
+        } else if (user.getId().equals(request.getUser().getId()) && (request.getType().equals(Request.Type.loaning) || request.getType().equals(Request.Type.selling))) {
+            isSeller = true;
+        }
+        User forProfile = null;
+        boolean isNormalRequest = request.getType().equals(Request.Type.renting) || request.getType().equals(Request.Type.buying);
+        if (isSeller) {
+            forProfile = isNormalRequest ? request.getUser() : response.getResponder();
+        } else {
+            forProfile = isNormalRequest ? response.getResponder() : request.getUser();
+        }
+        setProfilePic(forProfile, profileImage);
         transactionText = (TextView) view.findViewById(R.id.transaction_text);
-        Boolean complete = request.getRental() ? transaction.getExchanged() && transaction.getReturned() :
+        Boolean complete = request.isRental() ? transaction.getExchanged() && transaction.getReturned() :
                 transaction.getExchanged();
         String topDescription;
         String beginning;
-        if (complete && request.getRental()) {
+        if (complete && (request.getType().equals(Request.Type.renting) || request.getType().equals(Request.Type.loaning))) {
             beginning = !isSeller ? "Borrowed a " : "Loaned a ";
         } else if (complete) {
             beginning = !isSeller ? "Bought a " : "Sold a ";
-        } else if (request.getRental()) {
+        } else if (request.getType().equals(Request.Type.renting) || request.getType().equals(Request.Type.loaning)) {
             beginning = !isSeller ? "Borrowing a " : "Loaning a ";
         } else {
             beginning = !isSeller ? "Buying a " : "Selling a ";
         }
         if (!isSeller) {
-            topDescription = beginning + request.getItemName() +
-                    " from " + (response.getSeller().getFirstName() != null ?
-                    response.getSeller().getFirstName() : response.getSeller().getName());
+            if (isNormalRequest) {
+                topDescription = beginning + request.getItemName() +
+                        " from " + (response.getResponder().getFirstName() != null ?
+                        response.getResponder().getFirstName() : response.getResponder().getName());
+            } else {
+                topDescription = beginning + request.getItemName() +
+                        " from " + (request.getUser().getFirstName() != null ?
+                        request.getUser().getFirstName() : request.getUser().getName());
+            }
+
         } else {
-            topDescription = beginning + request.getItemName() +
-                    " to " + request.getUser().getFirstName();
+            if (isNormalRequest) {
+                topDescription = beginning + request.getItemName() +
+                        " to " + request.getUser().getFirstName();
+            } else {
+                topDescription = beginning + request.getItemName() +
+                        " to " + response.getResponder().getFirstName();
+            }
         }
         BigDecimal formattedValue = AppUtils.formatCurrency(response.getOfferPrice());
         topDescription += " for $" + formattedValue;
@@ -157,7 +181,7 @@ public class ViewTransactionFragment extends DialogFragment {
             }
             returnTime.setVisibility(View.GONE);
             returnLocation.setVisibility(View.GONE);
-        } else if (!transaction.getReturned() && request.getRental()) {
+        } else if (!transaction.getReturned() && (request.getType().equals(Request.Type.renting) || request.getType().equals(Request.Type.loaning))) {
             transactionStatus.setText("Awaiting return");
             String formattedDate = transaction.getExchangeTime() != null ? formatter.format(transaction.getExchangeTime()) : null;
             exchangeLocation.setVisibility(View.GONE);
@@ -197,7 +221,7 @@ public class ViewTransactionFragment extends DialogFragment {
         messageUserBtn = (FloatingActionButton) view.findViewById(R.id.message_user_fab);
         closeTransactionBtn = (FloatingActionButton) view.findViewById(R.id.close_transaction_fab);
         this.view = view;
-        setUpFabBtns(request, isSeller);
+        setUpFabBtns(request, isSeller, isNormalRequest);
         closeBtn = (ImageButton) view.findViewById(R.id.close_view);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -207,10 +231,10 @@ public class ViewTransactionFragment extends DialogFragment {
         return view;
     }
 
-    private void setUpFabBtns(Request request, final boolean isSeller) {
+    private void setUpFabBtns(Request request, final boolean isSeller, final boolean isNormalRequest) {
         exchangeFabText = (TextView) view.findViewById(R.id.exchange_text);
         closeTransactionFabText = (TextView) view.findViewById(R.id.close_transaction_text);
-        if ((transaction.getExchanged() && !request.getRental()) || transaction.getReturned() ||
+        if ((transaction.getExchanged() && !request.isRental()) || transaction.getReturned() ||
                 (!request.getStatus().equals("OPEN") && !request.getStatus().equals("TRANSACTION_PENDING"))) {
             exchangeBtn.setVisibility(View.GONE);
             exchangeFabText.setVisibility(View.GONE);
@@ -241,17 +265,17 @@ public class ViewTransactionFragment extends DialogFragment {
         messageUserFabText = (TextView) view.findViewById(R.id.message_user_text);
         messageUserFabText.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                messageUserClick(isSeller);
+                messageUserClick(isSeller, isNormalRequest);
             }
         });
         messageUserBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                messageUserClick(isSeller);
+                messageUserClick(isSeller, isNormalRequest);
             }
         });
     }
 
-    private void messageUserClick(boolean isSeller) {
+    private void messageUserClick(boolean isSeller, boolean isNormalRequest) {
         Intent smsIntent = new Intent(Intent.ACTION_VIEW);
         PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
         List activities = packageManager.queryIntentActivities(smsIntent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -260,17 +284,33 @@ public class ViewTransactionFragment extends DialogFragment {
             smsIntent.setType("vnd.android-dir/mms-sms");
             String phone;
             if (isSeller) {
-                phone = history.getRequest().getUser().getPhone().replace("-", "");
-            } else {
-                Response resp = null;
-                final Transaction transaction = history.getTransaction();
-                for (Response res : history.getResponses()) {
-                    if (res.getId().equals(transaction.getResponseId())) {
-                        resp = res;
-                        break;
+                if (isNormalRequest) {
+                    phone = history.getRequest().getUser().getPhone().replace("-", "");
+                } else {
+                    Response resp = null;
+                    final Transaction transaction = history.getTransaction();
+                    for (Response res : history.getResponses()) {
+                        if (res.getId().equals(transaction.getResponseId())) {
+                            resp = res;
+                            break;
+                        }
                     }
+                    phone = resp.getResponder().getPhone().replace("-", "");
                 }
-                phone = resp.getSeller().getPhone().replace("-", "");
+            } else {
+                if (isNormalRequest) {
+                    Response resp = null;
+                    final Transaction transaction = history.getTransaction();
+                    for (Response res : history.getResponses()) {
+                        if (res.getId().equals(transaction.getResponseId())) {
+                            resp = res;
+                            break;
+                        }
+                    }
+                    phone = resp.getResponder().getPhone().replace("-", "");
+                } else {
+                    phone = history.getRequest().getUser().getPhone().replace("-", "");
+                }
             }
             smsIntent.putExtra("address", phone);
             smsIntent.putExtra("sms_body","");

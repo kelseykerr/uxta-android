@@ -104,6 +104,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     public static Boolean homeLocation = false;
     public static Double currentRadius = 10.0;
     public static String sortBy;
+    public static Boolean sellingLoaning = true;
+    public static Boolean buyingRenting = true;
     private Location currentLocation;
     public static String searchTerm;
     private static final String TAG = "HomeFragment";
@@ -230,12 +232,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-    public void showNewOfferDialog(String requestId, Boolean isRental) {
+    public void showNewOfferDialog(String requestId, String type) {
         if (!MainActivity.areLocationServicesOn()) {
             ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
             return;
         }
-        DialogFragment newFragment = NewOfferDialogFragment.newInstance(requestId, isRental);
+        DialogFragment newFragment = NewOfferDialogFragment.newInstance(requestId, type);
         newFragment.show(getFragmentManager(), "dialog");
     }
 
@@ -297,6 +299,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                     }
                     if (sortBy != null && !sortBy.isEmpty() && !sortBy.equals("best match")) {
                         urlString += ("&sortBy=" + sortBy);
+                    }
+                    if (!buyingRenting && sellingLoaning) {
+                        urlString += ("&type=offers");
+                    } else if (!sellingLoaning && buyingRenting) {
+                        urlString += ("&type=requests");
                     }
                     HttpURLConnection conn = AppUtils.getHttpConnection(urlString, "GET", user);
                     String output = AppUtils.getResponseContent(conn);
@@ -364,10 +371,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                                 markerOptions.snippet(request.getDescription());
                             }
 
-                            float[] hsv = new float[3];
-                            Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                            if (request.getType() != null && (request.getType().equals(Request.Type.loaning) ||
+                                    request.getType().equals(Request.Type.selling))) {
+                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+                            } else {
+                                float[] hsv = new float[3];
+                                Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
+                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+                            }
                             //Color.colorToHSV(-11607316, hsv);
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
                             Marker marker = map.addMarker(markerOptions);
                             requestMarkers.add(marker);
                             builder.include(marker.getPosition());

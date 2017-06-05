@@ -88,7 +88,21 @@ public class ViewRequestFragment extends DialogFragment {
         request = history.getRequest();
         View view = inflater.inflate(R.layout.fragment_view_request, container, false);
         requestText = (TextView) view.findViewById(R.id.request_text);
-        requestText.setText("Requested a " + request.getItemName());
+        String title = "";
+        if (request.getType() != null && request.getType().equals(Request.Type.renting)) {
+            title = "Requested to rent a " +
+                    request.getItemName();
+        } else if (request.getType() != null && request.getType().equals(Request.Type.buying)) {
+            title = "Requested to buy a " +
+                    request.getItemName();
+        } else if (request.getType() != null && request.getType().equals(Request.Type.selling)) {
+            title = "Selling a " +
+                    request.getItemName();
+        } else if (request.getType() != null && request.getType().equals(Request.Type.loaning)) {
+            title = "Offering to loan out a " +
+                    request.getItemName();
+        }
+        requestText.setText(title);
         requestDescription = (TextView) view.findViewById(R.id.request_description_text);
         if (request.getDescription() != null && request.getDescription().length() > 0) {
             requestDescription.setText(request.getDescription());

@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
@@ -40,11 +43,15 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
     private Double currentRadius;
     private Boolean homeLocation;
     private String sortBy;
+    private Boolean sellLoan;
+    private Boolean rentBuy;
     private Spinner radiusSpinner;
     private Spinner locationSpinner;
     private Spinner sortBySpinner;
     private FiltersDialogFragment.OnFragmentInteractionListener mListener;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
+    private SwitchCompat sellingLoaning;
+    private SwitchCompat buyingRenting;
 
 
     public static FiltersDialogFragment newInstance() {
@@ -75,6 +82,8 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
         currentRadius = HomeFragment.currentRadius;
         homeLocation = HomeFragment.homeLocation;
         sortBy = HomeFragment.sortBy;
+        sellLoan = HomeFragment.sellingLoaning;
+        rentBuy = HomeFragment.buyingRenting;
         locationSpinner = (Spinner) view.findViewById(R.id.location_spinner);
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.locationItems));
@@ -169,6 +178,38 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
             sortBySpinner.setSelection(1);
         }
 
+        sellingLoaning = (SwitchCompat) view.findViewById(R.id.selling_loaning);
+        if (sellLoan != null) {
+            sellingLoaning.setChecked(sellLoan);
+        } else {
+            sellLoan = true;
+            sellingLoaning.setChecked(true);
+        }
+        buyingRenting = (SwitchCompat) view.findViewById(R.id.buying_renting);
+        if (rentBuy != null) {
+            buyingRenting.setChecked(rentBuy);
+        } else {
+            rentBuy = true;
+            buyingRenting.setChecked(true);
+        }
+
+        sellingLoaning.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    buyingRenting.setChecked(true);
+                }
+            }
+        });
+        buyingRenting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    sellingLoaning.setChecked(true);
+                }
+            }
+        });
+
         ImageButton closeBtn = (ImageButton) view.findViewById(R.id.close_filters);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -181,6 +222,8 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
                 HomeFragment.currentRadius = currentRadius;
                 HomeFragment.homeLocation = homeLocation;
                 HomeFragment.sortBy = sortBy;
+                HomeFragment.sellingLoaning = sellingLoaning.isChecked();
+                HomeFragment.buyingRenting = buyingRenting.isChecked();
                 String nextFragment = " ";
                 Uri url = null;
                 mListener.onFragmentInteraction(url, nextFragment, Constants.FPPR_SUBMIT_FILTERS);

@@ -66,7 +66,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         if (h.hasOpenTransaction()) {
             setUpTransactionCard(requestViewHolder, r, h);
         } else if (r.isMyRequest(user)) { // this is a request the user made
-            setUpRequestCard(requestViewHolder, r, h);
+            if (r.getType().equals(Request.Type.loaning) && r.getDuplicate()) {
+                setUpInventoryOfferCard(requestViewHolder, r, h);
+            } else {
+                setUpRequestCard(requestViewHolder, r, h);
+            }
         } else { //this is an offer the user made
             setUpOfferCard(requestViewHolder, r, h);
         }
@@ -147,12 +151,24 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         final Response resp = h.getResponses().get(0);
         String htmlString = "Offered a " + r.getItemName() + " to " + r.getRequesterName();
+        if (r.getType() != null && r.getType().equals(Request.Type.renting)) {
+            htmlString = "Offered to loan a " + r.getItemName() + " to " + r.getRequesterName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.buying)) {
+            htmlString = "Offered to sell a " + r.getItemName() + " to " + r.getRequesterName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.selling)) {
+            htmlString = "Requested to buy a " + r.getItemName() + " from " + r.getRequesterName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.loaning)) {
+            htmlString = "Requested to borrow a " + r.getItemName() + " from " + r.getRequesterName();
+        }
         requestViewHolder.setUpProfileImage(r.getUser());
         String diff = AppUtils.getTimeDiffString(resp.getResponseTime());
         requestViewHolder.vFirstRowText.setText(Html.fromHtml(htmlString));
         requestViewHolder.vPostedDate.setText(diff);
-        if (resp.getSellerStatus().equals(Response.SellerStatus.OFFERED)) {
+        if (!r.isInventoryListing() && resp.getSellerStatus().equals(Response.SellerStatus.OFFERED)) {
             requestViewHolder.vSecondRowText.setText("Buyer updated offer, awaiting your approval");
+            requestViewHolder.vSecondRowText.setVisibility(View.VISIBLE);
+        } else if (r.isInventoryListing() && resp.getBuyerStatus().equals(Response.BuyerStatus.OPEN)) {
+            requestViewHolder.vSecondRowText.setText("Seller updated offer, awaiting your approval");
             requestViewHolder.vSecondRowText.setVisibility(View.VISIBLE);
         } else {
             requestViewHolder.vSecondRowText.setText("");
@@ -208,6 +224,19 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
         String htmlString = "Requested a " +
                 r.getItemName();
+        if (r.getType() != null && r.getType().equals(Request.Type.renting)) {
+            htmlString = "Requested to rent a " +
+                    r.getItemName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.buying)) {
+            htmlString = "Requested to buy a " +
+                    r.getItemName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.selling)) {
+            htmlString = "Selling a " +
+                    r.getItemName();
+        } else if (r.getType() != null && r.getType().equals(Request.Type.loaning)) {
+            htmlString = "Offering to loan out a " +
+                    r.getItemName();
+        }
         requestViewHolder.vFirstRowText.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
         requestViewHolder.vPostedDate.setText(diff);
@@ -271,8 +300,80 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     }
 
+    private void setUpInventoryOfferCard(HistoryCardViewHolder historyViewHolder, final Request r, final History h) {
+        historyViewHolder.vPostedDate.setVisibility(View.GONE);
+        final Response resp = h.getResponses().get(0);
+        historyViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
+        BigDecimal formattedValue = AppUtils.formatCurrency(resp.getOfferPrice());
+        String htmlString = resp.getResponderName() + " requested to borrow your " +
+                r.getItemName() + " for $" + formattedValue;
+        historyViewHolder.vFirstRowText.setText(Html.fromHtml(htmlString));
+
+        historyViewHolder.setUpProfileImage(resp.getResponder());
+        String diff = AppUtils.getTimeDiffString(resp.getResponseTime());
+        historyViewHolder.vFirstRowText.setText(Html.fromHtml(htmlString));
+        historyViewHolder.vPostedDate.setText(diff);
+        if (resp.getSellerStatus().equals(Response.SellerStatus.OFFERED)) {
+            historyViewHolder.vSecondRowText.setText("Awaiting your approval");
+            historyViewHolder.vSecondRowText.setVisibility(View.VISIBLE);
+        } else if (resp.getBuyerStatus().equals(Response.BuyerStatus.OPEN)){
+            historyViewHolder.vSecondRowText.setText("Awaiting buyer approval");
+            historyViewHolder.vSecondRowText.setVisibility(View.VISIBLE);
+        } else {
+            historyViewHolder.vSecondRowText.setText("");
+            historyViewHolder.vSecondRowText.setVisibility(View.GONE);
+        }
+        historyViewHolder.vDescription.setText("");
+        historyViewHolder.vDescription.setVisibility(View.GONE);
+        historyViewHolder.vStatus.setText(resp.getResponseStatus().toString().toUpperCase());
+        if (resp.isClosed()) {
+            historyViewHolder.closeSwipe.setVisibility(View.GONE);
+            historyViewHolder.moreSwipe.setVisibility(View.GONE);
+
+        } else {
+            historyViewHolder.closeSwipe.setVisibility(View.VISIBLE);
+            View.OnClickListener closeClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    closeOffer(resp, r);
+                }
+            };
+            historyViewHolder.closeSwipe.setOnClickListener(closeClick);
+            historyViewHolder.closeSwipeBtn.setOnClickListener(closeClick);
+            historyViewHolder.moreSwipe.setVisibility(View.VISIBLE);
+            historyViewHolder.moreSwipeText.setText("edit");
+            historyViewHolder.moreSwipeBtn.setImageResource(R.drawable.ic_mode_edit_black_24dp);
+            historyViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            });
+            historyViewHolder.moreSwipeBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            });
+        }
+        setResponseStatusColor(historyViewHolder.vStatus, resp.getResponseStatus().toString());
+        historyViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
+                    historyFragment.showResponseDialog(resp);
+                }
+            }
+        });
+    }
+
     private void setUpTransactionCard(HistoryCardViewHolder requestViewHolder, Request r, final History h) {
-        boolean isBuyer = r.isMyRequest(user);
+        boolean isBuyer = false;
+        if (r.isMyRequest(user) && !r.isInventoryListing()) {
+            isBuyer = true;
+        } else if (!r.isMyRequest(user) && r.isInventoryListing()) {
+            isBuyer = true;
+        }
         final boolean isSeller = !isBuyer;
         requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.card_border_left));
         requestViewHolder.vPostedDate.setVisibility(View.GONE);
@@ -291,7 +392,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             handleExchangeClick(requestViewHolder, transaction, isSeller);
             requestViewHolder.closeSwipe.setVisibility(View.GONE);
         }
-        requestViewHolder.setUpProfileImage(isSeller ? r.getUser() : resp.getSeller());
+        if (!r.isInventoryListing()) {
+            requestViewHolder.setUpProfileImage(isSeller ? r.getUser() : resp.getResponder());
+        } else {
+            requestViewHolder.setUpProfileImage(isSeller ? resp.getResponder() : r.getUser());
+        }
         requestViewHolder.vFirstRowText.setText(getTransactionDescription(h));
         if (!transaction.getExchanged()) {
             String formattedDate = resp.getExchangeTime() != null ? Constants.DATE_FORMATTER.format(resp.getExchangeTime()) : "";
@@ -316,7 +421,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vTransactionStatus.setText("Pending exchange override approval");
                 handleOverride(h, r, resp, true);
             }
-        } else if (!transaction.getReturned() && r.getRental()) {
+        } else if (!transaction.getReturned() && (r.getType().equals(Request.Type.renting) || r.getType().equals(Request.Type.loaning))) {
             String formatedDate = resp.getReturnTime() != null ? Constants.DATE_FORMATTER.format(resp.getReturnTime()) : "";
             String returnTime = "<b>return time:</b> " + formatedDate;
             if (resp.getReturnTime() != null) {
@@ -348,8 +453,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 requestViewHolder.vTransactionStatus.setText("Processing Payment");
                 requestViewHolder.vTransactionStatus.setVisibility(View.VISIBLE);
             } else {
-                final String description = "For " + (r.getRental() ? "loaning " : "selling ") + "your " +
-                        r.getItemName() + " to " + r.getRequesterName();
+                String name = r.isInventoryListing() ? resp.getResponderName() : r.getRequesterName();
+                final String description = "For " + (r.isRental() ? "loaning " : "selling ") + "your " +
+                        r.getItemName() + " to " + name;
                 historyFragment.showConfirmChargeDialog(transaction.getCalculatedPrice(),
                         description, transaction.getId());
                 requestViewHolder.vTransactionStatus.setText("CONFIRM CHARGE!");
@@ -360,7 +466,7 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.historyCard.setBackground(context.getResources().getDrawable(R.drawable.request_card_background));
             requestViewHolder.vPostedDate.setVisibility(View.VISIBLE);
             Date completedDate;
-            if (r.getRental()) {
+            if (r.isRental()) {
                 completedDate = transaction.getReturnTime() != null ?
                         transaction.getReturnTime() : transaction.getReturnOverride().time;
             } else {
@@ -427,14 +533,18 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
 
     private void handleOverride(History history, Request request, Response response, boolean isExchange) {
         Transaction transaction = history.getTransaction();
-        if (isExchange && request.isMyRequest(user)) {
-            String description = response.getSellerName() +
+        boolean isMyRequest = request.isMyRequest(user);
+        boolean showInitialDialog = (request.isInventoryListing() && !isMyRequest) || (!request.isInventoryListing() && isMyRequest);
+        if (isExchange && showInitialDialog) {
+            String name = request.isInventoryListing() ? request.getRequesterName() : response.getResponderName();
+            String description = name +
                     " submitted an exchange override. Did you exchange the " +
                     request.getItemName() + " at the time above?";
             String time = Constants.DATE_FORMATTER.format(transaction.getExchangeOverride().time);
             historyFragment.showConfirmExchangeOverrideDialog(time, description, transaction.getId(), false);
-        } else if (!isExchange && !request.isMyRequest(user)) {
-            String description = request.getRequesterName() +
+        } else if (!isExchange && !showInitialDialog) {
+            String name = request.isInventoryListing() ? response.getResponderName() : request.getRequesterName();
+            String description = name +
                     " submitted a return override. Was the " +
                     request.getItemName() + " returned at the time above?";
             String time = Constants.DATE_FORMATTER.format(transaction.getReturnOverride().time);
@@ -447,27 +557,40 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
     private String getTransactionDescription(History history) {
         Request request = history.getRequest();
         String description = "";
-        boolean isBuyer = request.isMyRequest(user);
+        boolean isBuyer = false;
+        if (request.isMyRequest(user) && !request.isInventoryListing()) {
+            isBuyer = true;
+        } else if (!request.isMyRequest(user) && request.isInventoryListing()) {
+            isBuyer = true;
+        }
         if (history.isTransactionComplete()) {
-            if (request.getRental()) {
+            if (request.isRental()) {
                 description = isBuyer ? "Borrowed a " : "Loaned a ";
             } else {
                 description = isBuyer ? "Bought a " : "Sold a ";
             }
         } else {
-            if (request.getRental()) {
+            if (request.isRental()) {
                 description = isBuyer ? "Borrowing a " : "Loaning a ";
             } else {
                 description = isBuyer ? "Buying a " : "Selling a ";
             }
         }
         description += request.getItemName();
-
         if (isBuyer) {
-            Response resp = history.getAcceptedOffer();
-            description += " from " + resp.getSellerName();
+            if (!request.isInventoryListing()) {
+                Response resp = history.getAcceptedOffer();
+                description += " from " + resp.getResponderName();
+            } else {
+                description += " from " + request.getRequesterName();
+            }
         } else {
-            description += " to " + request.getRequesterName();
+            if (!request.isInventoryListing()) {
+                description += " to " + request.getRequesterName();
+            } else {
+                Response resp = history.getAcceptedOffer();
+                description += " to " + resp.getResponderName();
+            }
         }
 
         return description;

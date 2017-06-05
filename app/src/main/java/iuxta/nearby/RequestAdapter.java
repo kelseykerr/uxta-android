@@ -54,9 +54,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(final RequestViewHolder requestViewHolder, int i) {
         final Request r = requests.get(i);
         requestViewHolder.setUpProfileImage(r.getUser());
-        String htmlString = r.getRequesterName() + " would like to " +
-                (r.getRental() ? " borrow a " : " buy a ") + "<b>" +
-                r.getItemName() + "</b>";
+        String htmlString = "";
+        if (r.getType().equals(Request.Type.loaning)) {
+            htmlString = r.getRequesterName() + " has a " + r.getItemName() + " available to rent";
+        } else if (r.getType().equals(Request.Type.selling)) {
+            htmlString = r.getRequesterName() + " is selling a " + r.getItemName();
+        } else {
+            htmlString = r.getRequesterName() + " would like to " +
+                    (r.isRental() ? " borrow a " : " buy a ") + "<b>" +
+                    r.getItemName() + "</b>";
+        }
         requestViewHolder.vItemName.setText(Html.fromHtml(htmlString));
         String diff = AppUtils.getTimeDiffString(r.getPostDate());
         requestViewHolder.vPostedDate.setText(diff);
@@ -80,6 +87,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             }
         });
         requestViewHolder.offerSwipe.setTag(i);
+        if (r.getType().equals(Request.Type.loaning)) {
+            requestViewHolder.respondText.setText("request");
+        } else {
+            requestViewHolder.respondText.setText("respond");
+        }
         View.OnClickListener offerClick = new View.OnClickListener() {
             public void onClick(View v) {
                 makeOffer(r, requestViewHolder);
@@ -115,7 +127,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             });
             snack.show();
         } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-            homeFragment.showNewOfferDialog(r.getId(), r.getRental());
+            homeFragment.showNewOfferDialog(r.getId(), r.getType().toString());
         } else {
             String title;
             boolean showAction = true;
@@ -168,6 +180,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         private FrameLayout flagSwipe;
         private ImageButton flagBtn;
         private SwipeRevealLayout swipeLayout;
+        private TextView respondText;
 
         public RequestViewHolder(Context context, View v) {
             super(v);
@@ -181,6 +194,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             offerBtn = (ImageButton) v.findViewById(R.id.offer_btn);
             flagSwipe = (FrameLayout) v.findViewById(R.id.flag_swipe);
             flagBtn = (ImageButton) v.findViewById(R.id.flag_btn);
+            respondText = (TextView) v.findViewById(R.id.respond_text);
             swipeLayout = (SwipeRevealLayout) v.findViewById(R.id.swipe_layout);
             swipeLayout.setSwipeListener(new SwipeRevealLayout.SwipeListener() {
                 boolean wasOpen = false;

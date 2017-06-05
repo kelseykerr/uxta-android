@@ -30,7 +30,7 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
-                android:text="New Request"
+                android:text="New Item"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -180,7 +180,7 @@
                 android:layout_below="@id/request_map_view"
                 android:layout_marginBottom="15dp"
                 android:background="@drawable/primary_btn"
-                android:text="create request"
+                android:text="create"
                 android:textColor="#ffffff" />
 
             <Button
@@ -189,7 +189,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/create_request_button"
                 android:background="@color/colorAccent"
-                android:text="close request"
+                android:text="close"
                 android:textColor="#ffffff" />
 
         </RelativeLayout>

@@ -1,8 +1,6 @@
 package layout;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -45,7 +43,6 @@ import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import iuxta.nearby.AppUtils;
@@ -135,7 +132,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         returnTimeLayout = (TextInputLayout) view.findViewById(R.id.return_time_layout);
         returnTime = (EditText) view.findViewById(R.id.return_time);
         returnTime.setKeyListener(null);
-        if (!request.getRental()) {
+        if (request.getType().equals(Request.Type.buying) || request.getType().equals(Request.Type.selling)) {
             returnLocation.setVisibility(View.GONE);
             returnTime.setVisibility(View.GONE);
         } else {
@@ -165,9 +162,12 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 });
         descriptionLayout = (TextInputLayout) view.findViewById(R.id.description_layout);
         description = (EditText) view.findViewById(R.id.description);
+        if (request.getType().equals(Request.Type.loaning) || request.getType().equals(Request.Type.selling)) {
+            description.setHint("Message");
+        }
         description.setText(response.getDescription());
         //if this is the buyer, don't allow them to edit the description
-        if (!response.getSellerId().equals(user.getId())) {
+        if (!response.getResponderId().equals(user.getId())) {
             description.setEnabled(false);
         } else {
             description.setEnabled(true);
@@ -213,10 +213,10 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             }
         });
         messageSellerBtn = (Button) view.findViewById(R.id.message_seller_button);
-        if (response.getSellerId().equals(user.getId())) {
+        if (response.getResponderId().equals(user.getId())) {
             messageSellerBtn.setVisibility(View.GONE);
             rejectRequestBtn.setText("withdraw offer");
-        } else if (response.getMessagesEnabled() == null || !response.getMessagesEnabled() || response.getSeller() == null || response.getSeller().getPhone() == null) {
+        } else if (response.getMessagesEnabled() == null || !response.getMessagesEnabled() || response.getResponder() == null || response.getResponder().getPhone() == null) {
             messageSellerBtn.setVisibility(View.GONE);
         } else {
             messageSellerBtn.setOnClickListener(new View.OnClickListener() {
@@ -233,7 +233,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                         messageSellerBtn.setEnabled(false);
                         smsIntent.setType("vnd.android-dir/mms-sms");
                         String phone;
-                        phone = response.getSeller().getPhone().replace("-", "");
+                        phone = response.getResponder().getPhone().replace("-", "");
                         smsIntent.putExtra("address", phone);
                         smsIntent.putExtra("sms_body","");
                         context.startActivity(Intent.createChooser(smsIntent, "SMS:"));
@@ -259,7 +259,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                     }
                     ObjectMapper mapper = new ObjectMapper();
                     Response r = response;
-                    r.setSeller(null);
+                    r.setResponder(null);
                     if (user.getId().equals(request.getUser().getId())) {
                         r.setBuyerStatus(Response.BuyerStatus.DECLINED);
                     } else {
@@ -314,16 +314,24 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                     String apiPath = "/requests/" + request.getId() + "/responses/" + response.getId();
                     HttpURLConnection conn = AppUtils.getHttpConnection(apiPath, "PUT", user);
                     if (request.getUser().getId().equals(user.getId())) {
-                        response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        if (request.getType().equals(Request.Type.loaning) || request.getType().equals(Request.Type.selling)) {
+                            response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        } else {
+                            response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        }
                     } else {
-                        response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        if (request.getType().equals(Request.Type.loaning) || request.getType().equals(Request.Type.selling)) {
+                            response.setBuyerStatus(Response.BuyerStatus.ACCEPTED);
+                        } else {
+                            response.setSellerStatus(Response.SellerStatus.ACCEPTED);
+                        }
                     }
                     ObjectMapper mapper = new ObjectMapper();
-                    User seller = response.getSeller();
-                    response.setSeller(null);
+                    User seller = response.getResponder();
+                    response.setResponder(null);
                     String responseJson = mapper.writeValueAsString(response);
                     Log.i("updated response: ", responseJson);
-                    response.setSeller(seller);
+                    response.setResponder(seller);
                     byte[] outputInBytes = responseJson.getBytes("UTF-8");
                     OutputStream os = conn.getOutputStream();
                     os.write(outputInBytes);
@@ -374,7 +382,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         if (!pickupTime.getText().toString().isEmpty()) {
             response.setExchangeTime(exchangeDate);
         }
-        if (request.getRental()) {
+        if (request.isRental()) {
             response.setReturnLocation(returnLocation.getText().toString());
             if (!returnTime.getText().toString().isEmpty()) {
                 response.setReturnTime(returnDate);

@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +49,14 @@ public class RequestPreviewFragment extends DialogFragment {
     private EditText itemName;
     private EditText description;
     private TextInputLayout descriptionLayout;
+    private TextView title;
     private static HomeFragment homeFragment;
     private Button flagBtn;
     private static final String TAG = "RequestPreviewFragment";
+    private static final String RENT_TEXT = "looking to rent";
+    public static final String BUY_TEXT = "looking to buy";
+    public static final String SELL_TEXT = "item available for sale";
+    public static final String LOAN_TEXT = "item available to rent";
 
     public RequestPreviewFragment() {
         // Required empty public constructor
@@ -91,21 +97,34 @@ public class RequestPreviewFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.request_preview_dialog, container, false);
         scrollView = (ScrollView) view.findViewById(R.id.scrollview);
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
+        title = (TextView) view.findViewById(R.id.request_detail_text);
+        if (request.getType().equals(Request.Type.selling) || request.getType().equals(Request.Type.loaning)) {
+            title.setText("Item Detail");
+        }
         ArrayAdapter<String> rentBuyAdapter;
         List<String> rentBuyList = new ArrayList<>();
-        rentBuyList.add("rent");
-        rentBuyList.add("buy");
+        rentBuyList.add(RENT_TEXT);
+        rentBuyList.add(BUY_TEXT);
+        rentBuyList.add(SELL_TEXT);
+        rentBuyList.add(LOAN_TEXT);
         rentBuyAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, rentBuyList);
         rentBuyAdapter.setDropDownViewResource(R.layout.spinner_item);
         rentalSpinner.setAdapter(rentBuyAdapter);
-        if (request.getRental()) {
+        if (request.getType().equals(Request.Type.renting)) {
             rentalSpinner.setSelection(0);
-        } else {
+        } else if (request.getType().equals(Request.Type.buying)) {
             rentalSpinner.setSelection(1);
+        } else if (request.getType().equals(Request.Type.selling)) {
+            rentalSpinner.setSelection(2);
+        } else if (request.getType().equals(Request.Type.loaning)) {
+            rentalSpinner.setSelection(3);
         }
         rentalSpinner.setEnabled(false);
 
         createOfferBtn = (Button) view.findViewById(R.id.create_offer_button);
+        if (request.getType().equals(Request.Type.loaning)) {
+            createOfferBtn.setText("request this item");
+        }
         createOfferBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 createOfferBtn.setEnabled(false);
@@ -200,7 +219,7 @@ public class RequestPreviewFragment extends DialogFragment {
             snack.show();
             createOfferBtn.setEnabled(true);
         } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-            homeFragment.showNewOfferDialog(request.getId(), request.getRental());
+            homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
             dismiss();
         } else {
             String title;
