@@ -159,6 +159,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQUEST_CAMERA = 2;
 
+    private static final int READ_EXTERNAL_STORAGE = 3;
+
     private boolean hasMessage() {
         notificationType = getIntent().getStringExtra("type");
         return notificationType != null;
@@ -232,6 +234,11 @@ public class MainActivity extends AppCompatActivity
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermission(Manifest.permission.CAMERA,
                     R.string.permission_camera_rationale, REQUEST_CAMERA);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    R.string.permission_external_storage, READ_EXTERNAL_STORAGE);
         }
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
@@ -938,8 +945,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static String uploadPhoto(Uri uri) {
-        File f = new File(uri.getPath());
+    public static String uploadPhoto(File f) {
         String key = UUID.randomUUID().toString();
         TransferObserver observer = transferUtility.upload(
                 Constants.NEARBY_BUCKET,     /* The bucket to upload to */

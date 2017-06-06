@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by kerrk on 8/7/16.
@@ -42,6 +43,8 @@ public class Request extends BaseEntity {
     private Boolean inappropriate;
 
     private Boolean duplicate;
+
+    private List<String> photos;
 
     public User getUser() {
         return user;
@@ -217,5 +220,13 @@ public class Request extends BaseEntity {
 
     public void setDuplicate(Boolean duplicate) {
         this.duplicate = duplicate;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
     }
 }

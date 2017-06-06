@@ -9,6 +9,7 @@
     <string name="permission_fine_location_rationale">Please enable location permissions.</string>
     <string name="permission_wifi_state_rationale">Please enable WiFi state.</string>
     <string name="permission_camera_rationale">Please enable camera permissions so QR codes can be scanned during exchanges.</string>
+    <string name="permission_external_storage">Please enable access to external storage so that you can upload photos of your items.</string>
     <string-array name="request_type_array">
         <item>item</item>
         <item>service</item>

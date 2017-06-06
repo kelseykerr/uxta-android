@@ -1,10 +1,12 @@
 package layout;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +19,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -58,11 +62,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -130,7 +136,8 @@ public class RequestDialogFragment extends DialogFragment
     private static final String SELL_TEXT = "sell an item";
     private static final String LOAN_TEXT = "list a rentable item";
     private static final int SELECT_PICTURE = 17;
-    private List<Uri> photos;
+    private List<String> photos;
+    private static final String TAG = "RequestDialogFragment";
 
 
     public RequestDialogFragment() {
@@ -734,6 +741,86 @@ public class RequestDialogFragment extends DialogFragment
         return true;
     }
 
+
+    @SuppressLint("NewApi")
+    private String getPath(Uri uri) throws URISyntaxException {
+        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        // deal with different Uris.
+        if (needToCheckUri && DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[] {
+                        split[1]
+                };
+            }
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver()
+                        .query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+
+
     public void setupLocationSpinner(View view) {
         Spinner locationSpinner = (Spinner) view.findViewById(R.id.location_spinner);
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
@@ -794,8 +881,19 @@ public class RequestDialogFragment extends DialogFragment
 
     private void addPhotos() {
         Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+        if (Build.VERSION.SDK_INT >= 19) {
+            // For Android KitKat, we use a different intent to ensure
+            // we can
+            // get the file path from the returned intent URI
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            intent.setType("image/*");
+        } else {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+        }
+
         startActivityForResult(Intent.createChooser(intent,
                 "Select Picture"), SELECT_PICTURE);
     }
@@ -805,23 +903,73 @@ public class RequestDialogFragment extends DialogFragment
             if (requestCode == SELECT_PICTURE) {
                 Uri imageUri = data.getData();
                 try {
-                    photos.add(imageUri);
                     InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
                     Bitmap bm = BitmapFactory.decodeStream(inputStream);
-                    if (photos.size() == 1) {
+                    if (photos == null || photos.size() == 0) {
                         photo1.setImageBitmap(bm);
-                        String key = MainActivity.uploadPhoto(imageUri);
-                        Log.e("***", key);
-                    } else if (photos.size() == 2) {
+                    } else if (photos.size() == 1) {
                         photo2.setImageBitmap(bm);
-                    } else if (photos.size() == 3) {
+                    } else if (photos.size() == 2) {
                         photo3.setImageBitmap(bm);
                     }
+                    String picturePath = "";
+                    try {
+                        picturePath = getPath(imageUri);
+                    } catch (Exception e) {
+                        //error, do something with this
+                        return;
+                    }
+                    File f = new File(picturePath);
+                    String key = MainActivity.uploadPhoto(f);
+                    photos.add(key);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public void fullScreen() {
+
+        // BEGIN_INCLUDE (get_current_ui_flags)
+        // The UI options currently enabled are represented by a bitfield.
+        // getSystemUiVisibility() gives us that bitfield.
+        int uiOptions = getActivity().getWindow().getDecorView().getSystemUiVisibility();
+        int newUiOptions = uiOptions;
+        // END_INCLUDE (get_current_ui_flags)
+        // BEGIN_INCLUDE (toggle_ui_flags)
+        boolean isImmersiveModeEnabled =
+                ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
+        if (isImmersiveModeEnabled) {
+            Log.i(TAG, "Turning immersive mode mode off. ");
+        } else {
+            Log.i(TAG, "Turning immersive mode mode on.");
+        }
+
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (Build.VERSION.SDK_INT >= 14) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+
+        // Status bar hiding: Backwards compatible to Jellybean
+        if (Build.VERSION.SDK_INT >= 16) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+
+        // Immersive mode: Backward compatible to KitKat.
+        // Note that this flag doesn't do anything by itself, it only augments the behavior
+        // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
+        // all three flags are being toggled together.
+        // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
+        // Sticky immersive mode differs in that it makes the navigation and status bars
+        // semi-transparent, and the UI flag does not get cleared when the user interacts with
+        // the screen.
+        if (Build.VERSION.SDK_INT >= 18) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+        //END_INCLUDE (set_ui_flags)
     }
 
 }
