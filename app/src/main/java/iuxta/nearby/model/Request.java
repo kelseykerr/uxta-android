@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -183,7 +184,7 @@ public class Request extends BaseEntity {
         this.inappropriate = inappropriate;
     }
 
-    public static class Location {
+    public static class Location implements Serializable {
 
         public Location() {
 

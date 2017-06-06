@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,12 +31,15 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
@@ -47,6 +51,7 @@ import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
+import iuxta.nearby.FullScreenImageActivity;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
@@ -84,6 +89,10 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private Date exchangeDate;
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
     private final String TAG = "ViewOfferDialogFragment";
+    private TextView photos;
+    private ImageView photo1;
+    private ImageView photo2;
+    private ImageView photo3;
 
 
 
@@ -198,6 +207,44 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 dismiss();
             }
         });
+
+        photos = (TextView) view.findViewById(R.id.photos_text);
+        photo1 = (ImageView) view.findViewById(R.id.photo_1);
+        photo1.setVisibility(View.GONE);
+        photo2 = (ImageView) view.findViewById(R.id.photo_2);
+        photo2.setVisibility(View.GONE);
+        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+        photo3.setVisibility(View.GONE);
+        if (response.getPhotos() == null) {
+            photos.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < response.getPhotos().size(); i++) {
+                try {
+                    File dir = context.getCacheDir();
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File f = File.createTempFile(request.getPhotos().get(i), null, dir);
+                    ImageView photo = null;
+                    if (i == 0) {
+                        photo = photo1;
+                        photo1.setVisibility(View.VISIBLE);
+                    } else if (i == 1) {
+                        photo = photo2;
+                        photo2.setVisibility(View.VISIBLE);
+                    } else if (i == 2) {
+                        photo = photo3;
+                        photo3.setVisibility(View.VISIBLE);
+                    }
+                    ((MainActivity) getActivity()).fetchPreviewPhoto(response.getPhotos().get(i), f, context, photo, null, this);
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+            }
+        }
         updateRequestBtn = (Button) view.findViewById(R.id.accept_offer_button);
         updateRequestBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -440,6 +487,19 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             }
         });
     }
+
+    public void setImageClick(ImageView image, final Uri uri) {
+        image.setOnClickListener(
+                new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
+                fullScreenIntent.setData(uri);
+                startActivity(fullScreenIntent);
+            }
+        });
+    }
+
 
     private void openDatePicker(final EditText textView, final boolean pickup) {
         final Calendar currentDate = Calendar.getInstance();

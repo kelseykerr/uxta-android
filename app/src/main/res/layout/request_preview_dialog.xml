@@ -122,12 +122,51 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:id="@+id/photos_text"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/request_description_layout"
+                android:textColor="@color/colorAccent"
+                android:text="photos"
+                android:textSize="16sp"
+                />
+
+            <ImageView
+                android:id="@+id/photo_1"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/photos_text"
+                android:layout_height="300dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <ImageView
+                android:id="@+id/photo_2"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/photo_1"
+                android:layout_height="300dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <ImageView
+                android:id="@+id/photo_3"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/photo_2"
+                android:layout_height="300dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
             <Button
                 android:id="@+id/create_offer_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/request_description_layout"
+                android:layout_below="@id/photo_3"
                 android:layout_marginBottom="15dp"
+                android:layout_marginTop="30dp"
                 android:background="@drawable/primary_btn"
                 android:text="create offer"
                 android:textColor="#ffffff" />

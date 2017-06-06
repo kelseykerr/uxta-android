@@ -31,6 +31,9 @@
             android:name="iuxta.nearby.MainActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity android:name="iuxta.nearby.FullScreenImageActivity"
+            android:screenOrientation="portrait"></activity>
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

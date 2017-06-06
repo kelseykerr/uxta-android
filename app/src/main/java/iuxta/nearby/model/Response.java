@@ -69,6 +69,8 @@ public class Response extends BaseEntity {
 
     private Boolean isOfferToBuyOrRent;
 
+    private List<String> photos;
+
     public static enum PriceType {
         FLAT, PER_HOUR, PER_DAY
     }
@@ -271,5 +273,13 @@ public class Response extends BaseEntity {
 
     public void setIsOfferToBuyOrRent(Boolean requestToBuyOrRent) {
         isOfferToBuyOrRent = requestToBuyOrRent;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
     }
 }

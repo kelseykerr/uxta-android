@@ -5,12 +5,15 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +22,23 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
+import iuxta.nearby.FullScreenImageActivity;
+import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.model.Request;
@@ -52,6 +63,10 @@ public class RequestPreviewFragment extends DialogFragment {
     private TextView title;
     private static HomeFragment homeFragment;
     private Button flagBtn;
+    private TextView photos;
+    private ImageView photo1;
+    private ImageView photo2;
+    private ImageView photo3;
     private static final String TAG = "RequestPreviewFragment";
     private static final String RENT_TEXT = "looking to rent";
     public static final String BUY_TEXT = "looking to buy";
@@ -141,6 +156,43 @@ public class RequestPreviewFragment extends DialogFragment {
         itemName = (EditText) view.findViewById(R.id.item_name);
         itemName.setText(request.getItemName());
         itemName.setEnabled(false);
+        photos = (TextView) view.findViewById(R.id.photos_text);
+        photo1 = (ImageView) view.findViewById(R.id.photo_1);
+        photo1.setVisibility(View.GONE);
+        photo2 = (ImageView) view.findViewById(R.id.photo_2);
+        photo2.setVisibility(View.GONE);
+        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+        photo3.setVisibility(View.GONE);
+        if (request.getPhotos() == null) {
+            photos.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < request.getPhotos().size(); i++) {
+                try {
+                    File dir = context.getCacheDir();
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File f = File.createTempFile(request.getPhotos().get(i), null, dir);
+                    ImageView photo = null;
+                    if (i == 0) {
+                        photo = photo1;
+                        photo1.setVisibility(View.VISIBLE);
+                    } else if (i == 1) {
+                        photo = photo2;
+                        photo2.setVisibility(View.VISIBLE);
+                    } else if (i == 2) {
+                        photo = photo3;
+                        photo3.setVisibility(View.VISIBLE);
+                    }
+                    ((MainActivity) getActivity()).fetchPreviewPhoto(request.getPhotos().get(i), f, context, photo, this, null);
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+            }
+        }
         description = (EditText) view.findViewById(R.id.request_description);
         if (request.getDescription() == null || request.getDescription().length() == 0) {
             descriptionLayout = (TextInputLayout) view.findViewById(R.id.request_description_layout);
@@ -158,6 +210,17 @@ public class RequestPreviewFragment extends DialogFragment {
         });
         this.view = view;
         return view;
+    }
+
+    public void setImageClick(ImageView image, final Uri uri) {
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
+                fullScreenIntent.setData(uri);
+                startActivity(fullScreenIntent);
+            }
+        });
     }
 
     @Override

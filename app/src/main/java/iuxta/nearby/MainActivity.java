@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -42,15 +44,20 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.Auth;
@@ -68,9 +75,12 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.UUID;
 
 import layout.AccountFragment;
@@ -86,6 +96,7 @@ import layout.PaymentDetailsDialogFragment;
 import layout.PaymentDialogFragment;
 import layout.ReportRequestFragment;
 import layout.RequestDialogFragment;
+import layout.RequestPreviewFragment;
 import layout.UpdateAccountDialogFragment;
 import layout.ViewOfferDialogFragment;
 import layout.ViewRequestFragment;
@@ -94,6 +105,8 @@ import iuxta.nearby.model.Response;
 import iuxta.nearby.model.User;
 import iuxta.nearby.service.NearbyInstanceIdService;
 import iuxta.nearby.service.NearbyMessagingService;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by kerrk on 7/17/16.
@@ -955,15 +968,120 @@ public class MainActivity extends AppCompatActivity
         return observer.getKey();
     }
 
-    /*public static File fetchPhoto(String key) {
-        File outputDir = context.getCacheDir();
-        File imageFile = File.createTempFile(key, "extension", outputDir);
-        TransferObserver observer = transferUtility.download(
-                Constants.NEARBY_BUCKET,     /* The bucket to download from */
-                //key,    /* The key for the object to download */
-                //imageFile       /* The file to download the object to */
-      //  );
-    //}
+    public void fetchPhoto(String key, final File file, final Context context, final RequestDialogFragment frag, final ImageView photo, final ImageView delete) {
+        Log.i(TAG, "fetching photo [" + key + "]");
+        try {
+            TransferObserver observer = transferUtility.download(
+                    Constants.NEARBY_BUCKET,     /* The bucket to download from */
+                    key,    /* The key for the object to download */
+                    file       /* The file to download the object to */
+            );
+            observer.setTransferListener(new TransferListener(){
+
+                @Override
+                public void onStateChanged(int id, TransferState state) {
+                    Log.i(TAG, "download state changed" + state.toString() + "**" + state.name());
+                    if (state.equals(TransferState.COMPLETED)) {
+                        if (!file.exists()) {
+                            Log.e(TAG, "**file does not exist");
+                        }
+                        Uri uri = Uri.fromFile(file);
+                        try {
+                            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            photo.setImageBitmap(bitmap);
+                            frag.bitmaps.add(bitmap);
+                            delete.setVisibility(View.VISIBLE);
+                            frag.setImageClick(photo, uri);
+                        } catch (FileNotFoundException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                    //Display percentage transfered to user
+                }
+
+                @Override
+                public void onError(int id, Exception ex) {
+                    Log.e(TAG, ex.getMessage());
+                    // do something
+                }
+
+            });
+        } catch (Exception exception) {
+            return;
+        }
+    }
+
+    public void fetchPreviewPhoto(String key, final File file, final Context context, final ImageView photo, final RequestPreviewFragment frag1, final ViewOfferDialogFragment frag2) {
+        Log.i(TAG, "fetching photo [" + key + "]");
+        try {
+            TransferObserver observer = transferUtility.download(
+                    Constants.NEARBY_BUCKET,     /* The bucket to download from */
+                    key,    /* The key for the object to download */
+                    file       /* The file to download the object to */
+            );
+            observer.setTransferListener(new TransferListener(){
+
+                @Override
+                public void onStateChanged(int id, TransferState state) {
+                    Log.i(TAG, "download state changed" + state.toString() + "**" + state.name());
+                    if (state.equals(TransferState.COMPLETED)) {
+                        if (!file.exists()) {
+                            Log.e(TAG, "**file does not exist");
+                        }
+                        Uri uri = Uri.fromFile(file);
+                        try {
+                            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            photo.setImageBitmap(bitmap);
+                            if (frag1 != null) {
+                                frag1.setImageClick(photo, uri);
+                            } else {
+                                frag2.setImageClick(photo, uri);
+                            }
+                        } catch (FileNotFoundException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                    //Display percentage transfered to user
+                }
+
+                @Override
+                public void onError(int id, Exception ex) {
+                    Log.e(TAG, ex.getMessage());
+                    // do something
+                }
+
+            });
+        } catch (Exception exception) {
+            return;
+        }
+    }
+
+    public void deletePhoto(final String key) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                DeleteObjectsRequest dor = new DeleteObjectsRequest(Constants.NEARBY_BUCKET);
+                dor.setKeys(Collections.singletonList(new DeleteObjectsRequest.KeyVersion(key)));
+                s3.deleteObjects(dor);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+
+            }
+        }.execute();
+    }
 
 
 }

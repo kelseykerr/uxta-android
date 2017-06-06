@@ -61,7 +61,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,6 +74,7 @@ import java.util.List;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
+import iuxta.nearby.FullScreenImageActivity;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
@@ -130,6 +130,9 @@ public class RequestDialogFragment extends DialogFragment
     private ImageView photo1;
     private ImageView photo2;
     private ImageView photo3;
+    private ImageView delete1;
+    private ImageView delete2;
+    private ImageView delete3;
     private int zoomLevel = 15;
     private static final String RENT_TEXT = "request to rent an item";
     private static final String BUY_TEXT = "request to buy an item";
@@ -137,6 +140,7 @@ public class RequestDialogFragment extends DialogFragment
     private static final String LOAN_TEXT = "list a rentable item";
     private static final int SELECT_PICTURE = 17;
     private List<String> photos;
+    public List<Bitmap> bitmaps;
     private static final String TAG = "RequestDialogFragment";
 
 
@@ -183,11 +187,23 @@ public class RequestDialogFragment extends DialogFragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_request_dialog, container, false);
         photos = new ArrayList<>();
+        bitmaps = new ArrayList<>();
+        photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
+        photo1 = (ImageView) view.findViewById(R.id.photo_1);
+        photo2 = (ImageView) view.findViewById(R.id.photo_2);
+        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+        delete1 = (ImageView) view.findViewById(R.id.delete_1);
+        delete2 = (ImageView) view.findViewById(R.id.delete_2);
+        delete3 = (ImageView) view.findViewById(R.id.delete_3);
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
             btn.setText("update");
             TextView dialogTitle = (TextView) view.findViewById(R.id.new_request_text);
             dialogTitle.setText("Edit Item");
+            if (request.getPhotos() != null) {
+                photos = request.getPhotos();
+                setPhotos();
+            }
         }
         newRequestSV = (ScrollView) view.findViewById(R.id.new_request_sv);
         itemNameLayout = (TextInputLayout) view.findViewById(R.id.request_name_layout);
@@ -212,10 +228,21 @@ public class RequestDialogFragment extends DialogFragment
                 addPhotos();
             }
         });
-        photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
-        photo1 = (ImageView) view.findViewById(R.id.photo_1);
-        photo2 = (ImageView) view.findViewById(R.id.photo_2);
-        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+        setDeleteClick(delete1, 1);
+        setDeleteClick(delete2, 2);
+        setDeleteClick(delete3, 3);
+        for (int k = 0; k < photos.size(); k++) {
+            if (k == 0) {
+                //get photo from 3
+                delete1.setVisibility(View.VISIBLE);
+            } else if (k == 1) {
+                //get photo from 3
+                delete2.setVisibility(View.VISIBLE);
+            } else if (k == 2) {
+                //get photo from 3
+                delete3.setVisibility(View.VISIBLE);
+            }
+        }
 
         rentalSpinner = (Spinner) view.findViewById(R.id.rental_spinner);
         ArrayAdapter<String> rentBuyAdapter;
@@ -377,6 +404,7 @@ public class RequestDialogFragment extends DialogFragment
         setRequestType(request);
         request.setItemName(itemName.getText().toString());
         request.setDescription(description.getText().toString());
+        request.setPhotos(photos);
     }
 
     private void setRequestType(Request request) {
@@ -403,6 +431,7 @@ public class RequestDialogFragment extends DialogFragment
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
+        newRequest.setPhotos(photos);
         boolean isRental = rentalSpinner.getSelectedItem().toString().equals(RENT_TEXT);
         setRequestType(newRequest);
         newRequest.setRental(isRental);
@@ -907,10 +936,17 @@ public class RequestDialogFragment extends DialogFragment
                     Bitmap bm = BitmapFactory.decodeStream(inputStream);
                     if (photos == null || photos.size() == 0) {
                         photo1.setImageBitmap(bm);
+                        delete1.setVisibility(View.VISIBLE);
+                        setImageClick(photo1, imageUri);
                     } else if (photos.size() == 1) {
                         photo2.setImageBitmap(bm);
+                        delete2.setVisibility(View.VISIBLE);
+                        setImageClick(photo2, imageUri);
                     } else if (photos.size() == 2) {
                         photo3.setImageBitmap(bm);
+                        delete3.setVisibility(View.VISIBLE);
+                        setImageClick(photo3, imageUri);
+                        addPhotos.setVisibility(View.GONE);
                     }
                     String picturePath = "";
                     try {
@@ -922,6 +958,7 @@ public class RequestDialogFragment extends DialogFragment
                     File f = new File(picturePath);
                     String key = MainActivity.uploadPhoto(f);
                     photos.add(key);
+                    bitmaps.add(bm);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -929,47 +966,80 @@ public class RequestDialogFragment extends DialogFragment
         }
     }
 
-    public void fullScreen() {
+    public void setPhotos() {
+        for (int i= 0; i < photos.size(); i++) {
+            try {
+                File dir = context.getCacheDir();
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File f = File.createTempFile(photos.get(i), null, dir);
+                ImageView photo = null;
+                ImageView delete = null;
+                if (i==0) {
+                    photo = photo1;
+                    delete = delete1;
+                } else if (i==1) {
+                    photo = photo2;
+                    delete = delete2;
+                } else if (i==2) {
+                    photo = photo3;
+                    delete = delete3;
+                }
+                ((MainActivity) getActivity()).fetchPhoto(photos.get(i), f, context, this, photo, delete);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, e.getMessage());
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
 
-        // BEGIN_INCLUDE (get_current_ui_flags)
-        // The UI options currently enabled are represented by a bitfield.
-        // getSystemUiVisibility() gives us that bitfield.
-        int uiOptions = getActivity().getWindow().getDecorView().getSystemUiVisibility();
-        int newUiOptions = uiOptions;
-        // END_INCLUDE (get_current_ui_flags)
-        // BEGIN_INCLUDE (toggle_ui_flags)
-        boolean isImmersiveModeEnabled =
-                ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-        if (isImmersiveModeEnabled) {
-            Log.i(TAG, "Turning immersive mode mode off. ");
-        } else {
-            Log.i(TAG, "Turning immersive mode mode on.");
         }
+    }
 
-        // Navigation bar hiding:  Backwards compatible to ICS.
-        if (Build.VERSION.SDK_INT >= 14) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        }
+    public void setImageClick(ImageView image, final Uri uri) {
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
+                fullScreenIntent.setData(uri);
+                startActivity(fullScreenIntent);
+            }
+        });
+    }
 
-        // Status bar hiding: Backwards compatible to Jellybean
-        if (Build.VERSION.SDK_INT >= 16) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
-
-        // Immersive mode: Backward compatible to KitKat.
-        // Note that this flag doesn't do anything by itself, it only augments the behavior
-        // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-        // all three flags are being toggled together.
-        // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-        // Sticky immersive mode differs in that it makes the navigation and status bars
-        // semi-transparent, and the UI flag does not get cleared when the user interacts with
-        // the screen.
-        if (Build.VERSION.SDK_INT >= 18) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
-
-        getActivity().getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-        //END_INCLUDE (set_ui_flags)
+    public void setDeleteClick(final ImageView deleteBtn, final int order) {
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteBtn.setEnabled(false);
+                photo1.setImageResource(android.R.color.transparent);
+                photo2.setImageResource(android.R.color.transparent);
+                photo3.setImageResource(android.R.color.transparent);
+                delete1.setVisibility(View.GONE);
+                delete2.setVisibility(View.GONE);
+                delete3.setVisibility(View.GONE);
+                ((MainActivity) getActivity()).deletePhoto(photos.get(order -1));
+                photos.remove(order - 1);
+                bitmaps.remove(order - 1);
+                for (int i = 0; i < photos.size(); i++) {
+                    if (i==0) {
+                        photo1.setImageBitmap(bitmaps.get(0));
+                        setDeleteClick(delete1, 1);
+                        delete1.setVisibility(View.VISIBLE);
+                    } else if (i == 1) {
+                        photo2.setImageBitmap(bitmaps.get(1));
+                        setDeleteClick(delete2, 2);
+                        delete2.setVisibility(View.VISIBLE);
+                    } else if (i ==2) {
+                        photo3.setImageBitmap(bitmaps.get(2));
+                        setDeleteClick(delete3, 3);
+                        delete3.setVisibility(View.VISIBLE);
+                    }
+                }
+                addPhotos.setVisibility(View.VISIBLE);
+                deleteBtn.setEnabled(true);
+            }
+        });
     }
 
 }
