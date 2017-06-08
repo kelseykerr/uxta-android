@@ -1,19 +1,27 @@
 package layout;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -32,6 +40,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -41,10 +51,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +71,11 @@ import iuxta.nearby.R;
 import iuxta.nearby.model.Request;
 import iuxta.nearby.model.Response;
 import iuxta.nearby.model.User;
+
+import static android.app.Activity.RESULT_OK;
+import static layout.RequestDialogFragment.isDownloadsDocument;
+import static layout.RequestDialogFragment.isExternalStorageDocument;
+import static layout.RequestDialogFragment.isMediaDocument;
 
 /**
  * Created by kerrk on 9/16/16.
@@ -89,11 +107,20 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
     private Date exchangeDate;
     private SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy hh:mm a");
     private final String TAG = "ViewOfferDialogFragment";
-    private TextView photos;
+    private LinearLayout photoLayout;
+    private TextView photosText;
+    private ImageButton addPhotos;
     private ImageView photo1;
     private ImageView photo2;
     private ImageView photo3;
-
+    private ImageView delete1;
+    private ImageView delete2;
+    private ImageView delete3;
+    private ProgressBar spinner1;
+    private ProgressBar spinner2;
+    private ProgressBar spinner3;
+    private static final int SELECT_PICTURE = 19;
+    public List<Bitmap> bitmaps;
 
 
     public ViewOfferDialogFragment() {
@@ -133,7 +160,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
         pickupTime = (EditText) view.findViewById(R.id.pickup_time);
         pickupTime.setKeyListener(null);
         setDateTimeFunctionality(pickupTime, true);
-
+        bitmaps = new ArrayList<>();
         pickupLocation = (EditText) view.findViewById(R.id.pickup_location);
         pickupLocation.setText(response.getExchangeLocation());
         returnLocation = (EditText) view.findViewById(R.id.return_location);
@@ -175,9 +202,16 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             description.setHint("Message");
         }
         description.setText(response.getDescription());
+        addPhotos = (ImageButton) view.findViewById(R.id.add_photos);
+        addPhotos.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                addPhotos();
+            }
+        });
         //if this is the buyer, don't allow them to edit the description
         if (!response.getResponderId().equals(user.getId())) {
             description.setEnabled(false);
+            addPhotos.setVisibility(View.GONE);
         } else {
             description.setEnabled(true);
         }
@@ -208,35 +242,70 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
             }
         });
 
-        photos = (TextView) view.findViewById(R.id.photos_text);
+        photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
+        photosText = (TextView) view.findViewById(R.id.photos_text);
         photo1 = (ImageView) view.findViewById(R.id.photo_1);
         photo1.setVisibility(View.GONE);
         photo2 = (ImageView) view.findViewById(R.id.photo_2);
         photo2.setVisibility(View.GONE);
         photo3 = (ImageView) view.findViewById(R.id.photo_3);
         photo3.setVisibility(View.GONE);
-        if (response.getPhotos() == null) {
-            photos.setVisibility(View.GONE);
+        delete1 = (ImageView) view.findViewById(R.id.delete_1);
+        delete2 = (ImageView) view.findViewById(R.id.delete_2);
+        delete3 = (ImageView) view.findViewById(R.id.delete_3);
+        setDeleteClick(delete1, 1);
+        setDeleteClick(delete2, 2);
+        setDeleteClick(delete3, 3);
+        spinner1 = (ProgressBar) view.findViewById(R.id.loading_spinner_1);
+        spinner2 = (ProgressBar) view.findViewById(R.id.loading_spinner_2);
+        spinner3 = (ProgressBar) view.findViewById(R.id.loading_spinner_3);
+        if (response.getPhotos() == null && !response.getResponderId().equals(user.getId())) {
+            photosText.setVisibility(View.GONE);
+            photoLayout.setVisibility(View.GONE);
         } else {
+            photoLayout.setVisibility(View.VISIBLE);
+            boolean responder = response.getResponderId().equals(user.getId());
+            if (!responder) {
+                delete1.setVisibility(View.GONE);
+                delete2.setVisibility(View.GONE);
+                delete3.setVisibility(View.GONE);
+            }
             for (int i = 0; i < response.getPhotos().size(); i++) {
                 try {
                     File dir = context.getCacheDir();
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-                    File f = File.createTempFile(request.getPhotos().get(i), null, dir);
+                    File f = File.createTempFile(response.getPhotos().get(i), null, dir);
                     ImageView photo = null;
+                    ProgressBar spinner = null;
                     if (i == 0) {
+                        spinner1.setVisibility(View.VISIBLE);
+                        if (responder) {
+                            delete1.setVisibility(View.VISIBLE);
+                        }
+                        spinner = spinner1;
                         photo = photo1;
                         photo1.setVisibility(View.VISIBLE);
                     } else if (i == 1) {
+                        spinner2.setVisibility(View.VISIBLE);
+                        if (responder) {
+                            delete2.setVisibility(View.VISIBLE);
+                        }
+                        spinner = spinner2;
                         photo = photo2;
                         photo2.setVisibility(View.VISIBLE);
                     } else if (i == 2) {
+                        addPhotos.setVisibility(View.GONE);
+                        if (responder) {
+                            delete3.setVisibility(View.VISIBLE);
+                        }
+                        spinner3.setVisibility(View.VISIBLE);
+                        spinner = spinner3;
                         photo = photo3;
                         photo3.setVisibility(View.VISIBLE);
                     }
-                    ((MainActivity) getActivity()).fetchPreviewPhoto(response.getPhotos().get(i), f, context, photo, null, this);
+                    ((MainActivity) getActivity()).fetchPreviewPhoto(response.getPhotos().get(i), f, context, photo, spinner, null, this);
                 } catch (FileNotFoundException e) {
                     Log.e(TAG, e.getMessage());
                 } catch (IOException e) {
@@ -591,4 +660,155 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
 
     public void onNothingSelected(AdapterView<?> arg0) {
     }
+
+    public void setDeleteClick(final ImageView deleteBtn, final int order) {
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteBtn.setEnabled(false);
+                photo1.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo2.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo3.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                delete1.setVisibility(View.GONE);
+                delete2.setVisibility(View.GONE);
+                delete3.setVisibility(View.GONE);
+                ((MainActivity) getActivity()).deletePhoto(response.getPhotos().get(order -1));
+                response.getPhotos().remove(order - 1);
+                bitmaps.remove(order - 1);
+                for (int i = 0; i < response.getPhotos().size(); i++) {
+                    if (i==0) {
+                        photo1.setImageBitmap(bitmaps.get(0));
+                        setDeleteClick(delete1, 1);
+                        delete1.setVisibility(View.VISIBLE);
+                    } else if (i == 1) {
+                        photo2.setImageBitmap(bitmaps.get(1));
+                        setDeleteClick(delete2, 2);
+                        delete2.setVisibility(View.VISIBLE);
+                    } else if (i ==2) {
+                        photo3.setImageBitmap(bitmaps.get(2));
+                        setDeleteClick(delete3, 3);
+                        delete3.setVisibility(View.VISIBLE);
+                    }
+                }
+                addPhotos.setVisibility(View.VISIBLE);
+                deleteBtn.setEnabled(true);
+            }
+        });
+    }
+
+    private void addPhotos() {
+        Intent intent = new Intent();
+        if (Build.VERSION.SDK_INT >= 19) {
+            // For Android KitKat, we use a different intent to ensure
+            // we can
+            // get the file path from the returned intent URI
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            intent.setType("image/*");
+        } else {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+        }
+
+        startActivityForResult(Intent.createChooser(intent,
+                "Select Picture"), SELECT_PICTURE);
+    }
+
+
+    @SuppressLint("NewApi")
+    private String getPath(Uri uri) throws URISyntaxException {
+        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        // deal with different Uris.
+        if (needToCheckUri && DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[] {
+                        split[1]
+                };
+            }
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver()
+                        .query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri imageUri = data.getData();
+                try {
+                    InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
+                    Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    if (response.getPhotos() == null || response.getPhotos().size() == 0) {
+                        photo1.setImageBitmap(bm);
+                        photo1.setVisibility(View.VISIBLE);
+                        delete1.setVisibility(View.VISIBLE);
+                        setImageClick(photo1, imageUri);
+                    } else if (response.getPhotos().size() == 1) {
+                        photo2.setImageBitmap(bm);
+                        photo2.setVisibility(View.VISIBLE);
+                        delete2.setVisibility(View.VISIBLE);
+                        setImageClick(photo2, imageUri);
+                    } else if (response.getPhotos().size() == 2) {
+                        photo3.setImageBitmap(bm);
+                        photo3.setVisibility(View.VISIBLE);
+                        delete3.setVisibility(View.VISIBLE);
+                        setImageClick(photo3, imageUri);
+                        addPhotos.setVisibility(View.GONE);
+                    }
+                    String picturePath = "";
+                    try {
+                        picturePath = getPath(imageUri);
+                    } catch (Exception e) {
+                        //error, do something with this
+                        return;
+                    }
+                    File f = new File(picturePath);
+                    String key = MainActivity.uploadPhoto(f);
+                    response.getPhotos().add(key);
+                    bitmaps.add(bm);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }

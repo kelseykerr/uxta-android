@@ -45,6 +45,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -1016,7 +1017,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void fetchPreviewPhoto(String key, final File file, final Context context, final ImageView photo, final RequestPreviewFragment frag1, final ViewOfferDialogFragment frag2) {
+    public void fetchPreviewPhoto(String key, final File file, final Context context, final ImageView photo, final ProgressBar spinner, final RequestPreviewFragment frag1, final ViewOfferDialogFragment frag2) {
         Log.i(TAG, "fetching photo [" + key + "]");
         try {
             TransferObserver observer = transferUtility.download(
@@ -1038,10 +1039,12 @@ public class MainActivity extends AppCompatActivity
                             InputStream inputStream = context.getContentResolver().openInputStream(uri);
                             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                             photo.setImageBitmap(bitmap);
+                            spinner.setVisibility(View.GONE);
                             if (frag1 != null) {
                                 frag1.setImageClick(photo, uri);
                             } else {
                                 frag2.setImageClick(photo, uri);
+                                frag2.bitmaps.add(bitmap);
                             }
                         } catch (FileNotFoundException e) {
                             Log.e(TAG, e.getMessage());

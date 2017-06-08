@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -67,6 +68,9 @@ public class RequestPreviewFragment extends DialogFragment {
     private ImageView photo1;
     private ImageView photo2;
     private ImageView photo3;
+    private ProgressBar spinner1;
+    private ProgressBar spinner2;
+    private ProgressBar spinner3;
     private static final String TAG = "RequestPreviewFragment";
     private static final String RENT_TEXT = "looking to rent";
     public static final String BUY_TEXT = "looking to buy";
@@ -163,7 +167,10 @@ public class RequestPreviewFragment extends DialogFragment {
         photo2.setVisibility(View.GONE);
         photo3 = (ImageView) view.findViewById(R.id.photo_3);
         photo3.setVisibility(View.GONE);
-        if (request.getPhotos() == null) {
+        spinner1 = (ProgressBar) view.findViewById(R.id.loading_spinner_1);
+        spinner2 = (ProgressBar) view.findViewById(R.id.loading_spinner_2);
+        spinner3 = (ProgressBar) view.findViewById(R.id.loading_spinner_3);
+        if (request.getPhotos() == null || request.getPhotos().size() == 0) {
             photos.setVisibility(View.GONE);
         } else {
             for (int i = 0; i < request.getPhotos().size(); i++) {
@@ -174,17 +181,24 @@ public class RequestPreviewFragment extends DialogFragment {
                     }
                     File f = File.createTempFile(request.getPhotos().get(i), null, dir);
                     ImageView photo = null;
+                    ProgressBar spinner = null;
                     if (i == 0) {
+                        spinner1.setVisibility(View.VISIBLE);
+                        spinner = spinner1;
                         photo = photo1;
                         photo1.setVisibility(View.VISIBLE);
                     } else if (i == 1) {
+                        spinner2.setVisibility(View.VISIBLE);
+                        spinner = spinner2;
                         photo = photo2;
                         photo2.setVisibility(View.VISIBLE);
                     } else if (i == 2) {
+                        spinner3.setVisibility(View.VISIBLE);
+                        spinner = spinner3;
                         photo = photo3;
                         photo3.setVisibility(View.VISIBLE);
                     }
-                    ((MainActivity) getActivity()).fetchPreviewPhoto(request.getPhotos().get(i), f, context, photo, this, null);
+                    ((MainActivity) getActivity()).fetchPreviewPhoto(request.getPhotos().get(i), f, context, photo, spinner, this, null);
                 } catch (FileNotFoundException e) {
                     Log.e(TAG, e.getMessage());
                 } catch (IOException e) {

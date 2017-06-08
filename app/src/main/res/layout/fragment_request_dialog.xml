@@ -182,6 +182,7 @@
                         android:layout_height="200dp"
                         android:layout_marginTop="10dp"
                         android:gravity="center_horizontal"
+                        android:src="@drawable/ic_insert_photo_black_24dp"
                         android:background="?attr/selectableItemBackgroundBorderless" />
 
 
@@ -210,6 +211,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="200dp"
                         android:layout_marginTop="10dp"
+                        android:src="@drawable/ic_insert_photo_black_24dp"
                         android:gravity="center_horizontal" />
 
 
@@ -239,6 +241,7 @@
                         android:layout_height="200dp"
                         android:layout_marginTop="10dp"
                         android:gravity="center_horizontal"
+                        android:src="@drawable/ic_insert_photo_black_24dp"
                         android:background="?attr/selectableItemBackgroundBorderless" />
 
 

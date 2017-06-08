@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.stripe.android.model.Card;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -100,6 +102,12 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
             }
             rvh.editBtn.setEnabled(true);
             rvh.editBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    historyFragment.showResponseDialog(response);
+                }
+            });
+            rvh.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     historyFragment.showResponseDialog(response);
@@ -303,10 +311,12 @@ public class RequestResponseCardAdapter extends RecyclerView.Adapter<RequestResp
         private ImageButton rejectBtn;
         private ImageButton messageUserBtn;
         private ImageButton flagBtn;
+        private CardView cardView;
 
         public ResponseCardViewHolder(Context context, View v) {
             super(v);
             this.context = context;
+            cardView = (CardView) v.findViewById(R.id.my_history_card_view);
             profilePic = (ImageView) v.findViewById(R.id.profile_image);
             offerText = (TextView) v.findViewById(R.id.offer_text);
             responseStatus = (TextView) v.findViewById(R.id.response_status);

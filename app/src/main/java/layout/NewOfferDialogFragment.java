@@ -204,6 +204,13 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
         }
         if (requestType.equals("loaning") || requestType.equals("selling")) {
             descriptionLayout.setHint("Message");
+            photoLayout.setVisibility(View.GONE);
+            addPhotos.setVisibility(View.GONE);
+            photosText.setVisibility(View.GONE);
+        } else {
+            photoLayout.setVisibility(View.VISIBLE);
+            addPhotos.setVisibility(View.VISIBLE);
+            photosText.setVisibility(View.VISIBLE);
         }
         submitOfferBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -670,9 +677,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             @Override
             public void onClick(View v) {
                 deleteBtn.setEnabled(false);
-                photo1.setImageResource(android.R.color.transparent);
-                photo2.setImageResource(android.R.color.transparent);
-                photo3.setImageResource(android.R.color.transparent);
+                photo1.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo2.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo3.setImageResource(R.drawable.ic_insert_photo_black_24dp);
                 delete1.setVisibility(View.GONE);
                 delete2.setVisibility(View.GONE);
                 delete3.setVisibility(View.GONE);

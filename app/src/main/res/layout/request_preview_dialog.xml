@@ -8,9 +8,9 @@
     android:weightSum="1">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/scrollview"
         android:layout_marginBottom="20dp"
         android:descendantFocusability="beforeDescendants"
         android:focusable="true"
@@ -89,8 +89,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_marginBottom="10dp"
-                    android:hint="name"
                     android:enabled="false"
+                    android:hint="name"
                     android:maxLength="40"
                     android:maxLines="1"
                     android:textColor="@color/colorAccent"
@@ -113,8 +113,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_marginBottom="10dp"
-                    android:hint="description"
                     android:enabled="false"
+                    android:hint="description"
                     android:maxLength="100"
                     android:maxLines="3"
                     android:paddingBottom="16dp"
@@ -124,41 +124,76 @@
 
             <TextView
                 android:id="@+id/photos_text"
-                android:layout_marginStart="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/request_description_layout"
-                android:textColor="@color/colorAccent"
+                android:layout_marginStart="5dp"
                 android:text="photos"
-                android:textSize="16sp"
-                />
+                android:textColor="@color/colorAccent"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/photo_1"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/photos_text"
                 android:layout_height="300dp"
+                android:layout_below="@id/photos_text"
                 android:layout_marginTop="15dp"
-                android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:gravity="center_horizontal" />
+
+            <ProgressBar
+                android:id="@+id/loading_spinner_1"
+                style="@style/Base.Widget.AppCompat.ProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photos_text"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:layout_marginTop="100dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
             <ImageView
                 android:id="@+id/photo_2"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/photo_1"
                 android:layout_height="300dp"
+                android:layout_below="@id/photo_1"
                 android:layout_marginTop="15dp"
-                android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:gravity="center_horizontal" />
+
+            <ProgressBar
+                android:id="@+id/loading_spinner_2"
+                style="@style/Base.Widget.AppCompat.ProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photo_1"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="100dp"
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
             <ImageView
                 android:id="@+id/photo_3"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/photo_2"
                 android:layout_height="300dp"
+                android:layout_below="@id/photo_2"
                 android:layout_marginTop="15dp"
-                android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:gravity="center_horizontal" />
+
+            <ProgressBar
+                android:id="@+id/loading_spinner_3"
+                style="@style/Base.Widget.AppCompat.ProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photo_2"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="100dp"
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimary"
+                android:indeterminateTintMode="src_atop" />
 
             <Button
                 android:id="@+id/create_offer_button"
@@ -181,6 +216,6 @@
                 android:text="flag this request"
                 android:textColor="#ffffff" />
 
-            </RelativeLayout>
-        </ScrollView>
-    </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

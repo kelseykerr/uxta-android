@@ -298,7 +298,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                         urlString += ("&searchTerm=" + searchTerm);
                     }
                     if (sortBy != null && !sortBy.isEmpty() && !sortBy.equals("best match")) {
-                        urlString += ("&sortBy=" + sortBy);
+                        urlString += ("&sort=" + sortBy);
                     }
                     if (!buyingRenting && sellingLoaning) {
                         urlString += ("&type=offers");

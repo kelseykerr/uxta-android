@@ -212,6 +212,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/return_time_layout"
                 android:textColor="@color/colorAccent"
+                android:layout_marginBottom="15dp"
                 android:text="photos"
                 android:textSize="16sp"
                 />
@@ -238,7 +239,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photos_text"
                 android:layout_marginBottom="25dp"
-                android:layout_marginTop="15dp"
                 android:gravity="center" >
 
             <RelativeLayout
@@ -254,6 +254,7 @@
                     android:layout_height="200dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
+                    android:src="@drawable/ic_insert_photo_black_24dp"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
 
@@ -282,6 +283,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="200dp"
                     android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_insert_photo_black_24dp"
                     android:gravity="center_horizontal" />
 
 
@@ -311,6 +313,7 @@
                     android:layout_height="200dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
+                    android:src="@drawable/ic_insert_photo_black_24dp"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
 
@@ -334,7 +337,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photo_layout"
                 android:textColor="@color/colorAccent"
-                android:layout_marginTop="-10dp"
+                android:layout_marginTop="10dp"
                 app:buttonTint="@color/colorPrimary"
                 android:text="allow user to text me with questions" />
 
@@ -342,8 +345,8 @@
                 android:id="@+id/submit_offer_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/return_time_layout"
-                android:layout_marginTop="35dp"
+                android:layout_below="@id/enable_messages"
+                android:layout_marginTop="15dp"
                 android:background="@drawable/primary_btn"
                 android:text="submit offer"
                 android:textColor="#ffffff" />
