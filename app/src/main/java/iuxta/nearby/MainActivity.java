@@ -57,6 +57,8 @@ import com.amazonaws.regions.Regions;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AccessControlList;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -75,6 +77,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -964,7 +967,8 @@ public class MainActivity extends AppCompatActivity
         TransferObserver observer = transferUtility.upload(
                 Constants.NEARBY_BUCKET,     /* The bucket to upload to */
                 key,    /* The key for the uploaded object */
-                f        /* The file where the data to upload exists */
+                f,        /* The file where the data to upload exists */
+                CannedAccessControlList.PublicRead
         );
         return observer.getKey();
     }

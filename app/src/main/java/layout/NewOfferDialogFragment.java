@@ -51,8 +51,10 @@ import android.widget.TimePicker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -627,22 +629,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             if (requestCode == SELECT_PICTURE) {
                 Uri imageUri = data.getData();
                 try {
-                    InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
-                    Bitmap bm = BitmapFactory.decodeStream(inputStream);
-                    if (photos == null || photos.size() == 0) {
-                        photo1.setImageBitmap(bm);
-                        delete1.setVisibility(View.VISIBLE);
-                        setImageClick(photo1, imageUri);
-                    } else if (photos.size() == 1) {
-                        photo2.setImageBitmap(bm);
-                        delete2.setVisibility(View.VISIBLE);
-                        setImageClick(photo2, imageUri);
-                    } else if (photos.size() == 2) {
-                        photo3.setImageBitmap(bm);
-                        delete3.setVisibility(View.VISIBLE);
-                        setImageClick(photo3, imageUri);
-                        addPhotos.setVisibility(View.GONE);
-                    }
                     String picturePath = "";
                     try {
                         picturePath = getPath(imageUri);
@@ -651,6 +637,28 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                         return;
                     }
                     File f = new File(picturePath);
+                    InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
+                    Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    FileOutputStream fileArrayOS = new FileOutputStream(f);
+                    ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+                    bm.compress(Bitmap.CompressFormat.PNG, 25, fileArrayOS);
+                    bm.compress(Bitmap.CompressFormat.PNG, 25, byteArrayOS);
+                    byte[] byteArray = byteArrayOS.toByteArray();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
+                    if (photos == null || photos.size() == 0) {
+                        photo1.setImageBitmap(bitmap);
+                        delete1.setVisibility(View.VISIBLE);
+                        setImageClick(photo1, imageUri);
+                    } else if (photos.size() == 1) {
+                        photo2.setImageBitmap(bitmap);
+                        delete2.setVisibility(View.VISIBLE);
+                        setImageClick(photo2, imageUri);
+                    } else if (photos.size() == 2) {
+                        photo3.setImageBitmap(bitmap);
+                        delete3.setVisibility(View.VISIBLE);
+                        setImageClick(photo3, imageUri);
+                        addPhotos.setVisibility(View.GONE);
+                    }
                     String key = MainActivity.uploadPhoto(f);
                     photos.add(key);
                     bitmaps.add(bm);
