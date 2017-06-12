@@ -51,8 +51,10 @@ import android.widget.TimePicker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -63,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import iuxta.nearby.AppUtils;
 import iuxta.nearby.Constants;
@@ -92,11 +95,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
     private User user;
     private Context context;
     private OnFragmentInteractionListener mListener;
-    private Spinner offerTypeSpinner;
     private Button submitOfferBtn;
     private TextInputLayout offerPriceLayout;
     private EditText offerPrice;
-    private List<String> offerTypes = new ArrayList<>();
     private View view;
     private EditText pickupLocation;
     private TextInputLayout pickupTimeLayout;
@@ -165,14 +166,6 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_offer_dialog, container, false);
-        /*offerTypes.add("flat");
-        offerTypes.add("per hour");
-        offerTypes.add("per day");
-        ArrayAdapter<String> offerTypeAdapter;
-        offerTypeSpinner = (Spinner) view.findViewById(R.id.offer_type);
-        offerTypeAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, offerTypes);
-        offerTypeSpinner.setAdapter(offerTypeAdapter);
-        offerTypeSpinner.setOnItemSelectedListener(this);*/
         scrollView = (ScrollView) view.findViewById(R.id.scrollview);
         photos = new ArrayList<>();
         bitmaps = new ArrayList<>();
@@ -293,6 +286,9 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
             public void onClick(View v) {
                 exchangeDate = null;
                 returnDate = null;
+                for (String photo:photos) {
+                    ((MainActivity) getActivity()).deletePhoto(photo);
+                }
                 clearErrors();
                 dismiss();
             }
@@ -568,94 +564,36 @@ public class NewOfferDialogFragment extends DialogFragment implements AdapterVie
                 "Select Picture"), SELECT_PICTURE);
     }
 
-    @SuppressLint("NewApi")
-    private String getPath(Uri uri) throws URISyntaxException {
-        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
-        String selection = null;
-        String[] selectionArgs = null;
-        // Uri is different in versions after KITKAT (Android 4.4), we need to
-        // deal with different Uris.
-        if (needToCheckUri && DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
-            if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
-            } else if (isDownloadsDocument(uri)) {
-                final String id = DocumentsContract.getDocumentId(uri);
-                uri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-            } else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-                if ("image".equals(type)) {
-                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-                selection = "_id=?";
-                selectionArgs = new String[] {
-                        split[1]
-                };
-            }
-        }
-        if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = {
-                    MediaStore.Images.Media.DATA
-            };
-            Cursor cursor = null;
-            try {
-                cursor = context.getContentResolver()
-                        .query(uri, projection, selection, selectionArgs, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
-                }
-            } catch (Exception e) {
-            }
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-        return null;
-    }
-
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 Uri imageUri = data.getData();
                 try {
                     InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
-                    Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    File f = ((MainActivity) getActivity()).compressFile(bitmap);
                     if (photos == null || photos.size() == 0) {
-                        photo1.setImageBitmap(bm);
+                        photo1.setImageBitmap(bitmap);
                         delete1.setVisibility(View.VISIBLE);
                         setImageClick(photo1, imageUri);
                     } else if (photos.size() == 1) {
-                        photo2.setImageBitmap(bm);
+                        photo2.setImageBitmap(bitmap);
                         delete2.setVisibility(View.VISIBLE);
                         setImageClick(photo2, imageUri);
                     } else if (photos.size() == 2) {
-                        photo3.setImageBitmap(bm);
+                        photo3.setImageBitmap(bitmap);
                         delete3.setVisibility(View.VISIBLE);
                         setImageClick(photo3, imageUri);
                         addPhotos.setVisibility(View.GONE);
                     }
-                    String picturePath = "";
-                    try {
-                        picturePath = getPath(imageUri);
-                    } catch (Exception e) {
-                        //error, do something with this
-                        return;
-                    }
-                    File f = new File(picturePath);
                     String key = MainActivity.uploadPhoto(f);
                     photos.add(key);
-                    bitmaps.add(bm);
+                    bitmaps.add(bitmap);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, e.getMessage());
                 }
             }
         }

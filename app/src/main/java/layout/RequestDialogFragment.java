@@ -211,16 +211,6 @@ public class RequestDialogFragment extends DialogFragment
         itemName.setBackground(itemName.getBackground().getConstantState().newDrawable());
 
         description = (EditText) view.findViewById(R.id.request_description);
-
-        //Let's not do categories for the MVP...we can add this back in later
-        /*categorySpinner = (Spinner) view.findViewById(R.id.request_category);
-        ArrayAdapter<String> categoryAdapter;
-        //TODO: this is crazy...why can't I use the list above. must fix.
-        List<String> c = new ArrayList<>();
-        c.add(Constants.SELECT_CATEGORY_STRING);
-        c.add("tools");
-        categoryAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, c);
-        categorySpinner.setAdapter(categoryAdapter);*/
         photosText = (TextView) view.findViewById(R.id.photos_text);
         addPhotos = (ImageButton) view.findViewById(R.id.add_photos);
         addPhotos.setOnClickListener(new View.OnClickListener() {
@@ -311,6 +301,11 @@ public class RequestDialogFragment extends DialogFragment
         ImageButton cancelBtn = (ImageButton) view.findViewById(R.id.cancel_request);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if (request == null) {
+                    for (String photo:photos) {
+                        ((MainActivity) getActivity()).deletePhoto(photo);
+                    }
+                }
                 request = null;
                 dismiss();
             }
@@ -934,6 +929,7 @@ public class RequestDialogFragment extends DialogFragment
                 try {
                     InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
                     Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    File f = ((MainActivity) getActivity()).compressFile(bm);
                     if (photos == null || photos.size() == 0) {
                         photo1.setImageBitmap(bm);
                         delete1.setVisibility(View.VISIBLE);
@@ -948,14 +944,6 @@ public class RequestDialogFragment extends DialogFragment
                         setImageClick(photo3, imageUri);
                         addPhotos.setVisibility(View.GONE);
                     }
-                    String picturePath = "";
-                    try {
-                        picturePath = getPath(imageUri);
-                    } catch (Exception e) {
-                        //error, do something with this
-                        return;
-                    }
-                    File f = new File(picturePath);
                     String key = MainActivity.uploadPhoto(f);
                     photos.add(key);
                     bitmaps.add(bm);
@@ -968,6 +956,10 @@ public class RequestDialogFragment extends DialogFragment
 
     public void setPhotos() {
         for (int i= 0; i < photos.size(); i++) {
+            //only allow 3 photos
+            if (i > 2) {
+                break;
+            }
             try {
                 File dir = context.getCacheDir();
                 if (!dir.exists()) {
@@ -1012,9 +1004,9 @@ public class RequestDialogFragment extends DialogFragment
             @Override
             public void onClick(View v) {
                 deleteBtn.setEnabled(false);
-                photo1.setImageResource(android.R.color.transparent);
-                photo2.setImageResource(android.R.color.transparent);
-                photo3.setImageResource(android.R.color.transparent);
+                photo1.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo2.setImageResource(R.drawable.ic_insert_photo_black_24dp);
+                photo3.setImageResource(R.drawable.ic_insert_photo_black_24dp);
                 delete1.setVisibility(View.GONE);
                 delete2.setVisibility(View.GONE);
                 delete3.setVisibility(View.GONE);

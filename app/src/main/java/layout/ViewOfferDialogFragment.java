@@ -776,6 +776,7 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                 try {
                     InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
                     Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                    File f = ((MainActivity) getActivity()).compressFile(bm);
                     if (response.getPhotos() == null || response.getPhotos().size() == 0) {
                         photo1.setImageBitmap(bm);
                         photo1.setVisibility(View.VISIBLE);
@@ -793,14 +794,6 @@ public class ViewOfferDialogFragment extends DialogFragment implements AdapterVi
                         setImageClick(photo3, imageUri);
                         addPhotos.setVisibility(View.GONE);
                     }
-                    String picturePath = "";
-                    try {
-                        picturePath = getPath(imageUri);
-                    } catch (Exception e) {
-                        //error, do something with this
-                        return;
-                    }
-                    File f = new File(picturePath);
                     String key = MainActivity.uploadPhoto(f);
                     response.getPhotos().add(key);
                     bitmaps.add(bm);
