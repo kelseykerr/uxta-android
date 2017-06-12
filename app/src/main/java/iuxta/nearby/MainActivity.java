@@ -80,6 +80,7 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -1071,6 +1072,54 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception exception) {
             return;
         }
+    }
+
+    public File compressFile(Bitmap bitmap) {
+        File dir = this.getCacheDir();
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String name = UUID.randomUUID().toString();
+        File compressedFile = null;
+        try {
+            compressedFile = File.createTempFile(name, null, dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        int MAX_IMAGE_SIZE = 500 * 512;
+        int streamLength = MAX_IMAGE_SIZE;
+        int compressQuality = 115;
+        ByteArrayOutputStream bmpStream = new ByteArrayOutputStream();
+        while (streamLength >= MAX_IMAGE_SIZE && compressQuality > 5) {
+            try {
+                bmpStream.flush();//to avoid out of memory error
+                bmpStream.reset();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            compressQuality -= 15;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream);
+            byte[] bmpPicByteArray = bmpStream.toByteArray();
+            streamLength = bmpPicByteArray.length;
+            if(BuildConfig.DEBUG) {
+                Log.d("test upload", "Quality: " + compressQuality);
+                Log.d("test upload", "Size: " + streamLength);
+            }
+        }
+
+        try {
+            FileOutputStream fo = new FileOutputStream(compressedFile);
+            fo.write(bmpStream.toByteArray());
+            fo.flush();
+            fo.close();
+            return compressedFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     public void deletePhoto(final String key) {
