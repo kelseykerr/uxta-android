@@ -208,12 +208,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             });
         }
         setResponseStatusColor(requestViewHolder.vStatus, resp.getResponseStatus().toString());
-        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.historyCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
                     historyFragment.showResponseDialog(resp);
                 }
+                return true;
             }
         });
 
@@ -278,10 +279,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
         } else {
             requestViewHolder.closeSwipe.setVisibility(View.GONE);
         }
-        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.historyCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 historyFragment.showRequestDialog(h);
+                return true;
             }
         });
         requestViewHolder.moreSwipe.setVisibility(View.VISIBLE);
@@ -357,12 +359,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             });
         }
         setResponseStatusColor(historyViewHolder.vStatus, resp.getResponseStatus().toString());
-        historyViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+        historyViewHolder.historyCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 if (!resp.getResponseStatus().equals(Response.Status.CLOSED)) {
                     historyFragment.showResponseDialog(resp);
                 }
+                return true;
             }
         });
     }
@@ -488,10 +491,11 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
             requestViewHolder.vStatus.setText(r.getStatus().toUpperCase());
             requestViewHolder.vStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
         }
-        requestViewHolder.historyCard.setOnClickListener(new View.OnClickListener() {
+        requestViewHolder.historyCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 historyFragment.showTransactionDialog(h, resp);
+                return true;
             }
         });
         requestViewHolder.moreSwipe.setOnClickListener(new View.OnClickListener() {

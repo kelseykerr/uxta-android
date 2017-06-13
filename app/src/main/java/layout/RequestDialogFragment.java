@@ -36,6 +36,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -69,6 +70,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -133,6 +135,9 @@ public class RequestDialogFragment extends DialogFragment
     private ImageView delete1;
     private ImageView delete2;
     private ImageView delete3;
+    private ProgressBar spinner1;
+    private ProgressBar spinner2;
+    private ProgressBar spinner3;
     private int zoomLevel = 15;
     private static final String RENT_TEXT = "request to rent an item";
     private static final String BUY_TEXT = "request to buy an item";
@@ -140,7 +145,7 @@ public class RequestDialogFragment extends DialogFragment
     private static final String LOAN_TEXT = "list a rentable item";
     private static final int SELECT_PICTURE = 17;
     private List<String> photos;
-    public List<Bitmap> bitmaps;
+    public Bitmap[] bitmaps;
     private static final String TAG = "RequestDialogFragment";
 
 
@@ -187,7 +192,7 @@ public class RequestDialogFragment extends DialogFragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_request_dialog, container, false);
         photos = new ArrayList<>();
-        bitmaps = new ArrayList<>();
+        bitmaps = new Bitmap[3];
         photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
         photo1 = (ImageView) view.findViewById(R.id.photo_1);
         photo2 = (ImageView) view.findViewById(R.id.photo_2);
@@ -195,6 +200,9 @@ public class RequestDialogFragment extends DialogFragment
         delete1 = (ImageView) view.findViewById(R.id.delete_1);
         delete2 = (ImageView) view.findViewById(R.id.delete_2);
         delete3 = (ImageView) view.findViewById(R.id.delete_3);
+        spinner1 = (ProgressBar) view.findViewById(R.id.loading_spinner_1);
+        spinner2 = (ProgressBar) view.findViewById(R.id.loading_spinner_2);
+        spinner3 = (ProgressBar) view.findViewById(R.id.loading_spinner_3);
         if (request != null) {
             Button btn = (Button) view.findViewById(R.id.create_request_button);
             btn.setText("update");
@@ -223,14 +231,12 @@ public class RequestDialogFragment extends DialogFragment
         setDeleteClick(delete3, 3);
         for (int k = 0; k < photos.size(); k++) {
             if (k == 0) {
-                //get photo from 3
                 delete1.setVisibility(View.VISIBLE);
             } else if (k == 1) {
-                //get photo from 3
                 delete2.setVisibility(View.VISIBLE);
             } else if (k == 2) {
-                //get photo from 3
                 delete3.setVisibility(View.VISIBLE);
+                addPhotos.setVisibility(View.GONE);
             }
         }
 
@@ -934,19 +940,21 @@ public class RequestDialogFragment extends DialogFragment
                         photo1.setImageBitmap(bm);
                         delete1.setVisibility(View.VISIBLE);
                         setImageClick(photo1, imageUri);
+                        bitmaps[0] = bm;
                     } else if (photos.size() == 1) {
                         photo2.setImageBitmap(bm);
                         delete2.setVisibility(View.VISIBLE);
                         setImageClick(photo2, imageUri);
+                        bitmaps[1] = bm;
                     } else if (photos.size() == 2) {
                         photo3.setImageBitmap(bm);
                         delete3.setVisibility(View.VISIBLE);
                         setImageClick(photo3, imageUri);
                         addPhotos.setVisibility(View.GONE);
+                        bitmaps[2] = bm;
                     }
                     String key = MainActivity.uploadPhoto(f);
                     photos.add(key);
-                    bitmaps.add(bm);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -968,17 +976,24 @@ public class RequestDialogFragment extends DialogFragment
                 File f = File.createTempFile(photos.get(i), null, dir);
                 ImageView photo = null;
                 ImageView delete = null;
+                ProgressBar spinner = null;
                 if (i==0) {
+                    spinner1.setVisibility(View.VISIBLE);
+                    spinner = spinner1;
                     photo = photo1;
                     delete = delete1;
                 } else if (i==1) {
+                    spinner2.setVisibility(View.VISIBLE);
+                    spinner = spinner2;
                     photo = photo2;
                     delete = delete2;
                 } else if (i==2) {
+                    spinner3.setVisibility(View.VISIBLE);
+                    spinner = spinner3;
                     photo = photo3;
                     delete = delete3;
                 }
-                ((MainActivity) getActivity()).fetchPhoto(photos.get(i), f, context, this, photo, delete);
+                ((MainActivity) getActivity()).fetchPhoto(photos.get(i), f, context, this, photo, delete, spinner, i);
             } catch (FileNotFoundException e) {
                 Log.e(TAG, e.getMessage());
             } catch (IOException e) {
@@ -1012,18 +1027,20 @@ public class RequestDialogFragment extends DialogFragment
                 delete3.setVisibility(View.GONE);
                 ((MainActivity) getActivity()).deletePhoto(photos.get(order -1));
                 photos.remove(order - 1);
-                bitmaps.remove(order - 1);
+                List<Bitmap> list = new ArrayList<Bitmap>(Arrays.asList(bitmaps));
+                list.remove(order - 1);
+                bitmaps = list.toArray(bitmaps);
                 for (int i = 0; i < photos.size(); i++) {
                     if (i==0) {
-                        photo1.setImageBitmap(bitmaps.get(0));
+                        photo1.setImageBitmap(bitmaps[0]);
                         setDeleteClick(delete1, 1);
                         delete1.setVisibility(View.VISIBLE);
                     } else if (i == 1) {
-                        photo2.setImageBitmap(bitmaps.get(1));
+                        photo2.setImageBitmap(bitmaps[1]);
                         setDeleteClick(delete2, 2);
                         delete2.setVisibility(View.VISIBLE);
                     } else if (i ==2) {
-                        photo3.setImageBitmap(bitmaps.get(2));
+                        photo3.setImageBitmap(bitmaps[2]);
                         setDeleteClick(delete3, 3);
                         delete3.setVisibility(View.VISIBLE);
                     }

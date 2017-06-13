@@ -974,7 +974,7 @@ public class MainActivity extends AppCompatActivity
         return observer.getKey();
     }
 
-    public void fetchPhoto(String key, final File file, final Context context, final RequestDialogFragment frag, final ImageView photo, final ImageView delete) {
+    public void fetchPhoto(String key, final File file, final Context context, final RequestDialogFragment frag1, final ImageView photo, final ImageView delete, final ProgressBar spinner, final int order) {
         Log.i(TAG, "fetching photo [" + key + "]");
         try {
             TransferObserver observer = transferUtility.download(
@@ -992,13 +992,16 @@ public class MainActivity extends AppCompatActivity
                             Log.e(TAG, "**file does not exist");
                         }
                         Uri uri = Uri.fromFile(file);
+                        spinner.setVisibility(View.GONE);
                         try {
                             InputStream inputStream = context.getContentResolver().openInputStream(uri);
                             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                             photo.setImageBitmap(bitmap);
-                            frag.bitmaps.add(bitmap);
-                            delete.setVisibility(View.VISIBLE);
-                            frag.setImageClick(photo, uri);
+                            if (frag1 != null) {
+                                frag1.bitmaps[order] = bitmap;
+                                delete.setVisibility(View.VISIBLE);
+                                frag1.setImageClick(photo, uri);
+                            }
                         } catch (FileNotFoundException e) {
                             Log.e(TAG, e.getMessage());
                         }

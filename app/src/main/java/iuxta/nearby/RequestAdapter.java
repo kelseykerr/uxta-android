@@ -79,10 +79,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             requestViewHolder.vDescription.setText(r.getDescription());
         }
         requestViewHolder.card.setTag(i);
-        requestViewHolder.card.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        requestViewHolder.card.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View v) {
                 DialogFragment newFragment = RequestPreviewFragment.newInstance(r, homeFragment);
                 newFragment.show(((Activity) requestViewHolder.context).getFragmentManager(), "dialog");
+                return true;
                // makeOffer(r, requestViewHolder);
             }
         });

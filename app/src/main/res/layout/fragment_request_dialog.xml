@@ -185,6 +185,18 @@
                         android:src="@drawable/ic_insert_photo_black_24dp"
                         android:background="?attr/selectableItemBackgroundBorderless" />
 
+                    <ProgressBar
+                        android:id="@+id/loading_spinner_1"
+                        style="@style/Base.Widget.AppCompat.ProgressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:visibility="gone"
+                        android:layout_marginTop="100dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/colorPrimary"
+                        android:indeterminateTintMode="src_atop" />
+
 
                     <ImageView
                         android:id="@+id/delete_1"
@@ -213,6 +225,18 @@
                         android:layout_marginTop="10dp"
                         android:src="@drawable/ic_insert_photo_black_24dp"
                         android:gravity="center_horizontal" />
+
+                    <ProgressBar
+                        android:id="@+id/loading_spinner_2"
+                        style="@style/Base.Widget.AppCompat.ProgressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:visibility="gone"
+                        android:layout_marginTop="100dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/colorPrimary"
+                        android:indeterminateTintMode="src_atop" />
 
 
                     <ImageView
@@ -243,6 +267,18 @@
                         android:gravity="center_horizontal"
                         android:src="@drawable/ic_insert_photo_black_24dp"
                         android:background="?attr/selectableItemBackgroundBorderless" />
+
+                    <ProgressBar
+                        android:id="@+id/loading_spinner_3"
+                        style="@style/Base.Widget.AppCompat.ProgressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:visibility="gone"
+                        android:layout_marginTop="100dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/colorPrimary"
+                        android:indeterminateTintMode="src_atop" />
 
 
                     <ImageView

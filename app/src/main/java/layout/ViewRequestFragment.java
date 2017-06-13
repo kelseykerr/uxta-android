@@ -13,14 +13,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
 import iuxta.nearby.AppUtils;
+import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
 import iuxta.nearby.R;
 import iuxta.nearby.RequestResponseCardAdapter;
@@ -52,6 +62,13 @@ public class ViewRequestFragment extends DialogFragment {
     private FloatingActionButton editFab;
     private static HistoryFragment historyFragment;
     private static final String TAG = "ViewRequestFragment";
+    private LinearLayout photoLayout;
+    private ImageView photo1;
+    private ImageView photo2;
+    private ImageView photo3;
+    private ProgressBar spinner1;
+    private ProgressBar spinner2;
+    private ProgressBar spinner3;
 
     public ViewRequestFragment() {
     }
@@ -142,6 +159,19 @@ public class ViewRequestFragment extends DialogFragment {
                 }
             }
         });
+        photoLayout = (LinearLayout) view.findViewById(R.id.photo_layout);
+        photo1 = (ImageView) view.findViewById(R.id.photo_1);
+        photo2 = (ImageView) view.findViewById(R.id.photo_2);
+        photo3 = (ImageView) view.findViewById(R.id.photo_3);
+        spinner1 = (ProgressBar) view.findViewById(R.id.loading_spinner_1);
+        spinner2 = (ProgressBar) view.findViewById(R.id.loading_spinner_2);
+        spinner3 = (ProgressBar) view.findViewById(R.id.loading_spinner_3);
+        if (request.getPhotos() == null || request.getPhotos().size() == 0) {
+            photoLayout.setVisibility(View.GONE);
+        } else {
+            photoLayout.setVisibility(View.VISIBLE);
+            setPhotos();
+        }
         this.view = view;
         return view;
     }
@@ -197,6 +227,56 @@ public class ViewRequestFragment extends DialogFragment {
             case "fulfilled":
                 requestStatus.setBackground(context.getResources().getDrawable(R.drawable.rounded_corner_blue));
                 break;
+        }
+    }
+
+    public void setPhotos() {
+        List<String> photos = request.getPhotos();
+        for (int i= 0; i < photos.size(); i++) {
+            //only allow 3 photos
+            if (i > 2) {
+                break;
+            }
+            try {
+                File dir = context.getCacheDir();
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File f = File.createTempFile(photos.get(i), null, dir);
+                ImageView photo = null;
+                ProgressBar spinner = null;
+                if (i==0) {
+                    if (photos.size() == 1) {
+                        spinner2.setVisibility(View.VISIBLE);
+                        spinner = spinner2;
+                        photo = photo2;
+                    } else if (photos.size() == 2) {
+                       photoLayout.setWeightSum(2);
+                        photo3.setVisibility(View.GONE);
+                        spinner1.setVisibility(View.VISIBLE);
+                        spinner = spinner1;
+                        photo = photo1;
+                    } else {
+                        spinner1.setVisibility(View.VISIBLE);
+                        spinner = spinner1;
+                        photo = photo1;
+                    }
+                } else if (i==1) {
+                    spinner2.setVisibility(View.VISIBLE);
+                    spinner = spinner2;
+                    photo = photo2;
+                } else if (i==2) {
+                    spinner3.setVisibility(View.VISIBLE);
+                    spinner = spinner3;
+                    photo = photo3;
+                }
+                ((MainActivity) getActivity()).fetchPhoto(photos.get(i), f, context, null, photo, null, spinner, i);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, e.getMessage());
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
         }
     }
 

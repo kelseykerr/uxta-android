@@ -138,6 +138,7 @@
                 android:layout_height="300dp"
                 android:layout_below="@id/photos_text"
                 android:layout_marginTop="15dp"
+                android:layout_centerInParent="true"
                 android:gravity="center_horizontal" />
 
             <ProgressBar
@@ -147,6 +148,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photos_text"
                 android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
                 android:visibility="gone"
                 android:layout_marginTop="100dp"
                 android:indeterminate="true"
@@ -159,6 +161,7 @@
                 android:layout_height="300dp"
                 android:layout_below="@id/photo_1"
                 android:layout_marginTop="15dp"
+                android:layout_centerInParent="true"
                 android:gravity="center_horizontal" />
 
             <ProgressBar
@@ -167,6 +170,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photo_1"
+                android:layout_centerInParent="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="100dp"
                 android:visibility="gone"
@@ -180,6 +184,7 @@
                 android:layout_height="300dp"
                 android:layout_below="@id/photo_2"
                 android:layout_marginTop="15dp"
+                android:layout_centerInParent="true"
                 android:gravity="center_horizontal" />
 
             <ProgressBar
@@ -188,6 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photo_2"
+                android:layout_centerInParent="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="100dp"
                 android:visibility="gone"
