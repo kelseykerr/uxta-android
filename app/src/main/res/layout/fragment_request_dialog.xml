@@ -126,8 +126,8 @@
                     android:layout_gravity="left"
                     android:layout_marginBottom="10dp"
                     android:hint="description"
-                    android:maxLength="100"
-                    android:maxLines="3"
+                    android:maxLength="300"
+                    android:maxLines="4"
                     android:paddingBottom="16dp"
                     android:textColor="@color/colorAccent"
                     android:theme="@style/EditTextTheme" />

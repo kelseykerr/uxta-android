@@ -166,7 +166,7 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
             }
         });
         // set sort by spinner to current sort by
-        if (sortBy != null) {
+        if (sortBy != null && !sortBy.isEmpty()) {
             String [] sortItems = getResources().getStringArray(R.array.sortByItems);
             for (int i = 0; i < sortItems.length; i++) {
                 if (sortItems[i].equals(sortBy)) {
