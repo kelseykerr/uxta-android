@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
     private View view;
     public static Boolean homeLocation = false;
     public static Double currentRadius = 10.0;
-    public static String sortBy;
+    public static String sortBy = "newest";
     public static Boolean sellingLoaning = true;
     public static Boolean buyingRenting = true;
     private Location currentLocation;
