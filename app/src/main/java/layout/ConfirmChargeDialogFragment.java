@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 
 import iuxta.nearby.AppUtils;
+import iuxta.nearby.Constants;
 import iuxta.nearby.InputFilterMinMax;
 import iuxta.nearby.MainActivity;
 import iuxta.nearby.PrefUtils;
@@ -136,6 +137,13 @@ public class ConfirmChargeDialogFragment extends DialogFragment {
             price.setError("price cannot be empty");
             return false;
         } else {
+            double doublePrice = Double.parseDouble(p);
+            if (doublePrice != 0 && doublePrice < Constants.MINIMUM_OFFER_PRICE) {
+                price.setError("price can only be $0.00 or greater than $0.50");
+                return false;
+            } else {
+                price.setError(null);
+            }
             return true;
         }
 

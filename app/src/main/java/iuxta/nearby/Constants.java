@@ -15,10 +15,10 @@ public class Constants {
     public static final String HISTORY_FRAGMENT_TAG = "history";
 
     //prod
-    //public static final String NEARBY_API_PATH = "https://server.thenearbyapp.com/api";
+    public static final String NEARBY_API_PATH = "https://server.thenearbyapp.com/api";
 
     //alpha
-    public static final String NEARBY_API_PATH = "https://alpha-server.thenearbyapp.com/api";
+    //public static final String NEARBY_API_PATH = "https://alpha-server.thenearbyapp.com/api";
 
     //local
     //public static final String NEARBY_API_PATH = "http://192.168.0.173:8080/api";
