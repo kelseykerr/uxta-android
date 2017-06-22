@@ -295,27 +295,50 @@ public class RequestPreviewFragment extends DialogFragment {
             });
             snack.show();
             createOfferBtn.setEnabled(true);
-        } else if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-            homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
-            dismiss();
-        } else {
-            String title;
-            boolean showAction = true;
-            title = "Please link your bank account to your profile";
-            Snackbar snack = Snackbar.make(view.getRootView(), title,
-                    Constants.LONG_SNACK);
-            if (showAction) {
-                snack.setAction("update account", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                        FragmentManager fm = ((Activity) context).getFragmentManager();
-                        AccountFragment.paymentDialogFragment.show(fm, "dialog");
-                    }
-                });
+        }  else if (!request.isInventoryListing()) {
+            if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
+                dismiss();
+                homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
+            } else {
+                String title;
+                boolean showAction = true;
+                title = "Please link your bank account to your profile";
+                Snackbar snack = Snackbar.make(view.getRootView(), title,
+                        Constants.LONG_SNACK);
+                if (showAction) {
+                    snack.setAction("update account", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+                            FragmentManager fm = ((Activity) context).getFragmentManager();;
+                            AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                        }
+                    });
+                }
+                snack.show();
             }
-            snack.show();
-            createOfferBtn.setEnabled(true);
+        } else if (request.isInventoryListing()) {
+            if (user.getStripeCustomerId() != null && user.getCanRequest()) {
+                dismiss();
+                homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
+            } else {
+                String title;
+                boolean showAction = true;
+                title = "Please add payment info to your profile";
+                Snackbar snack = Snackbar.make(view.getRootView(), title,
+                        Constants.LONG_SNACK);
+                if (showAction) {
+                    snack.setAction("update account", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+                            FragmentManager fm = ((Activity) context).getFragmentManager();
+                            AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                        }
+                    });
+                }
+                snack.show();
+            }
         }
 
     }

@@ -632,8 +632,13 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryCardAdapter.
                 })
                 .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialoginterface, int i) {
-                        response.setSellerStatus(Response.SellerStatus.WITHDRAWN);
-                        historyFragment.updateOffer(response, request, null, null, null);
+                        if (request.isInventoryListing()) {
+                            response.setBuyerStatus(Response.BuyerStatus.DECLINED);
+                            historyFragment.updateOffer(response, request, null, null, null);
+                        } else {
+                            response.setSellerStatus(Response.SellerStatus.WITHDRAWN);
+                            historyFragment.updateOffer(response, request, null, null, null);
+                        }
                     }
                 })
                 .create();
