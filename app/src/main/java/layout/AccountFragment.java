@@ -19,8 +19,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -69,6 +71,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
     private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
     private TextView versionText;
+    private LinearLayout kickstarterBtn;
     private static final String TAG = "AccountFragment";
 
     private boolean updateAccountRequest;
@@ -208,6 +211,25 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         missingUserInfoText = (TextView) view.findViewById(R.id.missing_user_info_text);
         noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
         noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
+        kickstarterBtn = (LinearLayout) view.findViewById(R.id.kickstarter_btn);
+        kickstarterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
+                List activities = packageManager.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+                boolean isIntentSafe = activities.size() > 0;
+                if (isIntentSafe) {
+                    String url = "https://www.kickstarter.com/projects/1739597992/nearby-a-sharing-economy-app-for-your-stuff";
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                } else {
+                    Snackbar snackbar = Snackbar
+                            .make(view, "no browser found, find our Kickstarter by searching \"Nearby\"", Constants.LONG_SNACK);
+                    snackbar.show();
+                }
+            }
+        });
         boolean displayCustomerStatus = user.getStripeCustomerId() == null || !user.getCanRequest();
         boolean displayManagedAccountStatus = user.getStripeManagedAccountId() == null || !user.getCanRespond();
         if (!AppUtils.canAddPayments(user)) {

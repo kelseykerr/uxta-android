@@ -314,6 +314,34 @@
                 android:textColor="@color/redPink"
                 android:textSize="14sp"
                 android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/kickstarter_btn"
+                android:layout_below="@+id/no_merchant_text"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginTop="95dp"
+                android:layout_centerInParent="true"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:clickable="true"
+                android:background="@color/colorPrimary80">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/kickstartr"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:text="View our Kickstarter"/>
+
+            </LinearLayout>
         </RelativeLayout>
     </ScrollView>
 

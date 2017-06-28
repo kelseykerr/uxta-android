@@ -12,6 +12,8 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private Button google;
     private CallbackManager callbackManager;
     private User user;
+    private ProgressBar spinner;
     public static GoogleApiClient mGoogleApiClient;
     private static final String TAG = "LoginActivity";
     private ProgressDialog mProgressDialog;
@@ -133,6 +136,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
         info = (TextView) findViewById(R.id.info);
         fb = (Button) findViewById(R.id.fb);
+        spinner = (ProgressBar) findViewById(R.id.loading_spinner);
         facebookLoginButton = (LoginButton) findViewById(R.id.login_button);
 
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -143,11 +147,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             @Override
             public void onCancel() {
+                spinner.setVisibility(View.GONE);
                 info.setText("Login attempt canceled.");
             }
 
             @Override
             public void onError(FacebookException e) {
+                spinner.setVisibility(View.GONE);
                 info.setText("Login attempt failed.");
             }
         });
@@ -155,7 +161,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         google.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                spinner.setVisibility(View.VISIBLE);
                 google.setEnabled(false);
+                facebookLoginButton.setEnabled(false);
                 if (user != null) {
                     user.setAuthMethod(Constants.GOOGLE_AUTH_METHOD);
                 }
@@ -250,11 +258,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 Thread.sleep(2000);
                 startActivity(intent);
                 finish();
+                spinner.setVisibility(View.GONE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             // Signed out, show unauthenticated UI.
+            spinner.setVisibility(View.GONE);
+            info.setText("Login attempt failed.");
             Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
             google.setEnabled(true);
             //TODO: show error message
