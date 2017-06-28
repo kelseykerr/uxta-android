@@ -268,6 +268,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             info.setText("Login attempt failed.");
             Log.e(TAG, "error signing in: " + result.toString() + "**" + result.getStatus().getStatusCode());
             google.setEnabled(true);
+            facebookLoginButton.setEnabled(true);
             //TODO: show error message
         }
     }
