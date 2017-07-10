@@ -18,10 +18,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
-import iuxta.nearby.Constants;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.User;
+import iuxta.uxta.Constants;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kerrk on 3/12/17.

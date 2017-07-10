@@ -295,52 +295,11 @@
                 </RelativeLayout>
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/map_text"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_below="@id/photo_layout"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"
-                android:textSize="12dp"
-                android:layout_marginStart="10dp"
-                android:text="click to select your request location:"
-                />
-
-            <RelativeLayout
-                android:id="@+id/request_map_view"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:paddingBottom="30dp"
-                android:layout_below="@id/map_text"
-                android:background="#ffffff">
-
-                <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/request_map"
-                    android:name="com.google.android.gms.maps.MapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <Spinner
-                        android:id="@+id/location_spinner"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:background="@color/white75"
-                        android:layout_gravity="end|top"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:entries="@array/locationItems"
-                        android:layout_height="wrap_content"/>
-                </fragment>
-            </RelativeLayout>
-
             <Button
                 android:id="@+id/create_request_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/request_map_view"
+                android:layout_below="@id/photo_layout"
                 android:layout_marginBottom="15dp"
                 android:background="@drawable/primary_btn"
                 android:text="create"

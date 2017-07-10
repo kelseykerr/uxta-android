@@ -30,15 +30,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.Flag;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.Response;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.Flag;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.Response;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kelseykerr on 5/15/17.

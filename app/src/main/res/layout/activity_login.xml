@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:facebook="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@drawable/gradient"
     android:layout_height="match_parent"
     android:padding="20dp">
 
@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="140dp"
-        android:drawableStart="@drawable/rsz_nearby_logo_white_large"
+        android:layout_marginTop="70dp"
+        android:drawableStart="@drawable/pin_white_small"
         android:drawablePadding="0dp"
         android:id="@+id/nearby_logo"
         android:contextClickable="true" />
@@ -32,7 +32,7 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/facebook_button"
         android:layout_width="match_parent"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="130dp"
         android:layout_below="@id/nearby_logo"
         android:layout_height="wrap_content">
 
@@ -56,7 +56,7 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/google_button"
         android:layout_width="match_parent"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@id/facebook_button"
         android:layout_height="wrap_content">
 

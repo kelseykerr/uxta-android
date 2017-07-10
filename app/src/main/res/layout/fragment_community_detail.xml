@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="start"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingBottom="8dp"
+        android:paddingEnd="25dp"
+        android:paddingStart="8dp"
+        android:paddingTop="20dp"
+        android:src="@drawable/x_svg"
+        android:tint="@color/colorAccent" />
+
+    <TextView android:id="@+id/community_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:paddingTop="10dp"
+        android:gravity="center_horizontal"
+        android:textSize="20dp"
+        android:text="Community Name"
+        android:textStyle="bold"/>
+
+    <TextView android:id="@+id/community_description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="30dp"
+        android:gravity="center_horizontal"
+        android:paddingEnd="30dp"
+        android:paddingTop="10dp"
+        android:text="Community Description"
+        android:textSize="14dp"/>
+
+    <TextView android:id="@+id/community_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:paddingTop="10dp"
+        android:text="Community Address"
+        android:textSize="14dp"/>
+
+    <Button
+        android:id="@+id/action_btn"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="60dp"
+        android:background="@color/colorPrimary"
+        android:text="Request Access"
+        android:textColor="#ffffff" />
+
+
+
+    <RelativeLayout
+        android:id="@+id/spinner_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/loading_spinner"
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="125dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop" />
+    </RelativeLayout>
+</LinearLayout>

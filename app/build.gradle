@@ -5,11 +5,11 @@ android {
     buildToolsVersion '25.0.1'
 
     defaultConfig {
-        applicationId "iuxta.nearby"
+        applicationId "iuxta.uxta"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 62
-        versionName "0.62"
+        versionCode 1
+        versionName "0.1"
         multiDexEnabled true
 
     }

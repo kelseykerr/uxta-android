@@ -62,15 +62,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.FullScreenImageActivity;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.Response;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.FullScreenImageActivity;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.Response;
+import iuxta.uxta.model.User;
 
 import static android.app.Activity.RESULT_OK;
 import static layout.RequestDialogFragment.isDownloadsDocument;

@@ -74,16 +74,16 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.FullScreenImageActivity;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.Category;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.User;
-import iuxta.nearby.service.RequestNotificationService;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.FullScreenImageActivity;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.Category;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.User;
+import iuxta.uxta.service.RequestNotificationService;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -91,11 +91,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by kerrk on 8/23/16.
  */
 public class RequestDialogFragment extends DialogFragment
-        implements AdapterView.OnItemSelectedListener,
-        OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleMap.OnMarkerClickListener {
+        implements AdapterView.OnItemSelectedListener {
     public static Request request;
     private User user;
     private Context context;
@@ -111,19 +107,6 @@ public class RequestDialogFragment extends DialogFragment
     private EditText itemName;
     private EditText description;
     private View view;
-    private MapFragment mapFragment;
-    private GoogleMap map;
-    private CameraUpdate cu;
-    private GoogleApiClient mGoogleApiClient;
-    private Location currentLocation;
-    private FragmentManager fm;
-    private FragmentTransaction ft;
-    public static Boolean homeLocation = false;
-    private LatLng latLng;
-    private LocationRequest mLocationRequest;
-    private Location mLastLocation;
-    private Marker currLocationMarker;
-    private RelativeLayout mapView;
     private ScrollView newRequestSV;
     private RelativeLayout spinnerScreen;
     private TextView photosText;
@@ -138,7 +121,6 @@ public class RequestDialogFragment extends DialogFragment
     private ProgressBar spinner1;
     private ProgressBar spinner2;
     private ProgressBar spinner3;
-    private int zoomLevel = 15;
     private static final String RENT_TEXT = "request to rent an item";
     private static final String BUY_TEXT = "request to buy an item";
     private static final String SELL_TEXT = "sell an item";
@@ -333,17 +315,6 @@ public class RequestDialogFragment extends DialogFragment
                 //categorySpinner.setSelection(1);
             }
             description.setText(request.getDescription());
-        } else {
-            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.request_map);
-            fm = this.getFragmentManager();
-            ft = fm.beginTransaction();
-            mapFragment.getMapAsync(this);
-
-            mapView = (RelativeLayout) view.findViewById(R.id.request_map_view);
-            mapView.setVisibility(View.VISIBLE);
-            TextView mapText = (TextView) view.findViewById(R.id.map_text);
-            mapText.setVisibility(View.VISIBLE);
-            setupLocationSpinner(view);
         }
         return view;
     }
@@ -428,7 +399,7 @@ public class RequestDialogFragment extends DialogFragment
         }
     }
 
-    private Request createNewRequestObject(Double lat, Double lng) {
+    private Request createNewRequestObject() {
         Request newRequest = new Request();
         newRequest.setItemName(itemName.getText().toString());
         newRequest.setDescription(description.getText().toString());
@@ -445,8 +416,6 @@ public class RequestDialogFragment extends DialogFragment
             }
         }*/
         newRequest.setPostDate(new Date());
-        newRequest.setLatitude(lat);
-        newRequest.setLongitude(lng);
         newRequest.setLocation(null);
         return newRequest;
     }
@@ -532,11 +501,6 @@ public class RequestDialogFragment extends DialogFragment
             showNoNetworkSnack();
             return;
         }
-        final Double lat = currLocationMarker.getPosition() != null
-                ? currLocationMarker.getPosition().latitude : PrefUtils.latLng.latitude;
-        final Double lng = currLocationMarker.getPosition() != null
-                ? currLocationMarker.getPosition().longitude : PrefUtils.latLng.longitude;
-        // AsyncTask<Params, Progress, Result>
         new AsyncTask<Void, Void, Integer>() {
             String errorMessage;
 
@@ -545,7 +509,7 @@ public class RequestDialogFragment extends DialogFragment
                 Integer responseCode = null;
                 try {
                     HttpURLConnection conn = AppUtils.getHttpConnection("/requests", "POST", user);
-                    Request newRequest = createNewRequestObject(lat, lng);
+                    Request newRequest = createNewRequestObject();
                     ObjectMapper mapper = new ObjectMapper();
                     String requestJson = mapper.writeValueAsString(newRequest);
                     byte[] outputInBytes = requestJson.getBytes("UTF-8");
@@ -631,147 +595,6 @@ public class RequestDialogFragment extends DialogFragment
         public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
-    @Override
-    public void onMapReady(final GoogleMap map) {
-        this.map = map;
-        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                if (cu != null) {
-                    //map.moveCamera(cu);
-                }
-            }
-        });
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        try {
-            map.setMyLocationEnabled(true);
-            map.getUiSettings().setMyLocationButtonEnabled(false);
-            map.getUiSettings().setZoomGesturesEnabled(false);
-            map.getUiSettings().setAllGesturesEnabled(false);
-            map.getUiSettings().setScrollGesturesEnabled(false);
-            map.setOnMarkerClickListener(this);
-        } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to get user's current location, " + e.getMessage());
-        }
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latlng) {
-                if (currLocationMarker != null) {
-                    currLocationMarker.remove();
-                }
-                currLocationMarker = map.addMarker(new MarkerOptions()
-                        .position(latlng)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
-            }
-        });
-        buildGoogleApiClient();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        try {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-        } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to get user's last location, " + e.getMessage());
-        }
-        if (mLastLocation != null) {
-            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            PrefUtils.setLatLng(latLng);
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Request location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            currLocationMarker = map.addMarker(markerOptions);
-        }
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000); //5 seconds
-        mLocationRequest.setFastestInterval(3000); //3 seconds
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
-        } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to request location updates, " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Toast.makeText(context, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(context, "onConnectionFailed", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        currentLocation = location;
-        if (homeLocation != null && homeLocation) {
-            return;
-        }
-        updateMapFocus(new LatLng(location.getLatitude(), location.getLongitude()));
-        //If you only need one location, unregister the listener
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        fm = this.getFragmentManager();
-        if (fm != null) {
-            ft = fm.beginTransaction();
-        }
-    }
-
-    private void updateMapFocus(LatLng ll) {
-        if (currLocationMarker != null) {
-            currLocationMarker.remove();
-        }
-        latLng = new LatLng(ll.latitude, ll.longitude);
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
-        RequestNotificationService.latLng = latLng;
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        currLocationMarker = map.addMarker(markerOptions);
-        //zoom to current position:
-        updateZoom(currLocationMarker, null);
-    }
-
-    private void updateZoom(Marker marker, LatLng latLng) {
-        CircleOptions options = new CircleOptions();
-        options.center(marker != null ? marker.getPosition() : latLng);
-        //Radius in meters
-        options.radius(AppUtils.DEFAULT_REQUEST_RADIUS * 1609.344);
-        options.strokeWidth(10);
-
-        double radius = options.getRadius();
-        double scale = radius / 500;
-        zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
-
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(zoomLevel)
-                .target(marker != null ? marker.getPosition() : latLng).build();
-        cu = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        map.moveCamera(cu);
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    public boolean onMarkerClick(final Marker marker) {
-        return true;
-    }
-
-
     @SuppressLint("NewApi")
     private String getPath(Uri uri) throws URISyntaxException {
         final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
@@ -849,64 +672,9 @@ public class RequestDialogFragment extends DialogFragment
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
-
-
-    public void setupLocationSpinner(View view) {
-        Spinner locationSpinner = (Spinner) view.findViewById(R.id.location_spinner);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item,
-                getResources().getStringArray(R.array.locationItems));
-        locationSpinner.setAdapter(locationAdapter);
-        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
-            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedItem = parent.getItemAtPosition(position).toString();
-                    if (selectedItem.equals("current location")) {
-                        homeLocation = false;
-                        if (latLng != null) {
-                            updateMapFocus(new LatLng(currentLocation.getLatitude(),
-                                    currentLocation.getLongitude()));
-                        }
-                    } else {
-                        homeLocation = true;
-                        if (currLocationMarker != null) {
-                            currLocationMarker.remove();
-                        }
-                        latLng = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                        currLocationMarker = map.addMarker(markerOptions);
-
-                        //zoom to current position:
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(latLng).zoom(zoomLevel).build();
-
-                        map.animateCamera(CameraUpdateFactory
-                                .newCameraPosition(cameraPosition));
-                    }
-                } // to close the onItemSelected
-
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            locationSpinner.setVisibility(View.VISIBLE);
-        } else {
-            locationSpinner.setVisibility(View.GONE);
-        }
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        android.app.Fragment fragment = getFragmentManager()
-                .findFragmentById(R.id.request_map);
-        if (null != fragment) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.remove(fragment);
-            ft.commit();
-        }
     }
 
     private void addPhotos() {

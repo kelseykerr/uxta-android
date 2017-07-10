@@ -8,43 +8,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:491459641376:android:3871a1f4198f10f7",
-        "android_client_info": {
-          "package_name": "superstartupteam.nearby"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAGQrVLaAbRtVj8EuGb_CLSWl8AvgeLSAY"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:491459641376:android:bbfe0cb9fa7e0aec",
         "android_client_info": {
           "package_name": "iuxta.nearby"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "491459641376-ft4d33ugp0q6lc1t3fhvqhiukjq788lh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.nearby",
+            "certificate_hash": "344cae64bbaf3d3b12683d950d9e657bf825bcc9"
+          }
+        },
+        {
+          "client_id": "491459641376-t1v1hfgvh2kqprisa8s8es4943gdl6b1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.nearby",
+            "certificate_hash": "fbd8fcfa358974587c78d176b40f88e86ad84337"
+          }
+        },
         {
           "client_id": "491459641376-3dlu720luktd74t1jjf58ej8gfjpvs3c.apps.googleusercontent.com",
           "client_type": 1,
@@ -79,15 +64,74 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
+              "client_id": "491459641376-a0o6orf4feb3i2sj4g3t5km1l3vbbnpg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.iuxtainc.Nearby"
+              }
+            },
+            {
               "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
               "client_type": 3
-            },
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491459641376:android:f4b2b71f439038e6",
+        "android_client_info": {
+          "package_name": "iuxta.uxta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "491459641376-qk6i6qt28oeus80r3d8ktkfkkj3qjaol.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.uxta",
+            "certificate_hash": "6de7bd366aeacc173d959753f61598a3660e979f"
+          }
+        },
+        {
+          "client_id": "491459641376-31v8ilhbrc7i0jv8qj2kb52t54itqc6l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "iuxta.uxta",
+            "certificate_hash": "fbd8fcfa358974587c78d176b40f88e86ad84337"
+          }
+        },
+        {
+          "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGQrVLaAbRtVj8EuGb_CLSWl8AvgeLSAY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
             {
               "client_id": "491459641376-a0o6orf4feb3i2sj4g3t5km1l3vbbnpg.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.iuxtainc.Nearby"
               }
+            },
+            {
+              "client_id": "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com",
+              "client_type": 3
             }
           ]
         },

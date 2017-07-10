@@ -29,15 +29,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.RequestResponseCardAdapter;
-import iuxta.nearby.model.History;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.Response;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.RequestResponseCardAdapter;
+import iuxta.uxta.model.History;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.Response;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kerrk on 2/25/17.

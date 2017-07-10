@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,26 +26,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import iuxta.nearby.Constants;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.User;
+import iuxta.uxta.Constants;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kerrk on 11/23/16.
  */
 
-public class FiltersDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class FiltersDialogFragment extends DialogFragment {
     private User user;
     private Context context;
     private View view;
-    private Double currentRadius;
-    private Boolean homeLocation;
     private String sortBy;
     private Boolean sellLoan;
     private Boolean rentBuy;
-    private Spinner radiusSpinner;
-    private Spinner locationSpinner;
     private Spinner sortBySpinner;
     private FiltersDialogFragment.OnFragmentInteractionListener mListener;
     private Map<Double, String> radiusMap = new HashMap<Double, String>();
@@ -79,78 +74,9 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filters_dialog, container, false);
-        currentRadius = HomeFragment.currentRadius;
-        homeLocation = HomeFragment.homeLocation;
         sortBy = HomeFragment.sortBy;
         sellLoan = HomeFragment.sellingLoaning;
         rentBuy = HomeFragment.buyingRenting;
-        locationSpinner = (Spinner) view.findViewById(R.id.location_spinner);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.locationItems));
-        locationAdapter.setDropDownViewResource(R.layout.spinner_item);
-        locationSpinner.setAdapter(locationAdapter);
-        if (user.getHomeLongitude() != null && user.getHomeLatitude() != null) {
-            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedItem = parent.getItemAtPosition(position).toString();
-                    if (selectedItem.equals("current location")) {
-                        homeLocation = false;
-                    } else {
-                        homeLocation = true;
-                    }
-                }
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-            locationSpinner.setVisibility(View.VISIBLE);
-            if (homeLocation == null || !homeLocation) {
-                locationSpinner.setSelection(1);
-            } else {
-                locationSpinner.setSelection(2);
-            }
-        } else {
-            locationSpinner.setVisibility(View.GONE);
-        }
-
-
-        // Spinner element
-        radiusSpinner = (Spinner) view.findViewById(R.id.radius_spinner);
-
-        // Spinner click listener
-        radiusSpinner.setOnItemSelectedListener(this);
-
-        // Spinner Drop down elements
-        List<String> radiusList = new ArrayList<>();
-        radiusMap.put(.1, ".1 mile radius");
-        radiusMap.put(.25, ".25 mile radius");
-        radiusMap.put(.5, ".5 mile radius");
-        radiusMap.put(1.0, "1 mile radius");
-        radiusMap.put(5.0, "5 mile radius");
-        radiusMap.put(10.0, "10 mile radius");
-        radiusList.add(radiusMap.get(.1));
-        radiusList.add(radiusMap.get(.25));
-        radiusList.add(radiusMap.get(.5));
-        radiusList.add(radiusMap.get(1.0));
-        radiusList.add(radiusMap.get(5.0));
-        radiusList.add(radiusMap.get(10.0));
-
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, radiusList);
-        dataAdapter.setDropDownViewResource(R.layout.spinner_item);
-
-        // attaching data adapter to spinner
-        radiusSpinner.setAdapter(dataAdapter);
-
-        // set radius spinner to current radius
-        if (currentRadius != null) {
-            String selectedRadius = radiusMap.get(currentRadius);
-            for (int i = 0; i < radiusList.size(); i++) {
-                if (radiusList.get(i).equals(selectedRadius)) {
-                    radiusSpinner.setSelection(i+1);
-                    break;
-                }
-            }
-        }
 
         sortBySpinner = (Spinner) view.findViewById(R.id.sort_by_spinner);
         final ArrayAdapter<String> sortByAdapter = new ArrayAdapter<>(context, R.layout.simple_spinner_item,
@@ -219,8 +145,6 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
         Button submitBtn = (Button) view.findViewById(R.id.filter_button);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                HomeFragment.currentRadius = currentRadius;
-                HomeFragment.homeLocation = homeLocation;
                 HomeFragment.sortBy = sortBy;
                 HomeFragment.sellingLoaning = sellingLoaning.isChecked();
                 HomeFragment.buyingRenting = buyingRenting.isChecked();
@@ -276,20 +200,6 @@ public class FiltersDialogFragment extends DialogFragment implements AdapterView
         this.context = context;
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a radius from the spinner
-        String radiusString = (String) parent.getItemAtPosition(position);
-        for (Map.Entry<Double, String> entry : radiusMap.entrySet()) {
-            Double key = entry.getKey();
-            String value = entry.getValue();
-            if (value.equals(radiusString)) {
-                currentRadius = key;
-                break;
-            }
-        }
-
-    }
 
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub

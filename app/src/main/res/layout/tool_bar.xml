@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorPrimary"
+    android:background="@color/offWhite"
     app:contentInsetLeft="0dp"
     app:contentInsetStart="0dp"
     android:elevation="4dp"
@@ -14,7 +14,7 @@
         android:id="@+id/home_action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
+        android:background="@color/offWhite">
 
         <RelativeLayout
             android:id="@+id/toolbar_line_2"
@@ -24,7 +24,7 @@
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true">
 
-            <TextView
+            <ImageButton
                 android:id="@+id/filter_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,9 +35,10 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="15dp"
                 android:paddingTop="10dp"
-                android:text="filter"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:backgroundTint="@color/offWhite"
+                android:tint="@color/colorPrimary"
+                android:src="@drawable/ic_filter_list_black_24dp"
+                android:layout_margin="2dp"/>
 
             <EditText
                 android:id="@+id/search_bar"
@@ -63,21 +64,6 @@
                 android:layout_centerVertical="true"
                 android:layout_margin="2dp"/>
 
-            <TextView
-                android:id="@+id/list_map_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:onClick="switchListMapView"
-                android:paddingBottom="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="10dp"
-                android:text="list"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -93,8 +79,8 @@
             <ImageButton
                 android:id="@+id/filter_image"
                 android:layout_width="wrap_content"
-                android:backgroundTint="@color/colorPrimary"
-                android:tint="@color/white"
+                android:backgroundTint="@color/offWhite"
+                android:tint="@color/colorPrimary"
                 android:onClick="filterHistory"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_filter_list_black_24dp"
@@ -107,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="filterHistory"
                 android:text="filter history"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/filter_image" />

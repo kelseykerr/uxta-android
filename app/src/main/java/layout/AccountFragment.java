@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,21 +27,26 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.LoginActivity;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.LoginActivity;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.SharedAsyncMethods;
+import iuxta.uxta.model.Community;
+import iuxta.uxta.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,24 +59,24 @@ import iuxta.nearby.model.User;
 public class AccountFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
     private Context context;
     private Bitmap bitmap;
-    private TextView noCustomerText;
-    private TextView noMerchantText;
-    private TextView missingUserInfoText;
+    private TextView noCommunityText;
     private User user;
     private ImageView profileImage;
     public ScrollView parentScroll;
     private View view;
     public static String snackbarMessage = null;
     public static UpdateAccountDialogFragment updateAccountDialog;
+    public static CommunitySearchFragment communitySearchFragment;
     public static PaymentDialogFragment paymentDialogFragment;
     private RelativeLayout editAccntLayout;
     private RelativeLayout logoutLayout;
     private RelativeLayout shareLayout;
-    private RelativeLayout paymentsLayout;
     private RelativeLayout privacyLayout;
     private TextView versionText;
-    private LinearLayout kickstarterBtn;
+    private LinearLayout communityBtn;
+    private TextView communityBtnText;
     private static final String TAG = "AccountFragment";
+    private Community community;
 
     private boolean updateAccountRequest;
 
@@ -97,8 +101,9 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        user = PrefUtils.getCurrentUser(context);
         super.onCreate(savedInstanceState);
+        user = PrefUtils.getCurrentUser(context);
+        SharedAsyncMethods.getUserInfoFromServer(user, context);
     }
 
     public static void dismissUpdateAccountDialog() {
@@ -118,6 +123,7 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         user = PrefUtils.getCurrentUser(context);
+
         final View view = inflater.inflate(R.layout.fragment_account, container, false);
         profileImage = (ImageView) view.findViewById(R.id.profileImage);
         setProfilePic();
@@ -131,9 +137,6 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
 
         editAccntLayout = (RelativeLayout) view.findViewById(R.id.edit_accnt_layout);
         handleEditAccount();
-
-        paymentsLayout = (RelativeLayout) view.findViewById(R.id.payments_layout);
-        handlePayments();
 
         privacyLayout = (RelativeLayout) view.findViewById(R.id.privacy_layout);
         handlePrivacy();
@@ -187,20 +190,8 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             userPhone.setVisibility(View.GONE);
         }
         TextView notificationsText = (TextView) view.findViewById(R.id.notifications_text);
-        boolean homeNotifs = user.getHomeLocationNotifications() != null &&
-                user.getHomeLocationNotifications();
-        boolean nearNotifs = user.getCurrentLocationNotifications() != null &&
-                user.getCurrentLocationNotifications();
-        if (homeNotifs && nearNotifs) {
-            String htmlString = "you will receive notifications about requests within " +
-                    user.getNotificationRadius() + " miles of your home and your current location";
-            notificationsText.setText(htmlString);
-        } else if (!homeNotifs && !nearNotifs) {
-            String htmlString = "notifications about new requests are disabled";
-            notificationsText.setText(htmlString);
-        } else {
-            String htmlString = "you will receive notifications about requests within " +
-                    user.getNotificationRadius() + " of your " + (homeNotifs ? "home" : "current location");
+        if (user.getNewRequestNotificationsEnabled() != null && user.getNewRequestNotificationsEnabled()) {
+            String htmlString = "new post notifications are on";
             notificationsText.setText(htmlString);
         }
         if (snackbarMessage != null) {
@@ -208,47 +199,26 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                     .make(view, snackbarMessage, Constants.LONG_SNACK);
             snackbar.show();
         }
-        missingUserInfoText = (TextView) view.findViewById(R.id.missing_user_info_text);
-        noCustomerText = (TextView) view.findViewById(R.id.no_customer_text);
-        noMerchantText = (TextView) view.findViewById(R.id.no_merchant_text);
-        kickstarterBtn = (LinearLayout) view.findViewById(R.id.kickstarter_btn);
-        kickstarterBtn.setOnClickListener(new View.OnClickListener() {
+        communityBtn = (LinearLayout) view.findViewById(R.id.community_btn);
+        communityBtnText = (TextView) view.findViewById(R.id.community_btn_text);
+        if (user.getCommunityId() != null && !user.getCommunityId().isEmpty()) {
+            getCommunityBtnText(user.getCommunityId(), false);
+        } else if (user.getRequestedCommunityId() != null && !user.getRequestedCommunityId().isEmpty()) {
+            getCommunityBtnText(user.getRequestedCommunityId(), true);
+        }
+        final AccountFragment accountFragment = this;
+        communityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                PackageManager packageManager = ((MainActivity)getActivity()).getPackageManager();
-                List activities = packageManager.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
-                boolean isIntentSafe = activities.size() > 0;
-                if (isIntentSafe) {
-                    String url = "https://www.kickstarter.com/projects/1739597992/nearby-a-sharing-economy-app-for-your-stuff";
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
+                if (user.getCommunityId() != null && !user.getCommunityId().isEmpty() && community != null) {
+                    CommunityDetailFragment communityDetailFragment = CommunityDetailFragment.newInstance(community, accountFragment);
+                    communityDetailFragment.show(getFragmentManager(), "dialog");
                 } else {
-                    Snackbar snackbar = Snackbar
-                            .make(view, "no browser found, find our Kickstarter by searching \"Nearby\"", Constants.LONG_SNACK);
-                    snackbar.show();
+                    communitySearchFragment = CommunitySearchFragment.newInstance(accountFragment);
+                    communitySearchFragment.show(getFragmentManager(), "dialog");
                 }
             }
         });
-        boolean displayCustomerStatus = user.getStripeCustomerId() == null || !user.getCanRequest();
-        boolean displayManagedAccountStatus = user.getStripeManagedAccountId() == null || !user.getCanRespond();
-        if (!AppUtils.canAddPayments(user)) {
-            displayCustomerStatus = false;
-            displayManagedAccountStatus = false;
-            missingUserInfoText.setVisibility(View.VISIBLE);
-        } else {
-            missingUserInfoText.setVisibility(View.GONE);
-        }
-        if (displayCustomerStatus) {
-            noCustomerText.setVisibility(View.VISIBLE);
-        } else {
-            noCustomerText.setVisibility(View.GONE);
-        }
-        if (displayManagedAccountStatus) {
-            noMerchantText.setVisibility(View.VISIBLE);
-        } else {
-            noMerchantText.setVisibility(View.GONE);
-        }
         versionText = (TextView) view.findViewById(R.id.version_text);
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -261,6 +231,42 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
         this.view = view;
         return view;
 
+    }
+
+    public void requestedAccess(String communityName) {
+        communitySearchFragment.dismiss();
+        Snackbar snackbar = Snackbar
+                .make(view.getRootView(), "Your request to join " + communityName + " will be reviewed shortly.", Constants.LONG_SNACK);
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snackbar.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+        snackbar.getView().getRootView().setLayoutParams(params);
+        snackbar.show();
+        communityBtnText.setText("Pending approval for " + communityName);
+        //snackbar
+    }
+
+    public void requestedRemoval(String communityName) {
+        if (communitySearchFragment != null) {
+            communitySearchFragment.dismiss();
+        }
+        Snackbar snackbar = Snackbar
+                .make(view.getRootView(), "You have been removed from " + communityName + " community.", Constants.LONG_SNACK);
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
+                snackbar.getView().getRootView().getLayoutParams();
+
+        params.setMargins(params.leftMargin,
+                params.topMargin,
+                params.rightMargin,
+                params.bottomMargin + 150);
+        snackbar.getView().getRootView().setLayoutParams(params);
+        snackbar.show();
+        communityBtnText.setText("find your community");
+        //snackbar
     }
 
     public void handlePrivacy() {
@@ -277,34 +283,8 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
                     startActivity(i);
                 } else {
                     Snackbar snackbar = Snackbar
-                            .make(view, "no browser found, view our privacy policy at http://thenearbyapp.com/privacy", Constants.LONG_SNACK);
+                            .make(view.getRootView(), "no browser found, view our privacy policy at http://thenearbyapp.com/privacy", Constants.LONG_SNACK);
                     snackbar.show();
-                }
-            }
-        });
-    }
-
-    public void handlePayments() {
-        paymentsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!MainActivity.isNetworkConnected()) {
-                    showNoConnectionSnackbar();
-                } else if (!AppUtils.canAddPayments(user)) {
-                    Snackbar snackbar = Snackbar
-                            .make(view.getRootView(), "you must finish filling out your account info to add/edit payments", Constants.LONG_SNACK);
-                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                            snackbar.getView().getRootView().getLayoutParams();
-
-                    params.setMargins(params.leftMargin,
-                            params.topMargin,
-                            params.rightMargin,
-                            params.bottomMargin + 150);
-                    snackbar.getView().getRootView().setLayoutParams(params);
-                    snackbar.show();
-                } else {
-                    paymentDialogFragment = PaymentDialogFragment.newInstance();
-                    paymentDialogFragment.show(getFragmentManager(), "dialog");
                 }
             }
         });
@@ -494,5 +474,47 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             }.execute();
         }
     }
+
+    private void getCommunityBtnText(final String communityId, final Boolean isPending) {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                try {
+                    String path = "/communities/" + communityId;
+                    HttpURLConnection conn = AppUtils.getHttpConnection(path, "GET", user);
+                    Integer responseCode = conn.getResponseCode();
+                    Log.i(TAG, "GET /communities/{id} response code : " + responseCode);
+                    if (responseCode != 200) {
+                        throw new IOException(conn.getResponseMessage());
+                    }
+                    String output = AppUtils.getResponseContent(conn);
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        Community c = mapper.readValue(output, new TypeReference<Community>() {});
+                        community = c;
+                    } catch (IOException e) {
+                        Log.e(TAG, "error converting string to community: " + e.getMessage());
+                        throw new IOException(e);
+                    }
+                    return responseCode;
+                } catch (IOException e) {
+                    Log.e(TAG, "ERROR could not get community: " + e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Integer responseCode) {
+                if (community != null && community.getName() != null) {
+                    if (!isPending) {
+                        communityBtnText.setText(community.getName());
+                    } else {
+                        communityBtnText.setText("Pending approval for " + community.getName());
+                    }
+                }
+            }
+        }.execute();
+    }
+
 
 }

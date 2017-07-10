@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="iuxta.nearby">
+    package="iuxta.uxta">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/nearby_launcher"
+        android:icon="@mipmap/uxta_icon"
         android:label="@string/app_name"
         android:hardwareAccelerated="false"
         android:largeHeap="true"
@@ -19,7 +18,7 @@
         android:theme="@style/AppTheme"
         android:name="android.support.multidex.MultiDexApplication">
         <activity
-            android:name="iuxta.nearby.SplashActivity"
+            android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,12 +27,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="iuxta.nearby.LoginActivity"></activity>
+        <activity android:name="iuxta.uxta.LoginActivity"></activity>
         <activity
-            android:name="iuxta.nearby.MainActivity"
+            android:name="iuxta.uxta.MainActivity"
             android:screenOrientation="portrait"></activity>
 
-        <activity android:name="iuxta.nearby.FullScreenImageActivity"
+        <activity android:name="iuxta.uxta.FullScreenImageActivity"
             android:screenOrientation="portrait"></activity>
 
         <meta-data
@@ -57,12 +56,12 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
 
-        <service android:name="iuxta.nearby.service.NearbyMessagingService">
+        <service android:name="iuxta.uxta.service.NearbyMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="iuxta.nearby.service.NearbyInstanceIdService">
+        <service android:name="iuxta.uxta.service.NearbyInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
@@ -72,14 +71,14 @@
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
 
-        <activity android:name="iuxta.nearby.ScannerActivity"></activity>
+        <activity android:name="iuxta.uxta.ScannerActivity"></activity>
 
         <receiver
-            android:name="iuxta.nearby.ConnectivityReceiver"
+            android:name="iuxta.uxta.ConnectivityReceiver"
             android:process=":remote"></receiver>
 
         <service
-            android:name="iuxta.nearby.service.RequestNotificationService"
+            android:name="iuxta.uxta.service.RequestNotificationService"
             android:exported="false" />
 
     </application>

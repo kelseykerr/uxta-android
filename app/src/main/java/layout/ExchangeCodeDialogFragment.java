@@ -31,11 +31,11 @@ import com.google.zxing.common.BitMatrix;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kerrk on 9/27/16.

@@ -13,7 +13,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.SwitchCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.format.Formatter;
@@ -26,14 +25,12 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,13 +38,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.DobPickerFragment;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.SharedAsyncMethods;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.DobPickerFragment;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.SharedAsyncMethods;
+import iuxta.uxta.model.User;
 
 import static android.content.Context.WIFI_SERVICE;
 
@@ -72,17 +69,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
     private EditText email;
     private TextInputLayout phoneLayout;
     private EditText phone;
-    private SwitchCompat notificationsNearHome;
-    private SwitchCompat notificationsNearby;
-    private Double currentRadius;
+    private SwitchCompat notifications;
     private OnFragmentInteractionListener mListener;
     private View view;
-    private TextInputLayout dobLayout;
-    private EditText dob;
     private ScrollView screen1;
     private ScrollView screen2;
     private RelativeLayout updatingScreen;
-    private Map<Double, String> radiusMap = new HashMap<Double, String>();
 
     /**
      * Use this factory method to create a new instance of
@@ -159,25 +151,12 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         phone.setText(user.getPhone());
 
-        dobLayout = (TextInputLayout) view.findViewById(R.id.dob_layout);
-        dob = (EditText) view.findViewById(R.id.dob);
-        dob.setText(user.getDateOfBirth());
-        Log.i("UpdateAccount", "dob from user data = " + user.getDateOfBirth());
-
-        notificationsNearHome = (SwitchCompat) view.findViewById(R.id.notifications_near_home);
-        if (user.getHomeLocationNotifications() != null) {
-            notificationsNearHome.setChecked(user.getHomeLocationNotifications());
+        notifications = (SwitchCompat) view.findViewById(R.id.notifications_toggle);
+        if (user.getNewRequestNotificationsEnabled() != null) {
+            notifications.setChecked(user.getNewRequestNotificationsEnabled());
         } else {
-            notificationsNearHome.setChecked(false);
+            notifications.setChecked(false);
         }
-
-        notificationsNearby = (SwitchCompat) view.findViewById(R.id.notifications_nearby);
-        if (user.getCurrentLocationNotifications() != null) {
-            notificationsNearby.setChecked(user.getCurrentLocationNotifications());
-        } else {
-            notificationsNearby.setChecked(false);
-        }
-        configureRadiusSpinner(view);
 
         final Button nextBtn1 = (Button) view.findViewById(R.id.next_button_1);
         nextBtn1.setOnClickListener(new View.OnClickListener() {
@@ -201,26 +180,6 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 screen1.setVisibility(View.VISIBLE);
             }
         });
-
-        dob.setKeyListener(null);
-        dob.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
-                    showDobPickerDialog();
-                } else {
-                    // Hide your calender here
-                }
-            }
-        });
-        dob.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDobPickerDialog();
-            }
-        });
-
-
 
         final Button saveBtn = (Button) view.findViewById(R.id.next_button_2);
         saveBtn.setText("save");
@@ -252,14 +211,10 @@ public class UpdateAccountDialogFragment extends DialogFragment {
                 user.setState(AppUtils.validateString(sState) ? sState : null);
                 String sZip = zip.getText().toString();
                 user.setZip(AppUtils.validateString(sZip) ? sZip : null);
-                user.setCurrentLocationNotifications(notificationsNearby.isChecked());
-                user.setHomeLocationNotifications(notificationsNearHome.isChecked());
-                user.setNewRequestNotificationsEnabled(notificationsNearby.isChecked() || notificationsNearHome.isChecked());
-                user.setNotificationRadius(currentRadius);
+                user.setNewRequestNotificationsEnabled(notifications.isChecked());
                 String sEmail = email.getText().toString();
                 user.setEmail(AppUtils.validateString(sEmail) ? sEmail : null);
                 String sPhone = phone.getText().toString();
-                user.setDateOfBirth(dob.getText().toString());
                 if (user.getTosAccepted() == null || !user.getTosAccepted()) {
                     user.setTosAccepted(true);
                     WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
@@ -340,48 +295,7 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         } else {
             phoneLayout.setError(null);
         }
-        String dobString = dob.getText().toString();
-        if (dobString.isEmpty()) {
-            dobLayout.setError("please enter your date of birth");
-            valid = false;
-        } else {
-            dobLayout.setError(null);
-        }
         return valid;
-    }
-
-
-    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
-        // when dialog box is closed, below method will be called.
-        @Override
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            month += 1;
-            dob.setText(String.format("%1$04d-%2$02d-%3$02d", year, month, day));
-            Log.i("OnDateSet ", "DOB String = " + dob.getText().toString());
-        }
-    };
-
-    private void showDobPickerDialog() {
-        final Calendar c = Calendar.getInstance();
-        int year = 1995;
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        if (user.getDateOfBirth() != null) {
-            String[] dobArray = user.getDateOfBirth().split("-");
-            if (dobArray[0] != null) {
-                year = Integer.parseInt(dobArray[0]);
-            }
-            if (dobArray[1] != null) {
-                month = Integer.parseInt(dobArray[1]) - 1;
-            }
-            if (dobArray[2] != null) {
-                day = Integer.parseInt(dobArray[2]);
-            }
-        }
-
-        DobPickerFragment dobPicker = new DobPickerFragment(context, android.R.style.Theme_Holo_Light_Dialog, datePickerListener, year, month, day);
-        DatePickerDialog dialog = dobPicker.getPicker();
-        dialog.show();
     }
 
 
@@ -446,70 +360,5 @@ public class UpdateAccountDialogFragment extends DialogFragment {
         void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
-    private List<Double> getRadiusList() {
-        List<Double> radiusList = new ArrayList<>();
-        radiusList.add(.1);
-        radiusList.add(.25);
-        radiusList.add(.5);
-        radiusList.add(1D);
-        radiusList.add(5D);
-        radiusList.add(10D);
-        return radiusList;
-    }
 
-    private void configureRadiusSpinner(View v) {
-        Spinner radiusSpinner = (Spinner) v.findViewById(R.id.radius_spinner);
-        List<String> radiusList = new ArrayList<>();
-        radiusMap.put(.1, ".1 miles");
-        radiusMap.put(.25, ".25 miles");
-        radiusMap.put(.5, ".5 miles ");
-        radiusMap.put(1.0, "1 mile");
-        radiusMap.put(5.0, "5 miles");
-        radiusMap.put(10.0, "10 miles");
-        radiusList.add(radiusMap.get(.1));
-        radiusList.add(radiusMap.get(.25));
-        radiusList.add(radiusMap.get(.5));
-        radiusList.add(radiusMap.get(1.0));
-        radiusList.add(radiusMap.get(5.0));
-        radiusList.add(radiusMap.get(10.0));
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.simple_spinner_item, radiusList);
-        dataAdapter.setDropDownViewResource(R.layout.spinner_item);
-
-        // attaching data adapter to spinner
-        radiusSpinner.setAdapter(dataAdapter);
-
-        // set radius spinner to current radius
-        if (user.getNotificationRadius() != null) {
-            String selectedRadius = radiusMap.get(user.getNotificationRadius());
-            for (int i = 0; i < radiusList.size(); i++) {
-                if (radiusList.get(i).equals(selectedRadius)) {
-                    radiusSpinner.setSelection(i+1);
-                    break;
-                }
-            }
-        } else {
-            radiusSpinner.setSelection(4);
-        }
-
-        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
-                String radiusString = (String) parentView.getItemAtPosition(position);
-                for (Map.Entry<Double, String> entry : radiusMap.entrySet()) {
-                    Double key = entry.getKey();
-                    String value = entry.getValue();
-                    if (value.equals(radiusString)) {
-                        currentRadius = key;
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });
-    }
 }

@@ -31,17 +31,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.Transaction;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.Transaction;
+import iuxta.uxta.model.User;
 
 
 /**

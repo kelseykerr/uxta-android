@@ -104,7 +104,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/user_email_phone"
                 android:layout_centerHorizontal="true"
-                android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:paddingEnd="15dp"
                 android:paddingStart="15dp"
@@ -112,15 +111,45 @@
                 android:textSize="14sp"
                 android:textStyle="italic" />
 
+            <LinearLayout
+                android:id="@+id/community_btn"
+                android:layout_below="@+id/notifications_text"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_centerInParent="true"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:clickable="true"
+                android:background="@color/white">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:tint="@color/colorPrimary"
+                    android:src="@drawable/ic_home_black_24dp"/>
+
+                <TextView
+                    android:id="@+id/community_btn_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:text="find your community"/>
+
+            </LinearLayout>
+
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/action_bar"
                 android:layout_width="fill_parent"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/notifications_text"
+                android:layout_below="@+id/community_btn"
                 android:orientation="horizontal"
-                android:weightSum="5">
+                android:weightSum="4">
 
                 <RelativeLayout
                     android:id="@+id/edit_accnt_layout"
@@ -152,34 +181,6 @@
 
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:id="@+id/payments_layout">
-
-                    <ImageView
-                        android:id="@+id/edit_payments_btn"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:gravity="center_horizontal"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:tint="@color/colorAccent"
-                        android:src="@drawable/ic_credit_card_black_24dp" />
-
-                    <TextView
-                        android:id="@+id/edit_payments_text"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/edit_payments_btn"
-                        android:layout_marginBottom="6dp"
-                        android:layout_marginTop="6dp"
-                        android:gravity="center_horizontal"
-                        android:text="payments"
-                        android:textSize="12sp" />
-                </RelativeLayout>
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -314,34 +315,6 @@
                 android:textColor="@color/redPink"
                 android:textSize="14sp"
                 android:visibility="gone" />
-
-            <LinearLayout
-                android:id="@+id/kickstarter_btn"
-                android:layout_below="@+id/no_merchant_text"
-                android:layout_width="wrap_content"
-                android:layout_height="45dp"
-                android:layout_marginTop="95dp"
-                android:layout_centerInParent="true"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:clickable="true"
-                android:background="@color/colorPrimary80">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:src="@drawable/kickstartr"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:text="View our Kickstarter"/>
-
-            </LinearLayout>
         </RelativeLayout>
     </ScrollView>
 

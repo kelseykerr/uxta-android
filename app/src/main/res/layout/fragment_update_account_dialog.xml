@@ -315,29 +315,6 @@
                     android:theme="@style/EditTextTheme" />
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/dob_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/phone_layout"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="-10dp"
-                app:errorEnabled="true"
-                app:errorTextAppearance="@style/TextErrorStyle"
-                app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
-
-                <EditText
-                    android:id="@+id/dob"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/dobLabel"
-                    android:inputType="phone"
-                    android:maxLength="14"
-                    android:textColor="@color/colorAccent"
-                    android:theme="@style/EditTextTheme" />
-            </android.support.design.widget.TextInputLayout>
-
             <!--<TextView
                 android:id="@+id/dob_label"
                 android:layout_width="match_parent"
@@ -369,60 +346,18 @@
                 android:background="@color/colorAccent" />-->
 
             <android.support.v7.widget.SwitchCompat
-                android:id="@+id/notifications_near_home"
+                android:id="@+id/notifications_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/exp_date_layout"
+                android:layout_below="@id/phone_layout"
                 android:button="@null"
                 android:padding="10dp"
-                android:text="Receive notifications about requests near your home address:"
+                android:text="Receive notifications about new posts"
                 android:textColor="@color/colorAccent"
                 android:textOff="disabled"
                 android:textOn="enabled"
                 android:thumb="@drawable/switch_compat_thumb"
                 android:trackTint="@color/colorPrimary" />
-
-            <android.support.v7.widget.SwitchCompat
-                android:id="@+id/notifications_nearby"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/notifications_near_home"
-                android:background="@android:color/transparent"
-                android:button="@null"
-                android:padding="10dp"
-                android:text="Receive notifications about requests near your current location:"
-                android:textColor="@color/colorAccent"
-                android:textOff="disabled"
-                android:textOn="enabled"
-                android:thumb="@drawable/switch_compat_thumb" />
-
-
-            <fr.ganfra.materialspinner.MaterialSpinner
-                android:id="@+id/radius_spinner"
-                android:layout_width="match_parent"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="10dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="0dp"
-                android:textColor="@color/colorAccent"
-                app:ms_alignLabels="true"
-                app:ms_arrowColor="@color/colorAccent"
-                app:ms_arrowSize="16dp"
-                app:ms_baseColor="@color/colorAccent"
-                app:ms_enableErrorLabel="false"
-                app:ms_enableFloatingLabel="true"
-                app:ms_errorColor="@color/redPink"
-                app:ms_floatingLabelColor="@color/colorAccent"
-                app:ms_floatingLabelText="Notification Radius"
-                app:ms_highlightColor="@color/colorPrimary"
-                app:ms_hint="Notification Radius"
-                app:ms_hintColor="@color/colorAccent"
-                app:ms_multiline="false"
-                app:ms_thickness=".5dp" />
-
 
             <Button
                 android:id="@+id/next_button_2"

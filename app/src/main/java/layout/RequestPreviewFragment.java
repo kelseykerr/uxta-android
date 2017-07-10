@@ -28,22 +28,20 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.FullScreenImageActivity;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.User;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.FullScreenImageActivity;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.User;
 
 /**
  * Created by kelseykerr on 5/27/17.
@@ -281,64 +279,26 @@ public class RequestPreviewFragment extends DialogFragment {
     }
 
     private void createOffer() {
-        boolean goodMerchantStatus = user.getCanRespond();
-        if (!AppUtils.canAddPayments(user)) {
-            Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
+        if (user.getCommunityId() != null || !user.getCommunityId().isEmpty()) {
+            dismiss();
+            homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
+        } else {
+            String title;
+            boolean showAction = true;
+            title = "You must join a community before you can post";
+            Snackbar snack = Snackbar.make(view.getRootView(), title,
                     Constants.LONG_SNACK);
-            snack.setAction("update account", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                    FragmentManager fm = ((Activity) context).getFragmentManager();
-                    AccountFragment.updateAccountDialog.show(fm, "dialog");
-                }
-            });
+            if (showAction) {
+                snack.setAction("find my community", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+//                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
+//                        FragmentManager fm = ((Activity) context).getFragmentManager();
+//                        AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                    }
+                });
+            }
             snack.show();
-            createOfferBtn.setEnabled(true);
-        }  else if (!request.isInventoryListing()) {
-            if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-                dismiss();
-                homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
-            } else {
-                String title;
-                boolean showAction = true;
-                title = "Please link your bank account to your profile";
-                Snackbar snack = Snackbar.make(view.getRootView(), title,
-                        Constants.LONG_SNACK);
-                if (showAction) {
-                    snack.setAction("update account", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                            FragmentManager fm = ((Activity) context).getFragmentManager();;
-                            AccountFragment.paymentDialogFragment.show(fm, "dialog");
-                        }
-                    });
-                }
-                snack.show();
-            }
-        } else if (request.isInventoryListing()) {
-            if (user.getStripeCustomerId() != null && user.getCanRequest()) {
-                dismiss();
-                homeFragment.showNewOfferDialog(request.getId(), request.getType().toString());
-            } else {
-                String title;
-                boolean showAction = true;
-                title = "Please add payment info to your profile";
-                Snackbar snack = Snackbar.make(view.getRootView(), title,
-                        Constants.LONG_SNACK);
-                if (showAction) {
-                    snack.setAction("update account", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                            FragmentManager fm = ((Activity) context).getFragmentManager();
-                            AccountFragment.paymentDialogFragment.show(fm, "dialog");
-                        }
-                    });
-                }
-                snack.show();
-            }
         }
 
     }

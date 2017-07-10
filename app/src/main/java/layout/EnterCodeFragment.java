@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import iuxta.nearby.R;
-import iuxta.nearby.ScannerActivity;
+import iuxta.uxta.R;
+import iuxta.uxta.ScannerActivity;
 
 /**
  * Created by kerrk on 9/30/16.

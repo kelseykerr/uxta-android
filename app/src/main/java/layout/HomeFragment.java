@@ -7,8 +7,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -20,48 +18,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import iuxta.nearby.AppUtils;
-import iuxta.nearby.Constants;
-import iuxta.nearby.MainActivity;
-import iuxta.nearby.PrefUtils;
-import iuxta.nearby.R;
-import iuxta.nearby.RequestAdapter;
-import iuxta.nearby.model.Request;
-import iuxta.nearby.model.User;
-import iuxta.nearby.service.RequestNotificationService;
+import iuxta.uxta.AppUtils;
+import iuxta.uxta.Constants;
+import iuxta.uxta.MainActivity;
+import iuxta.uxta.PrefUtils;
+import iuxta.uxta.R;
+import iuxta.uxta.RequestAdapter;
+import iuxta.uxta.model.Request;
+import iuxta.uxta.model.User;
 
 
 /**
@@ -72,41 +50,24 @@ import iuxta.nearby.service.RequestNotificationService;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener,
-        AdapterView.OnItemSelectedListener {
+public class HomeFragment extends Fragment {
 
-    private GoogleMap map;
-    private MapView mapView;
     GoogleApiClient mGoogleApiClient;
-    LocationRequest mLocationRequest;
-    Location mLastLocation;
-    Marker currLocationMarker;
     LatLng latLng;
     FragmentManager fm;
     FragmentTransaction ft;
-    MapFragment mapFragment;
     private Context context;
     public static User user;
     private List<Request> requests = new ArrayList<>();
     private RecyclerView recList;
     private RequestAdapter requestAdapter;
-    private List<Marker> requestMarkers = new ArrayList<>();
-    private TextView noResults; //map
-    private TextView noResultsList;
+    private RelativeLayout noResultsLayout;
     private ScrollView listView;
-    private RelativeLayout requestMapView;
-    private CameraUpdate cu;
-    private Map<Double, String> radiusMap = new HashMap<Double, String>();
     private View view;
-    public static Boolean homeLocation = false;
     public static Double currentRadius = 10.0;
     public static String sortBy = "newest";
     public static Boolean sellingLoaning = true;
     public static Boolean buyingRenting = true;
-    private Location currentLocation;
     public static String searchTerm;
     private static final String TAG = "HomeFragment";
     public static String snackbarMessage = null;
@@ -143,27 +104,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         view = v;
-        mapFragment = (MapFragment) this.getChildFragmentManager()
-                .findFragmentById(R.id.map);
         fm = this.getChildFragmentManager();
         ft = fm.beginTransaction();
-        mapFragment.getMapAsync(this);
         user = PrefUtils.getCurrentUser(context);
         listView = (ScrollView) v.findViewById(R.id.list_view);
-        listView.setVisibility(View.GONE);
-        requestMapView = (RelativeLayout) v.findViewById(R.id.map_view);
-
         recList = (RecyclerView) v.findViewById(R.id.request_list);
         recList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(context);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
 
-        noResults = (TextView) v.findViewById(R.id.no_results);
-        noResults.setVisibility(View.GONE);
-
-        noResultsList = (TextView) v.findViewById(R.id.no_results_list);
-        noResultsList.setVisibility(View.GONE);
+        noResultsLayout = (RelativeLayout) v.findViewById(R.id.no_results_layout);
+        noResultsLayout.setVisibility(View.GONE);
         if (snackbarMessage != null) {
             Snackbar snackbar = Snackbar
                     .make(view, snackbarMessage, Constants.LONG_SNACK);
@@ -180,72 +132,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         getRequests(currentRadius);
     }
 
-    private void setMarkerClick() {
-        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                boolean goodMerchantStatus = user.getCanRespond();
-                if (user.getStripeManagedAccountId() != null && goodMerchantStatus) {
-                    try {
-                        for (Request r : requests) {
-                            if (r.getLatitude().equals(marker.getPosition().latitude) &&
-                                    r.getLongitude().equals(marker.getPosition().longitude) &&
-                                    marker.getTitle().equals(r.getItemName())) {
-                                showRequestPreviewDialog(r);
-                                break;
-                            }
-                        }
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        Log.e(TAG, " marker click - could not find request from marker index [" +
-                                marker.getSnippet() + "]");
-                    }
-                } else {
-                    String title;
-                    boolean showAction = false;
-                    /*if (user.getStripeManagedAccountId() != null &&
-                            user.getMerchantStatus().toString().toLowerCase().equals("pending")) {
-                        title = "Your merchant account is pending, please try again later";
-                    }*/
-                    title = "Please link your bank account to your profile";
-                    Snackbar snack = Snackbar.make(view.getRootView(), title,
-                            Constants.LONG_SNACK);
-                    final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                            snack.getView().getRootView().getLayoutParams();
-                    params.setMargins(params.leftMargin,
-                            params.topMargin,
-                            params.rightMargin,
-                            params.bottomMargin + 150);
-                    if (showAction) {
-                        snack.setAction("update account", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                                AccountFragment.paymentDialogFragment.show(getFragmentManager(), "dialog");
-                            }
-                        });
-                    }
-                    snack.getView().getRootView().setLayoutParams(params);
-                    snack.show();
-                }
-
-            }
-        });
-    }
-
     public void showNewOfferDialog(String requestId, String type) {
-        if (!MainActivity.areLocationServicesOn()) {
-            ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
-            return;
-        }
         DialogFragment newFragment = NewOfferDialogFragment.newInstance(requestId, type);
         newFragment.show(getFragmentManager(), "dialog");
     }
 
     public void showRequestPreviewDialog(Request request) {
-        if (!MainActivity.areLocationServicesOn()) {
-            ((MainActivity) getActivity()).showNoLocationServicesSnack(view);
-            return;
-        }
         DialogFragment newFragment = RequestPreviewFragment.newInstance(request, this);
         newFragment.show(getFragmentManager(), "dialog");
     }
@@ -290,10 +182,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
                 }
                 try {
                     Double r = radius != null ? radius : currentRadius;
-                    String urlString = "/requests?radius=" + r +
-                            "&latitude=" + (homeLocation ? user.getHomeLatitude() : latLng.latitude)
-                            + "&longitude=" + (homeLocation ? user.getHomeLongitude() : latLng.longitude) +
-                            "&includeMine=false&expired=false";
+                    String urlString = "/requests?includeMine=false&expired=false";
                     if (searchTerm != null && !searchTerm.isEmpty()) {
                         urlString += ("&searchTerm=" + searchTerm);
                     }
@@ -327,236 +216,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             protected void onPostExecute(Integer responseCode) {
-                if (!isAdded() || (!homeLocation && latLng == null)) {
+                if (!isAdded()) {
                     return;
                 }
                 //Nearby not in this location yet
                 if (responseCode != null && responseCode == 403) {
-                    if (requestMarkers != null) {
-                        //remove old markers
-                        for (Marker m : requestMarkers) {
-                            m.remove();
-                        }
-                    }
-                    requestMarkers.clear();
-                    noResults.setText("Nearby is not yet available here");
-                    noResults.setVisibility(View.VISIBLE);
                 } else {
                     if (requestAdapter != null) {
                         requestAdapter.swap(requests);
                     }
-                    if (requestMarkers != null) {
-                        //remove old markers
-                        for (Marker m : requestMarkers) {
-                            m.remove();
-                        }
-                    }
-                    requestMarkers.clear();
                     if (requests.size() < 1) {
-                        noResults.setText("no results found");
-                        noResults.setVisibility(View.VISIBLE);
-                        noResultsList.setVisibility(View.VISIBLE);
+                        noResultsLayout.setVisibility(View.VISIBLE);
                     } else {
-                        noResults.setVisibility(View.GONE);
-                        noResultsList.setVisibility(View.GONE);
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        builder.include(currLocationMarker.getPosition());
-                        setMarkerClick();
-                        for (Request request : requests) {
-                            LatLng latLng = new LatLng(request.getLatitude(), request.getLongitude());
-                            MarkerOptions markerOptions = new MarkerOptions();
-                            markerOptions.position(latLng);
-                            markerOptions.title(request.getItemName());
-                            if (request.getDescription() != null && request.getDescription().length() > 0) {
-                                markerOptions.snippet(request.getDescription());
-                            }
-
-                            if (request.getType() != null && (request.getType().equals(Request.Type.loaning) ||
-                                    request.getType().equals(Request.Type.selling))) {
-                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-                            } else {
-                                float[] hsv = new float[3];
-                                Color.colorToHSV(getResources().getColor(R.color.colorPrimary), hsv);
-                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
-                            }
-                            //Color.colorToHSV(-11607316, hsv);
-                            Marker marker = map.addMarker(markerOptions);
-                            requestMarkers.add(marker);
-                            builder.include(marker.getPosition());
-                        }
+                        noResultsLayout.setVisibility(View.GONE);
                     }
-                }
-                if (latLng != null && !homeLocation) {
-                    PrefUtils.setLatLng(latLng);
-                    updateZoom(null, latLng);
-                } else if (homeLocation != null && homeLocation && user.getHomeLongitude() != null
-                        && user.getHomeLatitude() != null) {
-                    LatLng home = new LatLng(user.getHomeLatitude(), user.getHomeLongitude());
-                    updateZoom(null, home);
                 }
             }
         }.execute();
-    }
-
-    private void updateZoom(Marker marker, LatLng latLng) {
-        if (currentRadius == null) {
-            currentRadius = 10.0;
-        }
-        CircleOptions options = new CircleOptions();
-        options.center(marker != null ? marker.getPosition() : latLng);
-        //Radius in meters
-        options.radius(currentRadius * 1609.344);
-        options.strokeWidth(10);
-
-        double radius = options.getRadius();
-        double scale = radius / 500;
-        int zoomLevel = (int) Math.floor((16 - Math.log(scale) / Math.log(2)));
-
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(zoomLevel)
-                .target(marker != null ? marker.getPosition() : latLng).build();
-        cu = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        map.moveCamera(cu);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a radius from the spinner
-        String radiusString = (String) parent.getItemAtPosition(position);
-        for (Map.Entry<Double, String> entry : radiusMap.entrySet()) {
-            Double key = entry.getKey();
-            String value = entry.getValue();
-            if (value.equals(radiusString)) {
-                currentRadius = key;
-                // Get requests within that radius
-                getRequests(key);
-                break;
-            }
-        }
-
-    }
-
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onMapReady(final GoogleMap map) {
-        this.map = map;
-        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                if (cu != null) {
-                    //map.moveCamera(cu);
-                }
-            }
-        });
-        map.getUiSettings().setZoomGesturesEnabled(true);
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        map.getUiSettings().setMapToolbarEnabled(false);
-
-        try {
-            map.setMyLocationEnabled(true);
-            map.getUiSettings().setMyLocationButtonEnabled(true);
-        } catch (SecurityException e) {
-            Log.e("map permission error: ", "unable to get user's current location, " + e.getMessage());
-        }
-        buildGoogleApiClient();
-        mGoogleApiClient.connect();
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "onConnected ***");
-        try {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-        } catch (SecurityException e) {
-            Log.e(TAG, "map error: unable to get user's last location, " + e.getMessage());
-        }
-        if (mLastLocation != null) {
-            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            PrefUtils.setLatLng(latLng);
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Current Position");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            currLocationMarker = map.addMarker(markerOptions);
-            getRequests(currentRadius);
-            if (recList != null) {
-                requestAdapter = new RequestAdapter(requests, this);
-                recList.setAdapter(requestAdapter);
-            }
-        } else {
-            ((MainActivity) getActivity()).goToHome(null);
-        }
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000); //5 seconds
-        mLocationRequest.setFastestInterval(3000); //3 seconds
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-        try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        } catch (SecurityException e) {
-            Log.e(TAG, "unable to request location updates, " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Toast.makeText(context, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(context, "onConnectionFailed", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.i(TAG, "onLocationChanged***");
-        currentLocation = location;
-        if (homeLocation != null && homeLocation) {
-            return;
-        }
-
-        //place marker at current position
-        //mGoogleMap.clear();
-        updateMapFocus(new LatLng(location.getLatitude(), location.getLongitude()));
-
-        //If you only need one location, unregister the listener
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        fm = this.getChildFragmentManager();
-        ft = fm.beginTransaction();
-        getRequests(currentRadius);
-        if (requestAdapter != null) {
-            requestAdapter.swap(requests);
-        }
-    }
-
-    private void updateMapFocus(LatLng ll) {
-        if (currLocationMarker != null) {
-            currLocationMarker.remove();
-        }
-        latLng = new LatLng(ll.latitude, ll.longitude);
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        Log.i("Location", "longitude: " + latLng.longitude + " latitude: " + latLng.latitude);
-        RequestNotificationService.latLng = latLng;
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        currLocationMarker = map.addMarker(markerOptions);
-
-        //zoom to current position:
-        updateZoom(currLocationMarker, null);
     }
 
     @Override
@@ -606,46 +282,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback,
         public void onFragmentInteraction(Uri url, String nextFragment, int fragmentPostProcessingRequest);
     }
 
-    public void toggleView(String v) {
-        if (v.equals("list")) {
-            listView.setVisibility(View.VISIBLE);
-            requestMapView.setVisibility(View.GONE);
-        } else {
-            requestMapView.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
-        }
-    }
-
-    public void displayUpdateAccountSnackbar() {
-        Snackbar snack = Snackbar.make(view.getRootView(), "Please finish filling out your account info",
+    public void displayNoCommunitySnackbar() {
+        Snackbar snack = Snackbar.make(view.getRootView(), "You must join a community to create posts",
                 Constants.LONG_SNACK)
-                .setAction("update account", new View.OnClickListener() {
+                .setAction("find my community", new View.OnClickListener() {
                     @Override
+                    //TODO: change this to community dialog
                     public void onClick(View view) {
                         AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
                         AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
-                    }
-                });
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
-                snack.getView().getRootView().getLayoutParams();
-
-        params.setMargins(params.leftMargin,
-                params.topMargin,
-                params.rightMargin,
-                params.bottomMargin + 150);
-
-        snack.getView().getRootView().setLayoutParams(params);
-        snack.show();
-    }
-
-    public void displayNoNewRequestSnackbar() {
-        Snackbar snack = Snackbar.make(view.getRootView(), "Please add payment information to your account",
-                Snackbar.LENGTH_LONG)
-                .setAction("update account", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-                        AccountFragment.paymentDialogFragment.show(getFragmentManager(), "dialog");
                     }
                 });
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
