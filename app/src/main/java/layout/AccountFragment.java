@@ -205,6 +205,8 @@ public class AccountFragment extends Fragment implements GoogleApiClient.OnConne
             getCommunityBtnText(user.getCommunityId(), false);
         } else if (user.getRequestedCommunityId() != null && !user.getRequestedCommunityId().isEmpty()) {
             getCommunityBtnText(user.getRequestedCommunityId(), true);
+        } else {
+            communityBtnText.setText("find your community");
         }
         final AccountFragment accountFragment = this;
         communityBtn.setOnClickListener(new View.OnClickListener() {

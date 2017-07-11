@@ -285,16 +285,16 @@ public class RequestPreviewFragment extends DialogFragment {
         } else {
             String title;
             boolean showAction = true;
-            title = "You must join a community before you can post";
+            title = "You must join a community";
             Snackbar snack = Snackbar.make(view.getRootView(), title,
                     Constants.LONG_SNACK);
             if (showAction) {
-                snack.setAction("find my community", new View.OnClickListener() {
+                snack.setAction("find community", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-//                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-//                        FragmentManager fm = ((Activity) context).getFragmentManager();
-//                        AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                        AccountFragment.communitySearchFragment = CommunitySearchFragment.newInstance(null);
+                        FragmentManager fm = ((Activity) context).getFragmentManager();
+                        AccountFragment.communitySearchFragment.show(fm, "dialog");
                     }
                 });
             }

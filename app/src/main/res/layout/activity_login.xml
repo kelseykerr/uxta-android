@@ -28,6 +28,15 @@
         android:indeterminateTint="@color/colorAccent"
         android:indeterminateTintMode="src_atop" />
 
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="@color/white"
+        android:layout_below="@id/nearby_logo"
+        android:layout_marginTop="60dp"/>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/facebook_button"

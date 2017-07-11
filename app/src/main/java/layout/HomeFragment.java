@@ -283,14 +283,14 @@ public class HomeFragment extends Fragment {
     }
 
     public void displayNoCommunitySnackbar() {
-        Snackbar snack = Snackbar.make(view.getRootView(), "You must join a community to create posts",
+        Snackbar snack = Snackbar.make(view.getRootView(), "You must join a community",
                 Constants.LONG_SNACK)
-                .setAction("find my community", new View.OnClickListener() {
+                .setAction("find community", new View.OnClickListener() {
                     @Override
                     //TODO: change this to community dialog
                     public void onClick(View view) {
-                        AccountFragment.updateAccountDialog = UpdateAccountDialogFragment.newInstance();
-                        AccountFragment.updateAccountDialog.show(getFragmentManager(), "dialog");
+                        AccountFragment.communitySearchFragment = CommunitySearchFragment.newInstance(null);
+                        AccountFragment.communitySearchFragment.show(getFragmentManager(), "dialog");
                     }
                 });
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)

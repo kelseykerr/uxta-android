@@ -43,7 +43,7 @@ public class Constants {
 
     public static final String FB_AUTH_METHOD = "facebook";
 
-    public static final String GOOGLE_WEB_CLIENT_ID = "491459641376-npvugv8od8v8j0a45asbsmem6r4qelhq.apps.googleusercontent.com";
+    public static final String GOOGLE_WEB_CLIENT_ID = "535627565597-oiafr5v9tdtciuon8n7mkskuaenbseg5.apps.googleusercontent.com";
 
     //alpha (fake money)
     //public static final String STRIPE_PUBLISHABLE_KEY = "pk_test_XXhtxu1S44u1en0gH6ozoB7t";
@@ -51,7 +51,7 @@ public class Constants {
     //prod (real money)
     public static final String STRIPE_PUBLISHABLE_KEY = "pk_live_qgUYywOaOSnKHZvAUSrbaDch";
 
-    public static final Double MINIMUM_OFFER_PRICE = 0.50;
+    public static final Double MINIMUM_OFFER_PRICE = 0.00;
 
     public static final int LONG_SNACK = 6000;
 

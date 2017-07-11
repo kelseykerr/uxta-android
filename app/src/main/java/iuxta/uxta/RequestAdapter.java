@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 
 import layout.AccountFragment;
+import layout.CommunitySearchFragment;
 import layout.HomeFragment;
 import layout.PaymentDialogFragment;
 import layout.RequestPreviewFragment;
@@ -119,16 +120,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         } else {
             String title;
             boolean showAction = true;
-            title = "You must join a community before you can post";
+            title = "You must join a community";
             Snackbar snack = Snackbar.make(view.getRootView(), title,
                     Constants.LONG_SNACK);
             if (showAction) {
-                snack.setAction("update account", new View.OnClickListener() {
+                snack.setAction("find community", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-//                        AccountFragment.paymentDialogFragment = PaymentDialogFragment.newInstance();
-//                        FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
-//                        AccountFragment.paymentDialogFragment.show(fm, "dialog");
+                        AccountFragment.communitySearchFragment = CommunitySearchFragment.newInstance(null);
+                        FragmentManager fm = ((Activity) requestViewHolder.context).getFragmentManager();
+                        AccountFragment.communitySearchFragment.show(fm, "dialog");
                     }
                 });
             }

@@ -25,8 +25,10 @@ import java.net.HttpURLConnection;
 
 import iuxta.uxta.AppUtils;
 import iuxta.uxta.Constants;
+import iuxta.uxta.MainActivity;
 import iuxta.uxta.PrefUtils;
 import iuxta.uxta.R;
+import iuxta.uxta.SharedAsyncMethods;
 import iuxta.uxta.model.Community;
 import iuxta.uxta.model.User;
 
@@ -136,6 +138,8 @@ public class CommunityDetailFragment extends DialogFragment {
                             errorMessage = output;
                             throw new IOException(errorMessage);
 
+                    } else {
+                        SharedAsyncMethods.getUserInfoFromServer(user, context);
                     }
                     return responseCode;
                 } catch (IOException e) {
@@ -147,7 +151,11 @@ public class CommunityDetailFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
-                    accountFragment.requestedAccess(community.getName());
+                    if (accountFragment != null) {
+                        accountFragment.requestedAccess(community.getName());
+                    } else {
+                        ((MainActivity) getActivity()).goToAccount("Your request to join join the community will be reviewed shortly.");
+                    }
                     dismiss();
                 } else {
                     communityName.setVisibility(View.VISIBLE);
@@ -184,6 +192,8 @@ public class CommunityDetailFragment extends DialogFragment {
                         errorMessage = output;
                         throw new IOException(errorMessage);
 
+                    } else {
+                        SharedAsyncMethods.getUserInfoFromServer(user, context);
                     }
                     return responseCode;
                 } catch (IOException e) {
@@ -195,7 +205,11 @@ public class CommunityDetailFragment extends DialogFragment {
             @Override
             protected void onPostExecute(Integer responseCode) {
                 if (responseCode == 200) {
-                    accountFragment.requestedRemoval(community.getName());
+                    if (accountFragment != null) {
+                        accountFragment.requestedRemoval(community.getName());
+                    } else {
+                        ((MainActivity) getActivity()).goToAccount("Your have been removed from the community.");
+                    }
                     dismiss();
                 } else {
                     communityName.setVisibility(View.VISIBLE);
